@@ -1,77 +1,94 @@
 package unknown.oopptt.api;
-import java.awt.Rectangle;
+import unknown.oopptt.physic.CollisionInfo;
+import java.awt.*;
+
 
 public class Ball extends GameEntity {
-    private int speedX;
-    private int speedY;
-    private boolean isSticky = false; // Đang dính vào thanh đỡ
+    public double speed = 400.0;
 
-    private static final int BALL_SIZE = 10;
 
-    public Ball(int x, int y, int speedX, int speedY) {
-        super(x, y, BALL_SIZE, BALL_SIZE);
-        this.speedX = speedX;
-        this.speedY = speedY;
+    // ---------- Tham số & hàm hỗ trợ để tránh thẳng đứng + random ----------
+    private static final double MAX_DEFLECT_DEG = 60.0; // lệch tối đa
+    private static final double MIN_DEFLECT_DEG = 12.0; // lệch tối thiểu để tránh thẳng đứng
+    private static final double JITTER_DEG = 8.0; // ngẫu nhiên thêm/bớt
+
+
+    private static double toRad(double deg) { return deg * Math.PI / 180.0; }
+
+
+    private static double enforceMinDeflect(double angleRad, double minRad) {
+        double s = Math.signum(angleRad);
+        if (s == 0) s = (Math.random() < 0.5 ? -1 : 1);
+        double a = Math.abs(angleRad);
+        if (a < minRad) a = minRad;
+        return s * a;
     }
 
-    @Override
-    public void update() {
-        if (isSticky) {
-            // Khi dính, vị trí bóng sẽ được đồng bộ với Paddle trong GameManager
-            return;
+
+    private static double clamp(double x, double lo, double hi) {
+        return Math.max(lo, Math.min(hi, x));
+    }
+// -----------------------------------------------------------------------
+
+
+    public Ball(String id, double x, double y, double radius) {
+        super(id, "ball", x, y, radius * 2.0, radius * 2.0);
+    }
+
+
+    public double radius() { return w / 2.0; }
+
+
+    @Override public void render(Graphics2D g) {
+        g.setColor(new Color(230, 230, 240));
+        g.fillOval((int)(x), (int)(y), (int)(w), (int)(h));
+    }
+
+
+    @Override public void onCollision(GameEntity other, CollisionInfo info) {
+// Phản xạ gương theo pháp tuyến (cho tường/brick)
+        double dot = vx * info.normalX + vy * info.normalY;
+        vx = vx - 2 * dot * info.normalX;
+        vy = vy - 2 * dot * info.normalY;
+
+
+// Nếu va vào paddle: tính lại góc bật ra để KHÔNG thẳng đứng + có random
+        if ("paddle".equals(other.kind)) {
+            double contactX = info.contactX;
+            double centerPaddle = other.x + other.w / 2.0;
+            double rel = (Double.isNaN(contactX) ? (this.x + this.w/2.0) : contactX) - centerPaddle;
+            rel /= (other.w / 2.0); // [-1, 1]
+            rel = clamp(rel, -1.0, 1.0);
+
+
+// Góc cơ sở theo vị trí tiếp xúc
+            double baseAngle = toRad(MAX_DEFLECT_DEG) * rel;
+
+
+// Jitter ngẫu nhiên
+            double jitter = toRad(JITTER_DEG) * (Math.random() * 2.0 - 1.0);
+
+
+// Tổng góc lệch so với phương thẳng đứng
+            double angle = baseAngle + jitter;
+
+
+// Ép góc tối thiểu để tránh thẳng đứng
+            double minDeflect = toRad(MIN_DEFLECT_DEG);
+            angle = enforceMinDeflect(angle, minDeflect);
+
+
+// Bảo toàn tốc độ, bắn lên trên
+            double speedNow = Math.hypot(vx, vy);
+            if (speedNow < 1e-6) speedNow = this.speed;
+            vx = speedNow * Math.sin(angle);
+            vy = -Math.abs(speedNow * Math.cos(angle));
+
+
+// Nếu vẫn gần thẳng đứng (vx nhỏ), nêm thêm chút lệch nhỏ
+            if (Math.abs(vx) < 20.0) {
+                vx = (Math.random() < 0.5 ? -1 : 1) * 20.0;
+            }
         }
-
-        this.boundingBox.x += this.speedX;
-        this.boundingBox.y += this.speedY;
-
-        // Xử lý va chạm với tường (Cần biết kích thước màn hình)
-        // Logic này thường được đặt trong GameManager, nhưng cơ bản là:
-        // if (getX() <= 0 || getX() + getWidth() >= SCREEN_WIDTH) speedX *= -1;
-        // if (getY() <= 0) speedY *= -1;
     }
-
-    @Override
-    public void draw(Object graphicsContext) {
-        // Vẽ quả bóng
-    }
-
-    /**
-     * Đảo chiều bóng khi va chạm.
-     * @param hitEntity Đối tượng mà bóng va chạm (Paddle, Brick, Wall).
-     */
-    public void reverseDirection(GameEntity hitEntity) {
-        // Logic phức tạp để xác định va chạm ngang/dọc cần được triển khai
-
-        // Đảo chiều Y (Mô phỏng nảy lên/xuống)
-        this.speedY *= -1;
-
-        // Nếu là va chạm với Paddle, nên thêm logic thay đổi speedX
-        // dựa trên vị trí chạm trên Paddle.
-    }
-
-    public void stickToPaddle() {
-        this.isSticky = true;
-        this.speedX = 0;
-        this.speedY = 0;
-    }
-
-    public void launch(int launchSpeedX, int launchSpeedY) {
-        if (isSticky) {
-            this.isSticky = false;
-            this.speedX = launchSpeedX;
-            this.speedY = -Math.abs(launchSpeedY); // Đảm bảo luôn ném lên
-        }
-    }
-
-    // Dùng cho PowerUp Multi-Ball
-    public Ball cloneAndChangeDirection() {
-        return new Ball(this.getX(), this.getY(), -this.speedX, this.speedY);
-    }
-
-    // Getters and Setters cho speedX/Y
-    public int getSpeedX() { return speedX; }
-    public int getSpeedY() { return speedY; }
-    public void setSpeedX(int speedX) { this.speedX = speedX; }
-    public void setSpeedY(int speedY) { this.speedY = speedY; }
-    public boolean isSticky() { return isSticky; }
 }

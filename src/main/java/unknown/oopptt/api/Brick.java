@@ -1,43 +1,35 @@
 package unknown.oopptt.api;
 
-import java.awt.Rectangle;
+import java.awt.*;
+
 
 public class Brick extends GameEntity {
-    protected int hitPoints;
-    protected String powerupType; // Loại PowerUp (ví dụ: "EXPAND", "MULTI_BALL"), null nếu không có
+    public int hp = 1;
+    public int score = 50;
+    public Color color;
 
-    public Brick(int x, int y, int width, int height, int initialHitPoints, String type) {
-        super(x, y, width, height);
-        this.hitPoints = initialHitPoints;
-        this.powerupType = type;
+
+    public Brick(String id, double x, double y, double w, double h, int hp, Color color) {
+        super(id, "brick", x, y, w, h);
+        this.hp = hp;
+        this.color = color;
+        this.score = 40 + hp * 20;
     }
 
-    /**
-     * Xử lý khi gạch bị bóng chạm.
-     * @return Loại PowerUp nếu gạch bị phá, ngược lại trả về null.
-     */
-    public String hit() {
-        if (!isActive()) return null;
 
-        this.hitPoints--;
+    @Override public void render(Graphics2D g) {
+        g.setColor(color);
+        g.fillRect((int)x, (int)y, (int)w, (int)h);
+// viền
+        g.setColor(new Color(0, 0, 0, 60));
+        g.drawRect((int)x, (int)y, (int)w, (int)h);
+    }
 
-        // Cập nhật trạng thái màu sắc/hình ảnh tại đây (ví dụ: đổi màu)
-        // ...
 
-        if (this.hitPoints <= 0) {
-            deactivate(); // Đặt isActive = false
-            return this.powerupType;
+    @Override public void onCollision(GameEntity other, unknown.oopptt.physic.CollisionInfo info) {
+        if ("ball".equals(other.kind)) {
+            hp -= 1;
+            if (hp <= 0) destroy();
         }
-        return null;
-    }
-
-    @Override
-    public void update() {
-        // Gạch thường không di chuyển, nên phương thức này thường để trống
-    }
-
-    @Override
-    public void draw(Object graphicsContext) {
-        // Vẽ gạch, có thể dựa vào hitPoints để hiển thị độ 'hỏng'
     }
 }
