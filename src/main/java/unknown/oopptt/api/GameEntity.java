@@ -1,72 +1,49 @@
 package unknown.oopptt.api;
 
-import javafx.scene.Node;
-import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
+
+import unknown.oopptt.physic.CollisionInfo;
+import unknown.oopptt.physic.AABB;
+import java.awt.Graphics2D;
 
 
-import java.awt.Rectangle;
-import java.io.File;
+public abstract class GameEntity implements IGameEntity {
+    public String id, kind;
+    public double x, y, w, h;
+    public double vx = 0, vy = 0;
+    public boolean isActive = true;
 
-/**
- * Lớp trừu tượng cơ sở (Abstract Base Class) cho tất cả các đối tượng
- * trong game Arkanoid.
- * Nó định nghĩa các thuộc tính cơ bản về vị trí, kích thước và trạng thái.
- */
-public abstract class GameEntity {
 
-    private static String path = new File("src/main/resources/graphic/ball_orange.png").toURI().toString();
-    protected ImageView imageView;
-    double pos_x, pos_y,width,height;
-    private static String superBall = new File("src/main/resources/graphic/Slime2_Attack_with_shadow.png").toURI().toString();
-    private  SpriteAnimation animation;
-    /**
-     * Constructor của GameEntity.
-     * @param x Tọa độ X ban đầu.
-     * @param y Tọa độ Y ban đầu.
-     * @param width Chiều rộng của đối tượng.
-     * @param height Chiều cao của đối tượng.
-     */
-    public GameEntity(double x, double y, double width, double height, String path) {
-        animation = new SpriteAnimation(path, 10 );
-        animation.setDisplaySize(width, height);
-        this.imageView = animation.getView();
-        this.imageView.setTranslateX(x - width/2);
-        this.imageView.setTranslateY(y -  height/2);
-        this.imageView.setFitWidth(width);
-        this.imageView.setFitHeight(height);
-
-        pos_x = x;
-        pos_y = y;
-        this.width = width;
-        this.height = height;
-    }
-
-    public void setAnimation(String newpath) {
-       animation.changeFrames(newpath);
-    }
-
-    public ImageView getImageView() {
-        return imageView;
-    }
-
-    public void updateAnimation(double dt) {
-        animation.update(dt);
+    protected GameEntity(String id, String kind, double x, double y, double w, double h) {
+        this.id = id; this.kind = kind;
+        this.x = x; this.y = y; this.w = w; this.h = h;
     }
 
 
-    public abstract void update();
+    @Override public String id() { return id; }
+    @Override public String kind() { return kind; }
+    @Override public double x() { return x; }
+    @Override public double y() { return y; }
+    @Override public double w() { return w; }
+    @Override public double h() { return h; }
+    @Override public double vx() { return vx; }
+    @Override public double vy() { return vy; }
+    @Override public boolean isActive() { return isActive; }
 
 
-    public abstract void setLocation(double v, double dt);
+    @Override public void update(double dt) {
+        x += vx * dt;
+        y += vy * dt;
+    }
 
-    public double getPos_x() {return pos_x;}
 
-    public double getPos_y() {return pos_y;}
+    @Override public void render(Graphics2D g) { /* mặc định không vẽ */ }
 
-    public double getWidth() {return width;}
 
-    public double getHeight() {return height;}
+    @Override public AABB getAABB() { return new AABB(x, y, w, h); }
+
+
+    @Override public void onCollision(GameEntity other, unknown.oopptt.physic.CollisionInfo info) { /* override khi cần */ }
+
+
+    @Override public void destroy() { isActive = false; }
 }
-
-
