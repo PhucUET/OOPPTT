@@ -1,4 +1,7 @@
 package unknown.oopptt.api;
+
+import javafx.util.Pair;
+
 public class Paddle extends GameEntity {
     private int moveSpeed = 8;
     private boolean isCatchEnabled = false; // PowerUp CATCH/Sticky Ball
@@ -54,6 +57,15 @@ public class Paddle extends GameEntity {
     @Override
     public void draw(Object graphicsContext) {
         // Vẽ thanh đỡ, có thể hiển thị trạng thái Catch (ví dụ: đổi màu)
+    }
+
+    @Override
+    public void setLocation(int v) {
+        this.boundingBox.x = v;
+    }
+
+    public Pair<Integer,Integer> getPosition() {
+        return new Pair<>(this.boundingBox.x - this.boundingBox.width/2, this.boundingBox.y - this.boundingBox.height/2);
     }
 
     public boolean isCatchEnabled() {

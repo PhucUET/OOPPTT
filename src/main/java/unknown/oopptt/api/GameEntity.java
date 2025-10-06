@@ -97,6 +97,8 @@ public abstract class GameEntity {
     public void setLocation(int x, int y) {
         this.boundingBox.setLocation(x, y);
     }
+
+    public abstract void setLocation(int v);
 }
 
 

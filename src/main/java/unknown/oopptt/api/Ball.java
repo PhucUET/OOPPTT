@@ -1,7 +1,7 @@
 package unknown.oopptt.api;
 import java.awt.Rectangle;
 
-public class Ball extends GameEntity {
+public  class Ball extends GameEntity {
     private int speedX;
     private int speedY;
     private boolean isSticky = false; // Đang dính vào thanh đỡ
@@ -35,6 +35,11 @@ public class Ball extends GameEntity {
         // Vẽ quả bóng
     }
 
+    @Override
+    public void setLocation(int v) {
+
+    }
+
     /**
      * Đảo chiều bóng khi va chạm.
      * @param hitEntity Đối tượng mà bóng va chạm (Paddle, Brick, Wall).
@@ -65,7 +70,12 @@ public class Ball extends GameEntity {
 
     // Dùng cho PowerUp Multi-Ball
     public Ball cloneAndChangeDirection() {
-        return new Ball(this.getX(), this.getY(), -this.speedX, this.speedY);
+        return new Ball(this.getX(), this.getY(), -this.speedX, this.speedY) {
+            @Override
+            public void setLocation(int v) {
+
+            }
+        };
     }
 
     // Getters and Setters cho speedX/Y

@@ -1,6 +1,5 @@
 package unknown.oopptt.api;
 
-import java.awt.Rectangle;
 
 public class Brick extends GameEntity {
     protected int hitPoints;
@@ -39,5 +38,10 @@ public class Brick extends GameEntity {
     @Override
     public void draw(Object graphicsContext) {
         // Vẽ gạch, có thể dựa vào hitPoints để hiển thị độ 'hỏng'
+    }
+
+    @Override
+    public void setLocation(int v) {
+
     }
 }
