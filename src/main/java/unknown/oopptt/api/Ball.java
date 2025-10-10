@@ -1,87 +1,81 @@
 package unknown.oopptt.api;
+import javafx.scene.Node;
+import javafx.scene.shape.Circle;
+
 import java.awt.Rectangle;
+import java.io.File;
 
 public  class Ball extends GameEntity {
-    private int speedX;
-    private int speedY;
+    private static String path = new File("src/main/graphic/ball_orange.png").toURI().toString();
+    private double speedX;
+    private double speedY;
+    private double speedXY = 6;
     private boolean isSticky = false; // Đang dính vào thanh đỡ
-
+    private double posinPaddle = 0;
+    private Circle ball = new Circle();
+    private int ball_size = 10;
     private static final int BALL_SIZE = 10;
 
+
+    public int getBall_size() {
+        return ball_size;
+    }
+
+    public Circle getBall() {
+        return ball;
+    }
+
+    /**
+     *
+     * @param x
+     * @param y
+     * @param speedX
+     * @param speedY
+     */
     public Ball(int x, int y, int speedX, int speedY) {
-        super(x, y, BALL_SIZE, BALL_SIZE);
+        super(x, y, BALL_SIZE, BALL_SIZE,path);
         this.speedX = speedX;
         this.speedY = speedY;
+        this.ball.setCenterX(x);
+        this.ball.setCenterY(y);
+        this.ball.setRadius(ball_size);
     }
 
     @Override
     public void update() {
-        if (isSticky) {
-            // Khi dính, vị trí bóng sẽ được đồng bộ với Paddle trong GameManager
-            return;
-        }
-
-        this.boundingBox.x += this.speedX;
-        this.boundingBox.y += this.speedY;
-
-        // Xử lý va chạm với tường (Cần biết kích thước màn hình)
-        // Logic này thường được đặt trong GameManager, nhưng cơ bản là:
-        // if (getX() <= 0 || getX() + getWidth() >= SCREEN_WIDTH) speedX *= -1;
-        // if (getY() <= 0) speedY *= -1;
+        this.pos_x += this.speedX;
+        this.pos_y += this.speedY;
+        ball.setCenterX(ball.getCenterX() + this.speedX);
+        ball.setCenterY(ball.getCenterY() + this.speedY);
+        this.imageView.setTranslateX(this.pos_x - ball_size/2);
+        this.imageView.setTranslateY(this.pos_y - ball_size/2);
     }
-
     @Override
-    public void draw(Object graphicsContext) {
-        // Vẽ quả bóng
+    public void setLocation(double v) {
+        this.pos_x = v;
+        this.imageView.setTranslateX(v - ball_size/2);
     }
 
-    @Override
-    public void setLocation(int v) {
-
+    public void updateSpeedX(double v) {
+        this.speedX = v;
+        this.speedY = Math.signum(this.speedY) * Math.sqrt(this.speedXY * this.speedXY - v * v);
+        System.out.println("speedX: " + this.speedX + " speedY: " + this.speedY);
+    }
+    public void updateSpeedY(double v) {
+        this.speedY = v;
+        this.speedX = Math.signum(this.speedX)*Math.sqrt(this.speedXY * this.speedXY - v * v);
+        System.out.println("speedX: " + this.speedX + " speedY: " + this.speedY);
     }
 
-    /**
-     * Đảo chiều bóng khi va chạm.
-     * @param hitEntity Đối tượng mà bóng va chạm (Paddle, Brick, Wall).
-     */
-    public void reverseDirection(GameEntity hitEntity) {
-        // Logic phức tạp để xác định va chạm ngang/dọc cần được triển khai
+    public double getSpeedX() {return speedX;}
 
-        // Đảo chiều Y (Mô phỏng nảy lên/xuống)
-        this.speedY *= -1;
+    public double getSpeedY() {return speedY;}
 
-        // Nếu là va chạm với Paddle, nên thêm logic thay đổi speedX
-        // dựa trên vị trí chạm trên Paddle.
+    public double getPosinPaddle() {
+        return posinPaddle;
     }
 
-    public void stickToPaddle() {
-        this.isSticky = true;
-        this.speedX = 0;
-        this.speedY = 0;
+    public void setPosinPaddle() {
+        this.posinPaddle = this.posinPaddle + getSpeedX();
     }
-
-    public void launch(int launchSpeedX, int launchSpeedY) {
-        if (isSticky) {
-            this.isSticky = false;
-            this.speedX = launchSpeedX;
-            this.speedY = -Math.abs(launchSpeedY); // Đảm bảo luôn ném lên
-        }
-    }
-
-    // Dùng cho PowerUp Multi-Ball
-    public Ball cloneAndChangeDirection() {
-        return new Ball(this.getX(), this.getY(), -this.speedX, this.speedY) {
-            @Override
-            public void setLocation(int v) {
-
-            }
-        };
-    }
-
-    // Getters and Setters cho speedX/Y
-    public int getSpeedX() { return speedX; }
-    public int getSpeedY() { return speedY; }
-    public void setSpeedX(int speedX) { this.speedX = speedX; }
-    public void setSpeedY(int speedY) { this.speedY = speedY; }
-    public boolean isSticky() { return isSticky; }
 }

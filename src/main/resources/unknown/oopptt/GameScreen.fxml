@@ -15,6 +15,7 @@
             <Pane fx:id="layout_game" prefHeight="650.0" prefWidth="600.0">
                <children>
                    <ImageView fx:id="paddle"  pickOnBounds="true" preserveRatio="true" />
+                   <ImageView fx:id="ball"  pickOnBounds="true" preserveRatio="true" />
                </children>
             </Pane>
          </children>
