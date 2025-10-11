@@ -3,6 +3,7 @@ package unknown.oopptt.controller;
 import javafx.animation.AnimationTimer;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
+import javafx.geometry.Bounds;
 import javafx.geometry.Pos;
 import javafx.scene.Cursor;
 import javafx.scene.image.Image;
@@ -34,7 +35,7 @@ public class GameScreen_controller {
     private boolean inPaddle = true;
     List<Brick> gameBricks = new LinkedList<Brick>();
     @FXML
-    private Pane stack_root;
+    private StackPane stack_root;
     @FXML
     private MediaView mediaView;
     @FXML
@@ -63,7 +64,7 @@ public class GameScreen_controller {
         min_y = y;
         max_x = x + width - 1;
         max_y = y + height - 1;
-        System.out.println(x + " " + y + " " + width + " " + height);
+
     }
 
     public void setBackground(String background) {
@@ -73,8 +74,8 @@ public class GameScreen_controller {
         gameBackground.setFitHeight(650);
 
         Platform.runLater(() -> {
-            gameBackground.setTranslateX(stack_root.getWidth()/2 - gameBackground.getFitWidth()/2);
-            gameBackground.setTranslateY(stack_root.getHeight()/2 - gameBackground.getFitHeight()/2);
+//            gameBackground.setTranslateX(stack_root.getWidth()/2 - gameBackground.getFitWidth()/2);
+//            gameBackground.setTranslateY(stack_root.getHeight()/2 - gameBackground.getFitHeight()/2);
 
             set_layout(gameBackground.getBoundsInParent().getMinX(),gameBackground.getBoundsInParent().getMinY(),
                     gameBackground.getBoundsInParent().getWidth(),gameBackground.getBoundsInParent().getHeight());
@@ -83,10 +84,11 @@ public class GameScreen_controller {
 
     }
 
+
     private void setLayout_game() {
         layout_game.prefWidthProperty().bind(stack_root.widthProperty());
         layout_game.prefHeightProperty().bind(stack_root.heightProperty());
-
+        System.out.println(layout_game.getLayoutX() + " " + layout_game.getLayoutY() + " " + layout_game.getWidth() + " " + layout_game.getHeight());
 
         layout_game.getChildren().add(paddleLogic.getImageView());
         layout_game.getChildren().add(ballLogic.getImageView());
@@ -98,7 +100,7 @@ public class GameScreen_controller {
             layout_game.setOnMouseClicked(event -> {
                 inPaddle = false;
                 ballLogic.updateSpeedY(-1);
-                ballLogic.updateSpeedX(6 * (ballLogic.getPosinPaddle()/ paddleLogic.getWidth() * 2));
+                ballLogic.updateSpeedX(12 * (ballLogic.getPosinPaddle()/ paddleLogic.getWidth()));
                 ballLogic.update();
             });
             layout_game.setOnMouseMoved(event -> {
@@ -119,8 +121,8 @@ public class GameScreen_controller {
     private void upMap() {
         for(int i = 0 ; i < 5 ; i ++) {
             for(int j = 0 ; j < 5 ; j ++) {
-                int x = 600 + i * (70 + 3);
-                int y = 300 + j * (30 + 3);
+                int x = 600 + i * (70);
+                int y = 300 + j * (30);
                 Brick brick = new Brick_yellow(x,y,70,30);
                 gameBricks.add(brick);
                 layout_game.getChildren().add(brick.getImageView());
@@ -150,7 +152,7 @@ public class GameScreen_controller {
         startGameLoop();
     }
     private void checkWall() {
-        if (ballLogic.getPos_x() - ballLogic.getBall_size()/2 <= min_x || ballLogic.getPos_x() + ballLogic.getBall_size()/2 >= max_x) {
+        if (ballLogic.getImageView().getBoundsInParent().getMinX() <= min_x || ballLogic.getImageView().getBoundsInParent().getMaxX() >= max_x) {
             ballLogic.updateSpeedX(-ballLogic.getSpeedX());
         }
         if (ballLogic.getImageView().getBoundsInParent().getMinY() <= min_y ||  ballLogic.getImageView().getBoundsInParent().getMaxY() >= max_y) {
@@ -171,27 +173,75 @@ public class GameScreen_controller {
             ballLogic.setPosinPaddle();
         } else {
             Collision_Paddle();
-            ballLogic.update();
             checkWall();
+            Collision_Brick();
+            ballLogic.update();
+        }
+    }
+    private double getDist(double x, double y) {
+        return Math.hypot(ballLogic.getPos_x() - x, ballLogic.getPos_y() - y);
+    }
+
+    private void Collision_Brick(){
+        for (Brick brick : gameBricks) {
+            if (ballLogic.getImageView().getBoundsInParent().intersects(brick.getImageView().getBoundsInParent())) {
+                Bounds b = ballLogic.getImageView().getBoundsInParent();
+                Bounds r = brick.getImageView().getBoundsInParent();
+
+                double overlapLeft = b.getMaxX() - r.getMinX();
+                double overlapRight = r.getMaxX() - b.getMinX();
+                double overlapTop = b.getMaxY() - r.getMinY();
+                double overlapBottom = r.getMaxY() - b.getMinY();
+
+                double minOverlap = Math.min(Math.min(overlapLeft, overlapRight),
+                        Math.min(overlapTop, overlapBottom));
+
+                if (minOverlap == overlapLeft) {
+                    ballLogic.updateSpeedX(-Math.abs(ballLogic.getSpeedX()));
+                } else if (minOverlap == overlapRight) {
+                    ballLogic.updateSpeedX(Math.abs(ballLogic.getSpeedX()));
+                } else if (minOverlap == overlapTop) {
+                    ballLogic.updateSpeedY(-Math.abs(ballLogic.getSpeedY()));
+                } else if (minOverlap == overlapBottom) {
+                    ballLogic.updateSpeedY(Math.abs(ballLogic.getSpeedY()));
+                }
+
+                if (!brick.hit()) {
+                    layout_game.getChildren().remove(brick.getImageView());
+                    gameBricks.remove(brick);
+                }
+                return;
+            }
         }
     }
 
     private void Collision_Paddle() {
         Platform.runLater(() -> {
+            Bounds ballB = ballLogic.getImageView().getBoundsInParent();
+            Bounds padB  = paddleLogic.getImageView().getBoundsInParent();
+
             if (ballLogic.getImageView().getBoundsInParent().intersects(paddleLogic.getImageView().getBoundsInParent())) {
-                ballLogic.updateSpeedX (12 * (ballLogic.getPos_x() - paddleLogic.getPos_x())/ paddleLogic.getWidth());
-                ballLogic.updateSpeedY(-ballLogic.getSpeedY());
+                if (ballLogic.getSpeedY() > 0) {
+                    double offset = (ballLogic.getPos_x() - paddleLogic.getPos_x()) / (paddleLogic.getWidth() / 2);
+                    offset = Math.max(-1, Math.min(1, offset));
+                    double newSpeedX = offset * 6;
+                    ballLogic.updateSpeedX(newSpeedX);
+                    ballLogic.updateSpeedY(-Math.abs(ballLogic.getSpeedY()));
+
+                }
             }
         });
 
     }
+    private long lastUpdateTime = 0;
+    private final double MAX_SPEED = 1000;
     int cnt = 0;
     private void startGameLoop() {
         AnimationTimer timer = new AnimationTimer() {
             @Override
             public void handle(long now) {
-                game_Ball();
 
+                game_Ball();
             }
         };
         timer.start();
