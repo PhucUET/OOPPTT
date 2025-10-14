@@ -6,19 +6,52 @@ import javafx.scene.image.ImageView;
 import javafx.scene.shape.Rectangle;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
-public abstract class Brick extends GameEntity {
-    private static String background_Brick = new File("src/main/graphic/brick-yellow.png").toURI().toString();
-    protected int hitPoints = 1;
+public class Brick extends GameEntity {
+    private static String brick1 = new File("src/main/resources/graphic/normal brick1.png").toURI().toString();
+    private static String brick1Broken = new File("src/main/resources/graphic/broken brick1.png").toURI().toString();
+    private static String brick2 = new File("src/main/resources/graphic/normal brick2.png").toURI().toString();
+    private static String brick2Broken = new File("src/main/resources/graphic/broken brick2.png").toURI().toString();
+    private static String brick3 = new File("src/main/resources/graphic/normal brick10.png").toURI().toString();
+    private static String brick3Broken = new File("src/main/resources/graphic/broken brick10.png").toURI().toString();
+    private int hitPoints = 1;
     protected String powerupType; // Loại PowerUp (ví dụ: "EXPAND", "MULTI_BALL"), null nếu không có
+    private final static int widthBrick = 32;
+    private final static int heightBrick = 15;
+    private int typeBrick = 0;
+    private final ArrayList<Integer> pointList = new ArrayList<Integer>(Arrays.asList(50, 100, 150, 200));
 
-    public Brick(int x, int y, int width, int height, int initialHitPoints, String type) {
-        super(x, y, width, height, type);
-        this.powerupType = type;
+    private static String Get_type(int t) {
+        String type = "";
+        switch (t) {
+            case 1:
+                type = brick1;
+                break;
+            case 2:
+                type = brick2;
+                break;
+            case 3:
+                type = brick3;
+                break;
+        }
+        return type;
+    }
+
+    public Brick(int x, int y, int t) {
+        super(x, y, widthBrick, heightBrick, Get_type(t));
+        hitPoints = t;
+        typeBrick = t;
+
     }
 
 
     public boolean hit() {
+        if (typeBrick == 1) setImageView(new ImageView( new Image(brick1Broken)));
+        if (typeBrick == 2) setImageView(new ImageView(new Image(brick2Broken)));
+        if (typeBrick == 3) setImageView(new ImageView(new  Image(brick3Broken)));
         hitPoints--;
         if (hitPoints == 0) {
             return false;

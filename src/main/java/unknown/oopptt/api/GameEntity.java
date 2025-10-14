@@ -39,6 +39,13 @@ public abstract class GameEntity {
     public ImageView getImageView() {
         return imageView;
     }
+    public void setImageView(ImageView imageView) {
+        this.imageView = imageView;
+        imageView.setTranslateX(pos_x - width/2);
+        imageView.setTranslateY(pos_y -  height/2);
+        imageView.setFitWidth(width);
+        imageView.setFitHeight(height);
+    }
 
     public abstract void update();
 

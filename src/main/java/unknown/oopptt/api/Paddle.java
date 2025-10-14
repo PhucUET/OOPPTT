@@ -6,7 +6,7 @@ import javafx.util.Pair;
 import java.io.File;
 
 public class Paddle extends GameEntity {
-    private static String path = new File("src/main/graphic/n-paddle0.png").toURI().toString();
+    private static String path = new File("src/main/resources/graphic/n-paddle0.png").toURI().toString();
     private int moveSpeed = 8;
     private boolean isCatchEnabled = false; // PowerUp CATCH/Sticky Ball
     private Rectangle Paddle;
