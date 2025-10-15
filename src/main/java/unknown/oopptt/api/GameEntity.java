@@ -24,7 +24,7 @@ public abstract class GameEntity {
      * @param width Chiều rộng của đối tượng.
      * @param height Chiều cao của đối tượng.
      */
-    public GameEntity(int x, int y, int width, int height, String path) {
+    public GameEntity(double x, double y, double width, double height, String path) {
         imageView = new ImageView(new Image(path));
         imageView.setTranslateX(x - width/2);
         imageView.setTranslateY(y -  height/2);

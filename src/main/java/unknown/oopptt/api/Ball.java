@@ -40,6 +40,11 @@ public  class Ball extends GameEntity {
         this.speedY = speedY;
         this.ball.setRadius(ball_size);
     }
+    public Ball(Ball ball) {
+        super(ball.getPos_x(), ball.getPos_y(), BALL_SIZE, BALL_SIZE,path);
+        this.speedX = ball.getSpeedX();
+        this.speedY = ball.getSpeedY();
+    }
 
     @Override
     public void update() {
@@ -56,6 +61,14 @@ public  class Ball extends GameEntity {
         this.imageView.setTranslateX(v - ball_size/2);
     }
 
+    public void changeBallsize(int newBallsize) {
+        this.ball_size = newBallsize;
+        this.imageView.setTranslateX(this.pos_x - newBallsize/2);
+        this.imageView.setTranslateY(this.pos_y - newBallsize/2);
+        this.imageView.setFitWidth(newBallsize);
+        this.imageView.setFitHeight(newBallsize);
+    }
+
     public void updateSpeedX(double v) {
         this.speedX = v;
         this.speedY = Math.signum(this.speedY) * Math.sqrt(this.speedXY * this.speedXY - v * v);
@@ -65,6 +78,11 @@ public  class Ball extends GameEntity {
         this.speedY = v;
         this.speedX = Math.signum(this.speedX)*Math.sqrt(this.speedXY * this.speedXY - v * v);
         System.out.println("speedX: " + this.speedX + " speedY: " + this.speedY + " speedXY: " + Math.sqrt(this.speedX*this.speedX + this.speedY*this.speedY));
+    }
+
+    public void stopBall() {
+        this.speedX = 0;
+        this.speedY = 0;
     }
 
     public double getSpeedX() {return speedX;}
@@ -77,5 +95,13 @@ public  class Ball extends GameEntity {
 
     public void setPosinPaddle() {
         this.posinPaddle = this.posinPaddle + getSpeedX();
+    }
+
+    public double getSpeedXY() {
+        return speedXY;
+    }
+
+    public void setSpeedXY(double speedXY) {
+        this.speedXY = speedXY;
     }
 }

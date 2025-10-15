@@ -19,6 +19,7 @@ import javafx.util.Duration;
 import unknown.oopptt.api.*;
 
 import java.io.*;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -27,10 +28,14 @@ public class GameScreen_controller {
     private static String background_Game = new File("src/main/resources/graphic/background10.jpg").toURI().toString();
     private static File mapBrick1 = new File("src/main/resources/map/map1.txt");
 
+
+    Powerup p = new Powerup(Powerup.PowerupType.SLOW,720,350,this);
+
     private final static int SCNENE_WIDTH = 1440;
     private final static int SCENE_HEIGHT = 810;
     private boolean inPaddle = true;
     List<Brick> gameBricks = new LinkedList<Brick>();
+    List<Powerup> gamePowerup = new LinkedList<>();
     @FXML
     private StackPane stack_root;
     @FXML
@@ -41,7 +46,8 @@ public class GameScreen_controller {
     private Paddle paddleLogic = new Paddle(720, 700);
 
     @FXML
-    private Ball ballLogic = new Ball(720, 680, 1, 0);
+    private List<Ball> gameBall = new ArrayList<Ball>();
+    //private Ball ballLogic = new Ball(720, 680, 1, 0);
 
 
     private double min_x;
@@ -55,6 +61,8 @@ public class GameScreen_controller {
     AnchorPane gamePane;
     @FXML
     Pane layout_game;
+
+
 
     private void set_layout(double x, double y, double width, double height) {
         min_x = x;
@@ -88,7 +96,10 @@ public class GameScreen_controller {
         System.out.println(layout_game.getLayoutX() + " " + layout_game.getLayoutY() + " " + layout_game.getWidth() + " " + layout_game.getHeight());
 
         layout_game.getChildren().add(paddleLogic.getImageView());
-        layout_game.getChildren().add(ballLogic.getImageView());
+        for (Ball ballLogic : gameBall) {
+            layout_game.getChildren().add(ballLogic.getImageView());
+        }
+
     }
 
     private void setOnMouse_Paddle() {
@@ -97,9 +108,12 @@ public class GameScreen_controller {
             layout_game.setOnMouseClicked(event -> {
                 if (inPaddle) {
                     inPaddle = false;
-                    ballLogic.updateSpeedY(-1);
-                    ballLogic.updateSpeedX(10 * (ballLogic.getPosinPaddle() / paddleLogic.getWidth()));
-                    ballLogic.update();
+                    for(Ball ballLogic: gameBall ) {
+                        ballLogic.updateSpeedY(-1);
+                        ballLogic.updateSpeedX(10 * (ballLogic.getPosinPaddle() / paddleLogic.getWidth()));
+                        ballLogic.update();
+                    }
+
                 }
             });
             layout_game.setOnMouseMoved(event -> {
@@ -155,109 +169,136 @@ public class GameScreen_controller {
         gamePane.prefHeightProperty().bind(stack_root.heightProperty());
 
         // Set background
-
+        Ball ballLogic = new Ball(720, 680, 1, 0);
+        gameBall.add(ballLogic);
         setBackground("huhu");
             setBackground_Video();
         setLayout_game();
+
 
         upMap();
 
         // Set paddle
         setOnMouse_Paddle();
+
+        layout_game.getChildren().add(p.getImageView());
+        gamePowerup.add(p);
+
         startGameLoop();
     }
 
     private void checkWall() {
-        if (ballLogic.getImageView().getBoundsInParent().getMinX() <= min_x || ballLogic.getImageView().getBoundsInParent().getMaxX() >= max_x) {
-            ballLogic.updateSpeedX(-ballLogic.getSpeedX());
+        for (Ball ballLogic: gameBall) {
+            if (ballLogic.getImageView().getBoundsInParent().getMinX() <= min_x || ballLogic.getImageView().getBoundsInParent().getMaxX() >= max_x) {
+                ballLogic.updateSpeedX(-ballLogic.getSpeedX());
+            }
+            if (ballLogic.getImageView().getBoundsInParent().getMinY() <= min_y || ballLogic.getImageView().getBoundsInParent().getMaxY() >= max_y) {
+                ballLogic.updateSpeedY(-ballLogic.getSpeedY());
+            }
         }
-        if (ballLogic.getImageView().getBoundsInParent().getMinY() <= min_y || ballLogic.getImageView().getBoundsInParent().getMaxY() >= max_y) {
-            ballLogic.updateSpeedY(-ballLogic.getSpeedY());
-        }
+
     }
 
     private void game_Ball() {
-        if (inPaddle) {
-            double new_X = paddleLogic.getPos_x() + ballLogic.getPosinPaddle();
-            if (new_X < paddleLogic.getImageView().getBoundsInParent().getMinX()) {
-                ballLogic.updateSpeedX(-ballLogic.getSpeedX());
+        for (Ball ballLogic: gameBall) {
+            if (inPaddle) {
+                double new_X = paddleLogic.getPos_x() + ballLogic.getPosinPaddle();
+                if (new_X < paddleLogic.getImageView().getBoundsInParent().getMinX()) {
+                    ballLogic.updateSpeedX(-ballLogic.getSpeedX());
+                }
+                if (new_X > paddleLogic.getImageView().getBoundsInParent().getMaxX()) {
+                    ballLogic.updateSpeedX(-ballLogic.getSpeedX());
+                }
+                ballLogic.setLocation(new_X);
+                ballLogic.setPosinPaddle();
+            } else {
+                Collision_Paddle();
+                checkWall();
+                Collision_Brick();
+                ballLogic.update();
             }
-            if (new_X > paddleLogic.getImageView().getBoundsInParent().getMaxX()) {
-                ballLogic.updateSpeedX(-ballLogic.getSpeedX());
-            }
-            ballLogic.setLocation(new_X);
-            ballLogic.setPosinPaddle();
-        } else {
-            Collision_Paddle();
-            checkWall();
-            Collision_Brick();
-            ballLogic.update();
         }
+
     }
 
-    private double getDist(double x, double y) {
-        return Math.hypot(ballLogic.getPos_x() - x, ballLogic.getPos_y() - y);
+    private void Collision_Powerup() {
+        for (Powerup powerup : gamePowerup) {
+            if (powerup.getPos_y() > paddleLogic.getImageView().getBoundsInParent().getMaxY() + 20) {
+                layout_game.getChildren().remove(powerup.getImageView());
+                gamePowerup.remove(powerup);
+            }
+            if (paddleLogic.getImageView().getBoundsInParent().intersects(powerup.getImageView().getBoundsInParent())) {
+                powerup.WhenCollison();
+                layout_game.getChildren().remove(powerup.getImageView());
+                gamePowerup.remove(powerup);
+                return;
+            }
+        }
     }
 
     private void Collision_Brick() {
         for (Brick brick : gameBricks) {
-            if (ballLogic.getImageView().getBoundsInParent().intersects(brick.getImageView().getBoundsInParent())) {
-                Bounds b = ballLogic.getImageView().getBoundsInParent();
-                Bounds r = brick.getImageView().getBoundsInParent();
+            for (Ball ballLogic: gameBall) {
+                if (ballLogic.getImageView().getBoundsInParent().intersects(brick.getImageView().getBoundsInParent())) {
+                    Bounds b = ballLogic.getImageView().getBoundsInParent();
+                    Bounds r = brick.getImageView().getBoundsInParent();
 
-                double overlapLeft = b.getMaxX() - r.getMinX();
-                double overlapRight = r.getMaxX() - b.getMinX();
-                double overlapTop = b.getMaxY() - r.getMinY();
-                double overlapBottom = r.getMaxY() - b.getMinY();
+                    double overlapLeft = b.getMaxX() - r.getMinX();
+                    double overlapRight = r.getMaxX() - b.getMinX();
+                    double overlapTop = b.getMaxY() - r.getMinY();
+                    double overlapBottom = r.getMaxY() - b.getMinY();
 
-                double minOverlap = Math.min(Math.min(overlapLeft, overlapRight),
-                        Math.min(overlapTop, overlapBottom));
+                    double minOverlap = Math.min(Math.min(overlapLeft, overlapRight),
+                            Math.min(overlapTop, overlapBottom));
 
-                if (minOverlap == overlapLeft) {
-                    ballLogic.updateSpeedX(-Math.abs(ballLogic.getSpeedX()));
+                    if (minOverlap == overlapLeft) {
+                        ballLogic.updateSpeedX(-Math.abs(ballLogic.getSpeedX()));
+                    }
+                    if (minOverlap == overlapRight) {
+                        ballLogic.updateSpeedX(Math.abs(ballLogic.getSpeedX()));
+                    }
+                    if (minOverlap == overlapTop) {
+                        ballLogic.updateSpeedY(-Math.abs(ballLogic.getSpeedY()));
+                    }
+                    if (minOverlap == overlapBottom) {
+                        ballLogic.updateSpeedY(Math.abs(ballLogic.getSpeedY()));
+                    }
+                    layout_game.getChildren().remove(brick.getImageView());
+                    if (!brick.hit()) {
+                        gameBricks.remove(brick);
+                    } else {
+                        layout_game.getChildren().add(brick.getImageView());
+                    }
+                    return;
                 }
-                if (minOverlap == overlapRight) {
-                    ballLogic.updateSpeedX(Math.abs(ballLogic.getSpeedX()));
-                }
-                if (minOverlap == overlapTop) {
-                    ballLogic.updateSpeedY(-Math.abs(ballLogic.getSpeedY()));
-                }
-                if (minOverlap == overlapBottom) {
-                    ballLogic.updateSpeedY(Math.abs(ballLogic.getSpeedY()));
-                }
-                layout_game.getChildren().remove(brick.getImageView());
-                if (!brick.hit()) {
-                    gameBricks.remove(brick);
-                } else {
-                    layout_game.getChildren().add(brick.getImageView());
-                }
-                return;
             }
         }
     }
 
     private void Collision_Paddle() {
         Platform.runLater(() -> {
-            Bounds ballB = ballLogic.getImageView().getBoundsInParent();
-            Bounds padB = paddleLogic.getImageView().getBoundsInParent();
+            for (Ball ballLogic: gameBall) {
+                Bounds ballB = ballLogic.getImageView().getBoundsInParent();
+                Bounds padB = paddleLogic.getImageView().getBoundsInParent();
 
-            if (ballLogic.getImageView().getBoundsInParent().intersects(paddleLogic.getImageView().getBoundsInParent())) {
-                if (ballLogic.getSpeedY() > 0) {
-                    double offset = (ballLogic.getPos_x() - paddleLogic.getPos_x()) / (paddleLogic.getWidth() / 2);
-                    offset = Math.max(-1, Math.min(1, offset));
-                    double newSpeedX = offset * 5;
-                    ballLogic.updateSpeedX(newSpeedX);
-                    ballLogic.updateSpeedY(-Math.abs(ballLogic.getSpeedY()));
-
+                if (ballLogic.getImageView().getBoundsInParent().intersects(paddleLogic.getImageView().getBoundsInParent())) {
+                    if (ballLogic.getSpeedY() > 0) {
+                        if (inPaddle) {
+                            ballLogic.stopBall();
+                        } else {
+                            double offset = (ballLogic.getPos_x() - paddleLogic.getPos_x()) / (paddleLogic.getWidth() / 2);
+                            offset = Math.max(-1, Math.min(1, offset));
+                            double newSpeedX = offset * 5;
+                            ballLogic.updateSpeedX(newSpeedX);
+                            ballLogic.updateSpeedY(-Math.abs(ballLogic.getSpeedY()));
+                        }
+                    }
                 }
             }
         });
 
     }
 
-    private long lastUpdateTime = 0;
-    private final double MAX_SPEED = 1000;
-    int cnt = 0;
 
     private void startGameLoop() {
         AnimationTimer timer = new AnimationTimer() {
@@ -265,29 +306,51 @@ public class GameScreen_controller {
             public void handle(long now) {
 
                 game_Ball();
+                p.movedown();
+                Collision_Powerup();
             }
         };
         timer.start();
     }
 
+//    private void chain(MediaPlayer a, MediaPlayer b, MediaView view) {
+//        a.setOnReady(() -> {
+//            Duration d = a.getMedia().getDuration();
+//            if (!Duration.UNKNOWN.equals(d) && d.greaterThan(Duration.ZERO)) {
+//                Duration stop = d.subtract(Duration.millis(100));
+//                if (stop.greaterThan(Duration.ZERO)) {
+//                    a.setStopTime(stop);
+//                }
+//            }
+//        });
+//
+//        a.setOnEndOfMedia(() -> {
+//            a.stop();
+//            a.seek(Duration.ZERO);
+//
+//            view.setMediaPlayer(b);
+//            b.seek(Duration.ZERO);
+//            b.play();
+//        });
+//    }
+
     private void chain(MediaPlayer a, MediaPlayer b, MediaView view) {
         a.setOnReady(() -> {
-            Duration d = a.getMedia().getDuration();
-            if (!Duration.UNKNOWN.equals(d) && d.greaterThan(Duration.ZERO)) {
-                Duration stop = d.subtract(Duration.millis(100));
-                if (stop.greaterThan(Duration.ZERO)) {
-                    a.setStopTime(stop);
+            Duration total = a.getMedia().getDuration();
+            a.currentTimeProperty().addListener((obs, oldTime, newTime) -> {
+                if (total.greaterThan(Duration.ZERO)
+                        && newTime.greaterThan(total.subtract(Duration.millis(200)))) {
+                    if (b.getStatus() != MediaPlayer.Status.PLAYING) {
+                        Platform.runLater(() -> {
+                            view.setMediaPlayer(b);
+                            b.seek(Duration.ZERO);
+                            b.play();
+                            a.stop();
+                            a.seek(Duration.ZERO);
+                        });
+                    }
                 }
-            }
-        });
-
-        a.setOnEndOfMedia(() -> {
-            a.stop();
-            a.seek(Duration.ZERO);
-
-            view.setMediaPlayer(b);
-            b.seek(Duration.ZERO);
-            b.play();
+            });
         });
     }
 
@@ -300,5 +363,77 @@ public class GameScreen_controller {
         mediaPlayer.play();
     }
 
+    public  void upBall() {
+        for (Ball ballLogic: gameBall) {
+            layout_game.getChildren().remove(ballLogic.getImageView());
+            ballLogic.changeBallsize(20);
+            layout_game.getChildren().add(ballLogic.getImageView());
+        }
+
+    }
+
+
+    public void upPaddle() {
+        layout_game.getChildren().remove(paddleLogic.getImageView());
+        paddleLogic.changeSize(paddleLogic.getWidth() * 2);
+        layout_game.getChildren().add(paddleLogic.getImageView());
+    }
+
+
+    public void sheild() {
+        Brick sheildBrick = new Brick(720,
+                paddleLogic.getImageView().getBoundsInParent().getMaxY() + 2,
+                gameBackground.getBoundsInParent().getWidth(),
+                1,1);
+        gameBricks.add(sheildBrick);
+        layout_game.getChildren().add(sheildBrick.getImageView());
+    }
+
+    public void moreBall() {
+        for (Ball ballLogic: gameBall) {
+            Ball new_Ball = new Ball(ballLogic);
+            new_Ball.updateSpeedX(-ballLogic.getSpeedX());
+            Ball new_Ball1 = new Ball(ballLogic);
+            new_Ball1.updateSpeedY(-ballLogic.getSpeedY());
+            gameBall.add(new_Ball);
+            gameBall.add(new_Ball1);
+            layout_game.getChildren().add(new_Ball.getImageView());
+            layout_game.getChildren().add(new_Ball1.getImageView());
+            return;
+        }
+    }
+
+    public void slowBall() {
+        for (Ball ballLogic: gameBall) {
+            ballLogic.setSpeedXY(ballLogic.getSpeedXY() * 0.8);
+        }
+    }
+
+    public void resetSlowBall() {
+        for (Ball ballLogic: gameBall) {
+            ballLogic.setSpeedXY(ballLogic.getSpeedXY()/0.8);
+        }
+    }
+
+    public void catchBall() {
+        inPaddle = !inPaddle;
+    }
+
+    public void gun() {
+    }
+
+    public void resetBall() {
+        for (Ball ballLogic: gameBall) {
+            layout_game.getChildren().remove(ballLogic.getImageView());
+            ballLogic.changeBallsize(10);
+            layout_game.getChildren().add(ballLogic.getImageView());
+        }
+    }
+
+    public void resetpaddle() {
+        layout_game.getChildren().remove(paddleLogic.getImageView());
+        paddleLogic.changeSize(paddleLogic.getWidth() / 2);
+        layout_game.getChildren().add(paddleLogic.getImageView());
+    }
 
 }

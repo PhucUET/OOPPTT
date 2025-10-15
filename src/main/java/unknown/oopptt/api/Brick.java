@@ -40,11 +40,16 @@ public class Brick extends GameEntity {
         return type;
     }
 
-    public Brick(int x, int y, int t) {
+    public Brick(double x, double y, int t) {
         super(x, y, widthBrick, heightBrick, Get_type(t));
         hitPoints = t;
         typeBrick = t;
+    }
 
+    public Brick(double x, double y, double width, double height , int t) {
+        super(x, y, width, height, Get_type(t));
+        hitPoints = t;
+        typeBrick = t;
     }
 
 

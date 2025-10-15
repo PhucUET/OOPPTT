@@ -36,15 +36,18 @@ public class Paddle extends GameEntity {
         }
     }
 
-    public Rectangle getPaddle() {
-        return Paddle;
-    }
     // --- Phương thức Power-Up ---
 
 
     @Override
     public void update() {
-        // Cập nhật logic phụ (ví dụ: hết thời gian PowerUp)
+
+    }
+
+    public void changeSize(double newSize) {
+        this.width = newSize;
+        imageView.setTranslateX(pos_x - width/2);
+        imageView.setFitWidth(width);
     }
 
 
