@@ -1,5 +1,7 @@
 package unknown.oopptt.api;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.PriorityQueue;
 import java.util.Collections;
 
@@ -26,5 +28,12 @@ public class Data extends Manage{
     @Override
     public void reset() {
         this.scoreQueue.clear();
+        System.out.println("🔁 Data reset: cleared all stored scores");
+    }
+
+    public List<Integer> getTopScores(int n) {
+        List<Integer> topScores = new ArrayList<>(scoreQueue);
+        Collections.sort(topScores, Collections.reverseOrder());
+        return topScores.subList(0, Math.min(n, topScores.size()));
     }
 }

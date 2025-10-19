@@ -31,7 +31,7 @@ public class NowPlay extends Manage{
     }
 
     public void reduceScore(int points) {
-        this.score -= points;
+        this.score = Math.max(0, this.score - points);
     }
 
     public void reduceLives() {
@@ -52,5 +52,9 @@ public class NowPlay extends Manage{
     public void reset() {
         this.score = 0;
         this.lives = 3;
+    }
+
+    public void displayStatus() {
+        System.out.println("Score: " + score + " | Lives: " + lives);
     }
 }
