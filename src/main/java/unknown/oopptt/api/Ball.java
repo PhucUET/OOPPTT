@@ -1,6 +1,26 @@
 package unknown.oopptt.api;
+<<<<<<< Updated upstream
 import unknown.oopptt.physic.CollisionInfo;
 import java.awt.*;
+=======
+import javafx.scene.Node;
+import javafx.scene.shape.Circle;
+import unknown.oopptt.controller.GameScreen_controller;
+
+import java.awt.Rectangle;
+import java.io.File;
+
+public  class Ball extends GameEntity {
+    private static String path = new File("src/main/resources/graphic/ball_orange.png").toURI().toString();
+    private double speedX;
+    private double speedY;
+    private double speedXY = 7;
+    private boolean isSticky = false; // Đang dính vào thanh đỡ
+    private double posinPaddle = 0;
+    private Circle ball = new Circle();
+    private int ball_size = 10;
+    private static final int BALL_SIZE = 10;
+>>>>>>> Stashed changes
 
 
 public class Ball extends GameEntity {
@@ -51,6 +71,19 @@ public class Ball extends GameEntity {
         vx = vx - 2 * dot * info.normalX;
         vy = vy - 2 * dot * info.normalY;
 
+<<<<<<< Updated upstream
+=======
+    public void updateSpeedX(double v) {
+        this.speedX = v;
+        this.speedY = Math.signum(this.speedY) * Math.sqrt(this.speedXY * this.speedXY - v * v);
+        //System.out.println("speedX: " + this.speedX + " speedY: " + this.speedY + " speedXY: " + Math.sqrt(this.speedX*this.speedX + this.speedY*this.speedY));
+    }
+    public void updateSpeedY(double v) {
+        this.speedY = v;
+        this.speedX = Math.signum(this.speedX)*Math.sqrt(this.speedXY * this.speedXY - v * v);
+        //System.out.println("speedX: " + this.speedX + " speedY: " + this.speedY + " speedXY: " + Math.sqrt(this.speedX*this.speedX + this.speedY*this.speedY));
+    }
+>>>>>>> Stashed changes
 
 // Nếu va vào paddle: tính lại góc bật ra để KHÔNG thẳng đứng + có random
         if ("paddle".equals(other.kind)) {
@@ -91,4 +124,5 @@ public class Ball extends GameEntity {
             }
         }
     }
+
 }
