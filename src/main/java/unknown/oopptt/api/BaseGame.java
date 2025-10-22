@@ -26,8 +26,8 @@ public class BaseGame {
 
         double wallXl = gameBackground.getBoundsInParent().getMinX() + 2;
         double wallXr = gameBackground.getBoundsInParent().getMaxX() - 2;
-        double wallYl = gameBackground.getBoundsInParent().getMinY();
-        double wallYr = gameBackground.getBoundsInParent().getMaxY();
+        double wallYl = gameBackground.getBoundsInParent().getMinY() + 2;
+        double wallYr = gameBackground.getBoundsInParent().getMaxY() - 2;
 
 
         if (ballXl <= wallXl && speedX <= 0) {
@@ -36,7 +36,10 @@ public class BaseGame {
         if (ballXr >= wallXr && speedX >= 0) {
             balllogic.updateSpeedX(-balllogic.getSpeedX());
         }
-        if (ballYl<= wallYl || ballYr >= wallYr) {
+        if (ballYl<= wallYl && speedY <= 0) {
+            balllogic.updateSpeedY(-balllogic.getSpeedY());
+        }
+        if (ballYr>= wallYr && speedY >= 0) {
             balllogic.updateSpeedY(-balllogic.getSpeedY());
         }
     }
@@ -66,8 +69,9 @@ public class BaseGame {
             dirX = dirX / len;
             dirY = dirY / len;
 
-            balllogic.updateSpeedX(balllogic.getSpeedXY() * dirX);
-            balllogic.updateSpeedY(balllogic.getSpeedXY() * dirY);
+            balllogic.updateSpeedX(dirX);
+            balllogic.updateSpeedY(dirY);
+            System.out.println(dirX + " " + dirY);
         }
 
     }
@@ -125,5 +129,18 @@ public class BaseGame {
 
     boolean shouldDrop(double p) {
         return ThreadLocalRandom.current().nextDouble() < p; // p ∈ [0..1]
+    }
+
+    public boolean outBall(Ball ballLogic, ImageView gameBackground) {
+        if (ballLogic.getImageView().getBoundsInParent().getMaxY() >= gameBackground.getBoundsInParent().getMaxY()) {
+            return true;
+        }
+        return false;
+    }
+    public boolean outPowerup(Powerup p, ImageView gameBackground) {
+        if (p.getImageView().getBoundsInParent().getMaxY() >= gameBackground.getBoundsInParent().getMaxY()) {
+            return true;
+        }
+        return false;
     }
 }

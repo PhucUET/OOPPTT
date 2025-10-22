@@ -48,7 +48,7 @@ public class Powerup  {
     }
 
     public Powerup(double pos_x, double pos_y ) {
-        this.type =  PowerupType.CATCHBALL;
+        this.type = randomUniform();
         this.pos_x = pos_x;
         this.pos_y = pos_y;
         switch (type) {
@@ -122,7 +122,7 @@ public class Powerup  {
                 runTimeEffect(type.getDuration(),  controller::catchBall, controller::catchBall);
                 break;
             case PowerupType.GUN:
-                //runTimeEffect(type.getDuration(), controller::gun, controller:: resetGun);
+                runTimeEffect(type.getDuration(),  controller::enableGun, controller::unEnableGun);
                 break;
 
         }

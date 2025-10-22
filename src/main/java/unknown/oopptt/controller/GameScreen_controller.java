@@ -23,6 +23,7 @@ import java.io.*;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.spi.AbstractResourceBundleProvider;
 
 public class GameScreen_controller {
     private static String background_Video = new File("src/main/resources/graphic/video1.mp4").toURI().toString();
@@ -37,6 +38,7 @@ public class GameScreen_controller {
     List<Brick> gameBricks = new LinkedList<Brick>();
     List<Powerup> gamePowerup = new LinkedList<>();
     Sheild sheild = new Sheild();
+    Shooter shooter;
 
     BaseGame baseGame = new BaseGame(this);
 
@@ -78,6 +80,7 @@ public class GameScreen_controller {
             gameBall.add(first_ball);
             layout_game.getChildren().add(first_ball.getImageView());
             powerBall = new PowerBall(gameBall);
+            shooter = new Shooter(200, 2, 1,3,layout_game, paddleLogic.getImageView(),20);
 
             upMap();
         });
@@ -215,8 +218,12 @@ public class GameScreen_controller {
      * Bóng di chuyển
      */
 
-    private void gameBall() {
-        for (Ball ballLogic: gameBall) {
+    private void gameBall(double dt) {
+        if  (gameBall.size() == 0) {
+            return;
+        }
+        for (int i = gameBall.size() - 1; i >= 0; i--) {
+            Ball ballLogic = gameBall.get(i);
             if (ballLogic.isSticky()) {
                 double newX = paddleLogic.getPos_x() + ballLogic.getPosinPaddle();
                 if (newX > paddleLogic.getImageView().getBoundsInParent().getMaxX() ||
@@ -228,11 +235,16 @@ public class GameScreen_controller {
                 ballLogic.setLocation(newX);
                 ballLogic.setPosinPaddle();
             } else {
+                if (baseGame.outBall(ballLogic, gameBackground)) {
+                    gameBall.remove(i);
+                    layout_game.getChildren().remove(ballLogic.getImageView());
+                    continue;
+                }
                 baseGame.brickCollision(ballLogic,gameBricks,layout_game, gamePowerup);
                 baseGame.paddleballCollision(ballLogic, paddleLogic, isCatch);
                 baseGame.wallCollision(ballLogic,gameBackground);
-                System.out.println(ballLogic.getSpeedX() + " " + ballLogic.getSpeedY());
-                ballLogic.update();
+                System.out.println("ngusi" + ballLogic.getSpeedX() + " " + ballLogic.getSpeedY());
+                ballLogic.updatePos(dt);
             }
         }
     }
@@ -244,6 +256,11 @@ public class GameScreen_controller {
                 gamePowerup.remove(powerup);
                 layout_game.getChildren().remove(powerup.getImageView());
             } else {
+                if (baseGame.outPowerup(powerup, gameBackground)) {
+                    gamePowerup.remove(powerup);
+                    layout_game.getChildren().remove(powerup.getImageView());
+                    continue;
+                }
                 powerup.movedown();
             }
 
@@ -253,11 +270,22 @@ public class GameScreen_controller {
 
     private void startgameloop() {
         AnimationTimer timer = new AnimationTimer() {
+            private Long lasts = 0L;
             @Override
             public void handle(long now) {
-                gameBall();
+                if (lasts == 0) {
+                    lasts = now;
+                    return;
+                }
+                if (shooter.getEnabled()) {
+                    shooter.tryFire();
+                }
+                double dt = (now - lasts) / 1e9;
+                System.out.println("frame" + dt);
+                lasts = now;
+                shooter.update(dt,gameBricks);
+                gameBall(dt);
                 setGamePowerup();
-                System.out.println(layout_game.getBoundsInParent().getMinX() + " " + layout_game.getBoundsInParent().getMinY());
             }
         };
         timer.start();
@@ -283,5 +311,13 @@ public class GameScreen_controller {
 
     public void catchBall() {
         isCatch = !isCatch;
+    }
+
+    public void enableGun() {
+        shooter.setEnabled(true);
+    }
+
+    public void unEnableGun() {
+        shooter.setEnabled(false);
     }
 }

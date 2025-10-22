@@ -9,7 +9,7 @@ public  class Ball extends GameEntity {
     private static String path = new File("src/main/resources/graphic/ball_orange.png").toURI().toString();
     private double speedX;
     private double speedY;
-    private double speedXY = 6;
+    private double speedXY = 360;
     private boolean isSticky = true; // Đang dính vào thanh đỡ
     private double posinPaddle = 0;
     private Circle ball = new Circle();
@@ -49,10 +49,17 @@ public  class Ball extends GameEntity {
 
     @Override
     public void update() {
-        this.pos_x += this.speedX;
-        this.pos_y += this.speedY;
-        ball.setCenterX(ball.getCenterX() + this.speedX);
-        ball.setCenterY(ball.getCenterY() + this.speedY);
+
+    }
+
+    public void updatePos(double dt) {
+        double speedx = this.speedX * dt * speedXY;
+        double speedy = this.speedY * dt * speedXY;
+        System.out.println("speedx: " + speedx +  " speedy: " + speedy);
+        this.pos_x += speedx;
+        this.pos_y += speedy;
+        ball.setCenterX(ball.getCenterX() + speedx);
+        ball.setCenterY(ball.getCenterY() + speedy);
         this.imageView.setTranslateX(this.pos_x - ball_size/2);
         this.imageView.setTranslateY(this.pos_y - ball_size/2);
     }
