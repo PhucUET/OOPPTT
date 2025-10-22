@@ -1,24 +1,31 @@
 package unknown.oopptt.api;
 
+import javafx.animation.TranslateTransition;
 import javafx.application.Platform;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.layout.Pane;
 import unknown.oopptt.controller.GameScreen_controller;
 
 import java.io.File;
+import java.util.List;
+import java.util.concurrent.ThreadLocalRandom;
 
 
-public class Powerup {
+public class Powerup  {
+
+
 
     private String upballview = new File("src/main/resources/graphic/ball.png" ).toURI().toString();
 
     private ImageView imageView;
+    private TranslateTransition translateTransition = new TranslateTransition();
     private PowerupType type;
-    private int pos_x;
-    private int pos_y;
-    private int width = 40;
-    private int height = 20;
-    private final GameScreen_controller controller;
+    private double pos_x;
+    private double pos_y;
+    private double width = 40;
+    private double height = 20;
+    private  GameScreen_controller controller;
 
     public enum PowerupType {
         UPBALL(10), UPPADDLE(8), SHEILD(-1), MOREBALL(-1), SLOW(10), CATCHBALL(10), GUN(8);;
@@ -34,13 +41,16 @@ public class Powerup {
         }
 
     }
+    static PowerupType randomUniform() {
+        PowerupType[] vals = PowerupType.values();
+        int i = ThreadLocalRandom.current().nextInt(vals.length);
+        return vals[i];
+    }
 
-    public Powerup(PowerupType type, int pos_x, int pos_y, GameScreen_controller controller) {
-        this.type = type;
+    public Powerup(double pos_x, double pos_y ) {
+        this.type =  PowerupType.CATCHBALL;
         this.pos_x = pos_x;
         this.pos_y = pos_y;
-        this.type = type;
-        this.controller = controller;
         switch (type) {
             case PowerupType.UPBALL:
                 imageView = new ImageView(new Image(upballview));
@@ -89,17 +99,18 @@ public class Powerup {
         }).start();
     }
 
-    public void WhenCollison() {
+    public void WhenCollison(GameScreen_controller controller) {
+        this.controller = controller;
         switch (type) {
             case PowerupType.UPBALL:
                 System.out.println("ditmecuocdoi");
-                runTimeEffect(type.getDuration(), controller::upBall, controller::resetBall);
+                        runTimeEffect(type.getDuration(), controller::upBall, controller::resetBall);
                 break;
             case PowerupType.UPPADDLE:
-                runTimeEffect(type.getDuration(), controller::upPaddle, controller::resetpaddle);
+                runTimeEffect(type.getDuration(), controller::upPaddle, controller::resetPaddle);
                 break;
             case PowerupType.SHEILD:
-                controller.sheild();
+                controller.openSheild();
                 break;
             case  PowerupType.MOREBALL:
                 controller.moreBall();
@@ -108,25 +119,21 @@ public class Powerup {
                 runTimeEffect(type.getDuration(), controller::slowBall, controller::resetSlowBall);
                 break;
             case PowerupType.CATCHBALL:
-                runTimeEffect(type.getDuration(),  controller::catchBall, controller::resetBall);
+                runTimeEffect(type.getDuration(),  controller::catchBall, controller::catchBall);
                 break;
             case PowerupType.GUN:
-                controller.gun();
+                //runTimeEffect(type.getDuration(), controller::gun, controller:: resetGun);
                 break;
 
         }
-        if (type.haveDuration()) {
-            new Thread(()->{
 
-            }).start();
-        }
     }
 
     public void setImageView(ImageView imageView) {
         this.imageView = imageView;
     }
 
-    public int getPos_x() {
+    public double getPos_x() {
         return pos_x;
     }
 
@@ -134,7 +141,7 @@ public class Powerup {
         this.pos_x = pos_x;
     }
 
-    public int getPos_y() {
+    public double getPos_y() {
         return pos_y;
     }
 

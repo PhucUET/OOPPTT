@@ -11,7 +11,7 @@ import java.util.Arrays;
 import java.util.List;
 
 public class Brick extends GameEntity {
-    private static String brick1 = new File("src/main/resources/graphic/normal brick1.png").toURI().toString();
+    private static String brick1 = new File("src/main/resources/graphic/pixil-frame-0 (1).png").toURI().toString();
     private static String brick1Broken = new File("src/main/resources/graphic/broken brick1.png").toURI().toString();
     private static String brick2 = new File("src/main/resources/graphic/normal brick2.png").toURI().toString();
     private static String brick2Broken = new File("src/main/resources/graphic/broken brick2.png").toURI().toString();
@@ -41,22 +41,22 @@ public class Brick extends GameEntity {
     }
 
     public Brick(double x, double y, int t) {
-        super(x, y, widthBrick, heightBrick, Get_type(t));
+        super(x + widthBrick/2, y + heightBrick/2, widthBrick, heightBrick, Get_type(t));
         hitPoints = t;
         typeBrick = t;
     }
 
     public Brick(double x, double y, double width, double height , int t) {
-        super(x, y, width, height, Get_type(t));
+        super(x + width/2, y + height/2 , width, height, Get_type(t));
         hitPoints = t;
         typeBrick = t;
     }
 
 
     public boolean hit() {
-        if (typeBrick == 1) setImageView(new ImageView( new Image(brick1Broken)));
-        if (typeBrick == 2) setImageView(new ImageView(new Image(brick2Broken)));
-        if (typeBrick == 3) setImageView(new ImageView(new  Image(brick3Broken)));
+        if (typeBrick == 1) setImageView(new Image(brick1Broken));
+        if (typeBrick == 2) setImageView(new Image(brick2Broken));
+        if (typeBrick == 3) setImageView(new  Image(brick3Broken));
         hitPoints--;
         if (hitPoints == 0) {
             return false;

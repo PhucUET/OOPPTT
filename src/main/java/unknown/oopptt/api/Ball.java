@@ -10,7 +10,7 @@ public  class Ball extends GameEntity {
     private double speedX;
     private double speedY;
     private double speedXY = 6;
-    private boolean isSticky = false; // Đang dính vào thanh đỡ
+    private boolean isSticky = true; // Đang dính vào thanh đỡ
     private double posinPaddle = 0;
     private Circle ball = new Circle();
     private int ball_size = 10;
@@ -34,7 +34,7 @@ public  class Ball extends GameEntity {
      * @param speedX
      * @param speedY
      */
-    public Ball(int x, int y, int speedX, int speedY) {
+    public Ball(double x, double y, double speedX, double speedY) {
         super(x, y, BALL_SIZE, BALL_SIZE,path);
         this.speedX = speedX;
         this.speedY = speedY;
@@ -44,6 +44,7 @@ public  class Ball extends GameEntity {
         super(ball.getPos_x(), ball.getPos_y(), BALL_SIZE, BALL_SIZE,path);
         this.speedX = ball.getSpeedX();
         this.speedY = ball.getSpeedY();
+        this.isSticky = false;
     }
 
     @Override
@@ -71,18 +72,15 @@ public  class Ball extends GameEntity {
 
     public void updateSpeedX(double v) {
         this.speedX = v;
-        this.speedY = Math.signum(this.speedY) * Math.sqrt(this.speedXY * this.speedXY - v * v);
-        System.out.println("speedX: " + this.speedX + " speedY: " + this.speedY + " speedXY: " + Math.sqrt(this.speedX*this.speedX + this.speedY*this.speedY));
     }
     public void updateSpeedY(double v) {
         this.speedY = v;
-        this.speedX = Math.signum(this.speedX)*Math.sqrt(this.speedXY * this.speedXY - v * v);
-        System.out.println("speedX: " + this.speedX + " speedY: " + this.speedY + " speedXY: " + Math.sqrt(this.speedX*this.speedX + this.speedY*this.speedY));
     }
 
-    public void stopBall() {
-        this.speedX = 0;
+    public void stopBall(double x) {
+        this.speedX = 1;
         this.speedY = 0;
+        this.posinPaddle = x;
     }
 
     public double getSpeedX() {return speedX;}
@@ -103,5 +101,13 @@ public  class Ball extends GameEntity {
 
     public void setSpeedXY(double speedXY) {
         this.speedXY = speedXY;
+    }
+
+    public boolean isSticky() {
+        return isSticky;
+    }
+
+    public void setSticky(boolean sticky) {
+        isSticky = sticky;
     }
 }

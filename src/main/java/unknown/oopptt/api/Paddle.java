@@ -14,7 +14,7 @@ public class Paddle extends GameEntity {
     private static final int DEFAULT_WIDTH = 100;
     private static final int DEFAULT_HEIGHT = 15;
 
-    public Paddle(int x, int y) {
+    public Paddle(double x, double y) {
         super(x, y, DEFAULT_WIDTH, DEFAULT_HEIGHT, path);
         Paddle = new Rectangle(x - DEFAULT_WIDTH, y - DEFAULT_HEIGHT, DEFAULT_WIDTH, DEFAULT_HEIGHT);
     }
@@ -46,8 +46,9 @@ public class Paddle extends GameEntity {
 
     public void changeSize(double newSize) {
         this.width = newSize;
-        imageView.setTranslateX(pos_x - width/2);
         imageView.setFitWidth(width);
+        imageView.setTranslateX(pos_x - width/2);
+
     }
 
 
