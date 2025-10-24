@@ -1,0 +1,30 @@
+<?import javafx.scene.control.SplitPane?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.media.MediaView?>
+
+
+<StackPane fx:id="stack_root" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="unknown.oopptt.controller.BattleScreenController">
+    <children>
+        <MediaView fx:id="video_Background" fitHeight="200.0" fitWidth="200.0" />
+        <SplitPane fx:id="Background" dividerPositions="0.5" prefHeight="160.0" prefWidth="200.0">
+            <items>
+                <AnchorPane fx:id="Player_1" minHeight="0.0" minWidth="0.0" prefHeight="428.0" prefWidth="294.0">
+                    <children>
+                        <ImageView fx:id="ScreenP1" fitHeight="600.0" fitWidth="500.0" layoutX="175" layoutY="200.0" pickOnBounds="true" preserveRatio="false" />
+                        <ImageView fx:id="Data_Sheet_P1" fitHeight="50.0" fitWidth="296.0" layoutY="1.0" pickOnBounds="true" preserveRatio="true" />
+                    </children>
+                </AnchorPane>
+                <AnchorPane fx:id="Player_2" minHeight="0.0" minWidth="0.0" prefHeight="160.0" prefWidth="100.0" centerShape="false">
+                    <children>
+                        <ImageView fx:id="ScreenP2" fitHeight="600.0" fitWidth="500.0" layoutX="175" layoutY="200.0" pickOnBounds="true" preserveRatio="false" />
+                        <ImageView fx:id="Data_Sheet_P2" fitWidth="296.0" pickOnBounds="true" preserveRatio="true" />
+                    </children>
+                </AnchorPane>
+            </items>
+        </SplitPane>
+    </children>
+</StackPane>
+
+

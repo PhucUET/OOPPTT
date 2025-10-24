@@ -4,6 +4,7 @@ package unknown.oopptt.api;
 import javafx.geometry.Bounds;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.Pane;
+import unknown.oopptt.controller.BattleScreenController;
 import unknown.oopptt.controller.GameScreen_controller;
 
 import javax.sound.midi.MidiFileFormat;
@@ -11,7 +12,11 @@ import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class BaseGame {
-    private final GameScreen_controller controller;
+    private GameScreen_controller controller;
+    private BattleScreenController BTcontroller;
+    public BaseGame(BattleScreenController BTcontroller){
+        this.BTcontroller = BTcontroller;
+    }
     public BaseGame(GameScreen_controller controller) {
         this.controller = controller;
     }
@@ -26,8 +31,8 @@ public class BaseGame {
 
         double wallXl = gameBackground.getBoundsInParent().getMinX() + 2;
         double wallXr = gameBackground.getBoundsInParent().getMaxX() - 2;
-        double wallYl = gameBackground.getBoundsInParent().getMinY() + 2;
-        double wallYr = gameBackground.getBoundsInParent().getMaxY() - 2;
+        double wallYl = gameBackground.getBoundsInParent().getMinY();
+        double wallYr = gameBackground.getBoundsInParent().getMaxY();
 
 
         if (ballXl <= wallXl && speedX <= 0) {
@@ -36,10 +41,7 @@ public class BaseGame {
         if (ballXr >= wallXr && speedX >= 0) {
             balllogic.updateSpeedX(-balllogic.getSpeedX());
         }
-        if (ballYl<= wallYl && speedY <= 0) {
-            balllogic.updateSpeedY(-balllogic.getSpeedY());
-        }
-        if (ballYr>= wallYr && speedY >= 0) {
+        if (ballYl<= wallYl || ballYr >= wallYr) {
             balllogic.updateSpeedY(-balllogic.getSpeedY());
         }
     }
@@ -61,6 +63,7 @@ public class BaseGame {
             double maxAngle = 165;
             double deg = (maxAngle - minAngle)*(t + 1)/2 + minAngle;
 
+
             double rad = Math.toRadians(-deg);
             double dirX = - Math.cos(rad);
             double dirY = Math.sin(rad);
@@ -69,15 +72,19 @@ public class BaseGame {
             dirX = dirX / len;
             dirY = dirY / len;
 
-            balllogic.updateSpeedX(dirX);
-            balllogic.updateSpeedY(dirY);
-            System.out.println(dirX + " " + dirY);
+            balllogic.updateSpeedX(balllogic.getSpeedXY() * dirX);
+            balllogic.updateSpeedY(balllogic.getSpeedXY() * dirY);
         }
 
     }
-    public boolean paddlePUCollision(Powerup p, Paddle paddlelogic) {
+    public boolean paddlePUCollision(Powerup p, Paddle paddlelogic,String define) {
         if (p.getImageView().getBoundsInParent().intersects(paddlelogic.getImageView().getBoundsInParent())) {
-            p.WhenCollison(controller);
+            if(define.equals("GS")){
+                p.WhenCollison(controller);
+            }
+            if(define.equals("BTS")){
+                p.WhenCollison(BTcontroller);
+            }
             return true;
         }
         return false;
@@ -130,17 +137,5 @@ public class BaseGame {
     boolean shouldDrop(double p) {
         return ThreadLocalRandom.current().nextDouble() < p; // p ∈ [0..1]
     }
-
-    public boolean outBall(Ball ballLogic, ImageView gameBackground) {
-        if (ballLogic.getImageView().getBoundsInParent().getMaxY() >= gameBackground.getBoundsInParent().getMaxY()) {
-            return true;
-        }
-        return false;
-    }
-    public boolean outPowerup(Powerup p, ImageView gameBackground) {
-        if (p.getImageView().getBoundsInParent().getMaxY() >= gameBackground.getBoundsInParent().getMaxY()) {
-            return true;
-        }
-        return false;
-    }
 }
+
