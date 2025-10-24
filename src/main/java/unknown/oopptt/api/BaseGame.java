@@ -133,6 +133,18 @@ public class BaseGame {
             break;
         }
     }
+    public boolean outBall(Ball ballLogic, ImageView gameBackground) {
+        if (ballLogic.getImageView().getBoundsInParent().getMaxY() >= gameBackground.getBoundsInParent().getMaxY()) {
+            return true;
+        }
+        return false;
+    }
+    public boolean outPowerup(Powerup p, ImageView gameBackground) {
+        if (p.getImageView().getBoundsInParent().getMaxY() >= gameBackground.getBoundsInParent().getMaxY()) {
+            return true;
+        }
+        return false;
+    }
 
     boolean shouldDrop(double p) {
         return ThreadLocalRandom.current().nextDouble() < p; // p ∈ [0..1]

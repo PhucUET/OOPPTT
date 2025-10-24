@@ -252,7 +252,7 @@ public class GameScreen_controller {
     private void setGamePowerup() {
         for (int i = gamePowerup.size() - 1; i >= 0; i--) {
             Powerup powerup = gamePowerup.get(i);
-            if (baseGame.paddlePUCollision(powerup,paddleLogic)) {
+            if (baseGame.paddlePUCollision(powerup,paddleLogic,"GS")) {
                 gamePowerup.remove(powerup);
                 layout_game.getChildren().remove(powerup.getImageView());
             } else {

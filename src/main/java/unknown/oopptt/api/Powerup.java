@@ -5,6 +5,7 @@ import javafx.application.Platform;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.Pane;
+import unknown.oopptt.controller.BattleScreenController;
 import unknown.oopptt.controller.GameScreen_controller;
 
 import java.io.File;
@@ -25,7 +26,8 @@ public class Powerup  {
     private double pos_y;
     private double width = 40;
     private double height = 20;
-    private  GameScreen_controller controller;
+    private GameScreen_controller controller;
+    private BattleScreenController BTcontroller;
 
     public enum PowerupType {
         UPBALL(10), UPPADDLE(8), SHEILD(-1), MOREBALL(-1), SLOW(10), CATCHBALL(10), GUN(8);;
@@ -97,6 +99,35 @@ public class Powerup  {
             } catch (InterruptedException e) {}
             Platform.runLater(endEffect);
         }).start();
+    }
+    public void WhenCollison(BattleScreenController BTcontroller) {
+        this.BTcontroller = BTcontroller;
+        switch (type) {
+            case PowerupType.UPBALL:
+                System.out.println("ditmecuocdoi");
+                runTimeEffect(type.getDuration(), BTcontroller::upBall, BTcontroller::resetBall);
+                break;
+            case PowerupType.UPPADDLE:
+                runTimeEffect(type.getDuration(), BTcontroller::upPaddle, BTcontroller::resetPaddle);
+                break;
+            case PowerupType.SHEILD:
+                BTcontroller.openSheild();
+                break;
+            case  PowerupType.MOREBALL:
+                BTcontroller.moreBall();
+                break;
+            case PowerupType.SLOW:
+                runTimeEffect(type.getDuration(), BTcontroller::slowBall, BTcontroller::resetSlowBall);
+                break;
+            case PowerupType.CATCHBALL:
+                runTimeEffect(type.getDuration(),  BTcontroller::catchBall, BTcontroller::catchBall);
+                break;
+            case PowerupType.GUN:
+                //runTimeEffect(type.getDuration(), controller::gun, controller:: resetGun);
+                break;
+
+        }
+
     }
 
     public void WhenCollison(GameScreen_controller controller) {
