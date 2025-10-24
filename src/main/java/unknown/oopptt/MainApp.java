@@ -17,6 +17,7 @@ public class MainApp extends Application {
 
     @Override
     public void start(Stage primaryStage) throws Exception {
+<<<<<<< Updated upstream
         // Nạp file FXML và Controller
         FXMLLoader loader = new FXMLLoader(getClass().getResource("/unknown/oopptt/GameScreen.fxml"));
         Parent root = loader.load();
@@ -26,6 +27,12 @@ public class MainApp extends Application {
 
         // Cấu hình cửa sổ game
         primaryStage.setTitle("Arkanoid Multiplayer - Doppelherz Edition");
+=======
+
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("/unknown/oopptt/BattleScreen.fxml"));
+        Parent root = loader.load();
+        primaryStage.setTitle("Holaaaaaaaa");
+>>>>>>> Stashed changes
         primaryStage.setFullScreen(true);
 
         Scene scene = new Scene(root);
@@ -39,4 +46,5 @@ public class MainApp extends Application {
             }
         });
     }
+
 }

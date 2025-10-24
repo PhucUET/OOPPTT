@@ -5,6 +5,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
+<<<<<<< Updated upstream
 import unknown.oopptt.controller.GameScreen_controller;
 
 /**
@@ -20,12 +21,18 @@ public class MA extends Application {
 
     private GameScreen_controller controller;
 
+=======
+
+public class MA extends Application {
+
+>>>>>>> Stashed changes
     public static void main(String[] args) {
         launch(args);
     }
 
     @Override
     public void start(Stage primaryStage) throws Exception {
+<<<<<<< Updated upstream
         // Nạp file FXML và Controller
         FXMLLoader loader = new FXMLLoader(getClass().getResource("/unknown/oopptt/GameScreen.fxml"));
         Parent root = loader.load();
@@ -45,5 +52,16 @@ public class MA extends Application {
                 controller.onClose();
             }
         });
+=======
+
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("/unknown/oopptt/GameScreen.fxml"));
+        Parent root = loader.load();
+        primaryStage.setTitle("Hola");
+        primaryStage.setFullScreen(true);
+        Scene scene = new Scene(root);
+        primaryStage.setScene(scene);
+
+        primaryStage.show();
+>>>>>>> Stashed changes
     }
 }
