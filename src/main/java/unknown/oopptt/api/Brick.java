@@ -19,8 +19,8 @@ public class Brick extends GameEntity {
     private static String brick3Broken = new File("src/main/resources/graphic/broken brick10.png").toURI().toString();
     private int hitPoints = 1;
     protected String powerupType; // Loại PowerUp (ví dụ: "EXPAND", "MULTI_BALL"), null nếu không có
-    private final static int widthBrick = 32;
-    private final static int heightBrick = 15;
+    private final static int widthBrick = 33;
+    private final static int heightBrick = 25;
     private int typeBrick = 0;
     private final ArrayList<Integer> pointList = new ArrayList<Integer>(Arrays.asList(50, 100, 150, 200));
 

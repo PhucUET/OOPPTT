@@ -31,8 +31,8 @@ public class BaseGame {
 
         double wallXl = gameBackground.getBoundsInParent().getMinX() + 2;
         double wallXr = gameBackground.getBoundsInParent().getMaxX() - 2;
-        double wallYl = gameBackground.getBoundsInParent().getMinY();
-        double wallYr = gameBackground.getBoundsInParent().getMaxY();
+        double wallYl = gameBackground.getBoundsInParent().getMinY() + 2;
+        double wallYr = gameBackground.getBoundsInParent().getMaxY() - 2;
 
 
         if (ballXl <= wallXl && speedX <= 0) {
@@ -41,7 +41,10 @@ public class BaseGame {
         if (ballXr >= wallXr && speedX >= 0) {
             balllogic.updateSpeedX(-balllogic.getSpeedX());
         }
-        if (ballYl<= wallYl || ballYr >= wallYr) {
+        if (ballYl<= wallYl && speedY <= 0) {
+            balllogic.updateSpeedY(-balllogic.getSpeedY());
+        }
+        if (ballYr>= wallYr && speedY >= 0) {
             balllogic.updateSpeedY(-balllogic.getSpeedY());
         }
     }
@@ -63,7 +66,6 @@ public class BaseGame {
             double maxAngle = 165;
             double deg = (maxAngle - minAngle)*(t + 1)/2 + minAngle;
 
-
             double rad = Math.toRadians(-deg);
             double dirX = - Math.cos(rad);
             double dirY = Math.sin(rad);
@@ -72,17 +74,18 @@ public class BaseGame {
             dirX = dirX / len;
             dirY = dirY / len;
 
-            balllogic.updateSpeedX(balllogic.getSpeedXY() * dirX);
-            balllogic.updateSpeedY(balllogic.getSpeedXY() * dirY);
+            balllogic.updateSpeedX(dirX);
+            balllogic.updateSpeedY(dirY);
+            System.out.println(dirX + " " + dirY);
         }
 
     }
-    public boolean paddlePUCollision(Powerup p, Paddle paddlelogic,String define) {
+    public boolean paddlePUCollision(Powerup p, Paddle paddlelogic,String keydefine) {
         if (p.getImageView().getBoundsInParent().intersects(paddlelogic.getImageView().getBoundsInParent())) {
-            if(define.equals("GS")){
+            if(keydefine.equals("GS")) {
                 p.WhenCollison(controller);
             }
-            if(define.equals("BTS")){
+            if(keydefine.equals("BTS")) {
                 p.WhenCollison(BTcontroller);
             }
             return true;
@@ -133,6 +136,11 @@ public class BaseGame {
             break;
         }
     }
+
+    boolean shouldDrop(double p) {
+        return ThreadLocalRandom.current().nextDouble() < p; // p ∈ [0..1]
+    }
+
     public boolean outBall(Ball ballLogic, ImageView gameBackground) {
         if (ballLogic.getImageView().getBoundsInParent().getMaxY() >= gameBackground.getBoundsInParent().getMaxY()) {
             return true;
@@ -145,9 +153,4 @@ public class BaseGame {
         }
         return false;
     }
-
-    boolean shouldDrop(double p) {
-        return ThreadLocalRandom.current().nextDouble() < p; // p ∈ [0..1]
-    }
 }
-

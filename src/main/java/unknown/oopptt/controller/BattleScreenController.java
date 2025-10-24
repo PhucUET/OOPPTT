@@ -40,6 +40,8 @@ public class BattleScreenController {
     Sheild sheild1 = new Sheild();
     private SpecialPaddle specialPaddle1;
     BaseGame baseGame1 = new BaseGame(this);
+    Sheild sheild = new Sheild();
+    Shooter shooter;
 
     private boolean inPaddle2 = true;
     private boolean isCatch2 = false;
@@ -67,13 +69,13 @@ public class BattleScreenController {
     @FXML
     private SplitPane split_pane;
     @FXML
-    private AnchorPane Player_1;
+    private AnchorPane player_1;
     @FXML
-    private ImageView ScreenP1;
+    private ImageView screenP1;
     @FXML
-    private AnchorPane Player_2;
+    private AnchorPane player_2;
     @FXML
-    private ImageView ScreenP2;
+    private ImageView screenP2;
     @FXML
     private ImageView Data_Sheet_P1;
     @FXML
@@ -82,11 +84,11 @@ public class BattleScreenController {
     public void initialize()
     {
         connectToServer();
-        setPos((int) ScreenP1.getBoundsInParent().getCenterX());
+        //setPos((int) screenP1.getBoundsInParent().getCenterX());
         set_Player1_BackGround();
         set_Player2_BackGround();
+        startgameloop();
         setOnMouse_Paddle();
-        startgameloop1();
 
     }
 
@@ -109,12 +111,12 @@ public class BattleScreenController {
     private void set_Player2_BackGround()
     {
         Platform.runLater(()-> {
-            ScreenP2.setImage(new Image(background_Game));
-            paddleLogic2 = new Paddle(ScreenP2.getBoundsInParent().getCenterX(), ScreenP2.getBoundsInParent().getMaxY() - 20);
-            Player_2.getChildren().add(paddleLogic2.getImageView());
+            screenP2.setImage(new Image(background_Game));
+            paddleLogic2 = new Paddle(screenP2.getBoundsInParent().getCenterX(), screenP2.getBoundsInParent().getMaxY() - 20);
+            player_2.getChildren().add(paddleLogic2.getImageView());
             Ball first_ball = new Ball(paddleLogic2.getPos_x(),paddleLogic2.getPos_y() - 2,1,0);
             gameBall2.add(first_ball);
-            Player_2.getChildren().add(first_ball.getImageView());
+            player_2.getChildren().add(first_ball.getImageView());
 
             powerBall2 = new PowerBall(gameBall1);
 
@@ -122,8 +124,8 @@ public class BattleScreenController {
     }
     private void set_Move_Opponent(){
         Platform.runLater(() -> {
-            int low = (int) ScreenP2.getBoundsInParent().getMinX();
-            int high = (int) ScreenP2.getBoundsInParent().getMaxX();
+            int low = (int) screenP2.getBoundsInParent().getMinX();
+            int high = (int) screenP2.getBoundsInParent().getMaxX();
             int i = 0;
             while (i <= high && i >= low) {
                 paddleLogic2.setLocation(i);
@@ -134,19 +136,19 @@ public class BattleScreenController {
     }
 
     private void setOnMouse_Paddle() {
-        Player_1.setCursor(Cursor.NONE);
+        player_1.setCursor(Cursor.NONE);
         Platform.runLater(() -> {
-            Player_1.setOnMouseClicked(event -> {
+            player_1.setOnMouseClicked(event -> {
                 for (Ball ball : gameBall1) {
                     ball.setSticky(false);
                 }
             });
-            Player_1.setOnMouseMoved(event -> {
+            player_1.setOnMouseMoved(event -> {
                 int newX = (int) Math.round(
                         Math.max(
-                                ScreenP1.getBoundsInParent().getMinX() + paddleLogic1.getWidth() / 2,
+                                screenP1.getBoundsInParent().getMinX() + paddleLogic1.getWidth() / 2,
                                 Math.min(event.getX() - paddleLogic1.getWidth() / 2,
-                                        ScreenP1.getBoundsInParent().getMaxX()- paddleLogic1.getWidth() / 2)
+                                        screenP1.getBoundsInParent().getMaxX()- paddleLogic1.getWidth() / 2)
                         )
                 );
                 //System.out.println(newX);
@@ -156,19 +158,23 @@ public class BattleScreenController {
 
         });
     }
-    private void set_Player1_BackGround()
-    {
+    private void set_Player1_BackGround() {
+
+
         Platform.runLater(()-> {
-            ScreenP1.setImage(new Image(background_Game));
-            paddleLogic1 = new Paddle(ScreenP1.getBoundsInParent().getCenterX(), ScreenP1.getBoundsInParent().getMaxY() - 20);
-            Player_1.getChildren().add(paddleLogic1.getImageView());
+            screenP1.setImage(new Image(background_Game));
+
+            paddleLogic1 = new Paddle(screenP1.getBoundsInParent().getCenterX(), screenP1.getBoundsInParent().getMaxY() - 20);
+            player_1.getChildren().add(paddleLogic1.getImageView());
+            specialPaddle1 = new SpecialPaddle(paddleLogic1);
+
             Ball first_ball = new Ball(paddleLogic1.getPos_x(),paddleLogic1.getPos_y() - 2,1,0);
             gameBall1.add(first_ball);
-            Player_1.getChildren().add(first_ball.getImageView());
-
+            player_1.getChildren().add(first_ball.getImageView());
             powerBall1 = new PowerBall(gameBall1);
-            upMap();
+            shooter = new Shooter(200, 2, 1,3,player_1, paddleLogic1.getImageView(),20);
 
+            upMap();
         });
     }
 
@@ -187,7 +193,7 @@ public class BattleScreenController {
                         int newY = startY + row * 25;
                         Brick new_Brick = new Brick(newX,newY,type);
                         gameBricks1.add(new_Brick);
-                        Player_1.getChildren().add(new_Brick.getImageView());
+                        player_1.getChildren().add(new_Brick.getImageView());
                         //Player_2.getChildren().add(new_Brick.getImageView());
                     }
                 }
@@ -212,7 +218,7 @@ public class BattleScreenController {
                         int newY = startY + row * 25;
                         Brick new_Brick = new Brick(newX,newY,type);
                         gameBricks2.add(new_Brick);
-                        Player_2.getChildren().add(new_Brick.getImageView());
+                        player_2.getChildren().add(new_Brick.getImageView());
                         //Player_2.getChildren().add(new_Brick.getImageView());
                     }
                 }
@@ -225,8 +231,12 @@ public class BattleScreenController {
         }
     }
 
-    private void gameBall() {
-        for (Ball ballLogic: gameBall1) {
+    private void gameBall(double dt) {
+        if  (gameBall1.size() == 0) {
+            return;
+        }
+        for (int i = gameBall1.size() - 1; i >= 0; i--) {
+            Ball ballLogic = gameBall1.get(i);
             if (ballLogic.isSticky()) {
                 double newX = paddleLogic1.getPos_x() + ballLogic.getPosinPaddle();
                 if (newX > paddleLogic1.getImageView().getBoundsInParent().getMaxX() ||
@@ -238,11 +248,15 @@ public class BattleScreenController {
                 ballLogic.setLocation(newX);
                 ballLogic.setPosinPaddle();
             } else {
-                baseGame1.brickCollision(ballLogic,gameBricks1,Player_1, gamePowerup1);
+                if (baseGame1.outBall(ballLogic, screenP1)) {
+                    gameBall1.remove(i);
+                    player_1.getChildren().remove(ballLogic.getImageView());
+                    continue;
+                }
+                baseGame1.brickCollision(ballLogic,gameBricks1,player_1, gamePowerup1);
                 baseGame1.paddleballCollision(ballLogic, paddleLogic1, isCatch1);
-                baseGame1.wallCollision(ballLogic,ScreenP1);
-                //System.out.println(ballLogic.getSpeedX() + " " + ballLogic.getSpeedY());
-                ballLogic.update();
+                baseGame1.wallCollision(ballLogic,screenP1);
+                ballLogic.updatePos(dt);
             }
         }
     }
@@ -251,23 +265,35 @@ public class BattleScreenController {
             Powerup powerup = gamePowerup1.get(i);
             if (baseGame1.paddlePUCollision(powerup,paddleLogic1,"BTS")) {
                 gamePowerup1.remove(powerup);
-                Player_1.getChildren().remove(powerup.getImageView());
+                player_1.getChildren().remove(powerup.getImageView());
             } else {
+                if (baseGame1.outPowerup(powerup, screenP1)) {
+                    gamePowerup1.remove(powerup);
+                    player_1.getChildren().remove(powerup.getImageView());
+                    continue;
+                }
                 powerup.movedown();
             }
 
         }
     }
-    private void startgameloop1() {
+    private void startgameloop() {
         AnimationTimer timer = new AnimationTimer() {
+            private Long lasts = 0L;
             @Override
             public void handle(long now) {
-                gameBall();
+                if (lasts == 0) {
+                    lasts = now;
+                    return;
+                }
+                double dt = (now - lasts) / 1e9;
+                lasts = now;
+//                if (shooter.getEnabled()) {
+//                    shooter.tryFire();
+//                }
+                //shooter.update(dt,gameBricks1);
+                gameBall(dt);
                 setGamePowerup();
-                System.out.println(getPos());
-                paddleLogic2.setLocation(getPos());
-
-                //tem.out.println(layout_game.getBoundsInParent().getMinX() + " " + layout_game.getBoundsInParent().getMinY());
             }
         };
         timer.start();
@@ -280,9 +306,9 @@ public class BattleScreenController {
 
     public void resetSlowBall() {powerBall1.normalBall();}
 
-    public void openSheild() {sheild1.openSheild(gameBricks1, Player_1, ScreenP1);}
+    public void openSheild() {sheild1.openSheild(gameBricks1, player_1, screenP1);}
 
-    public void moreBall() {powerBall1.moreBall(Player_1);}
+    public void moreBall() {powerBall1.moreBall(player_1);}
 
     public void upPaddle() {specialPaddle1.upPaddle();}
 

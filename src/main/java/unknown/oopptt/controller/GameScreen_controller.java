@@ -176,7 +176,7 @@ public class GameScreen_controller {
         // di chuyển paddle
 
 
-        startgameloop();
+        //startgameloop();
         setOnMouse_Paddle();
 
     }
