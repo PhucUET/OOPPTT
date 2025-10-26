@@ -26,8 +26,17 @@ public class Powerup  {
     private double pos_y;
     private double width = 40;
     private double height = 20;
+    private int randomIndex;
     private GameScreen_controller controller;
     private BattleScreenController BTcontroller;
+
+    public int getRandomIndex() {
+        return randomIndex;
+    }
+
+    public void setRandomIndex(int randomIndex) {
+        this.randomIndex = randomIndex;
+    }
 
     public enum PowerupType {
         UPBALL(10), UPPADDLE(8), SHEILD(-1), MOREBALL(-1), SLOW(10), CATCHBALL(10), GUN(8);;
@@ -43,14 +52,17 @@ public class Powerup  {
         }
 
     }
-    static PowerupType randomUniform() {
+    public PowerupType randomUniform(int index) {
         PowerupType[] vals = PowerupType.values();
-        int i = ThreadLocalRandom.current().nextInt(vals.length);
-        return vals[i];
+        if(index == -1) {
+            index = ThreadLocalRandom.current().nextInt(vals.length);
+        }
+        setRandomIndex(index);
+        return vals[index];
     }
 
-    public Powerup(double pos_x, double pos_y ) {
-        this.type = randomUniform();
+    public Powerup(double pos_x, double pos_y,int randomIndex) {
+        this.type = randomUniform(randomIndex);
         this.pos_x = pos_x;
         this.pos_y = pos_y;
         switch (type) {
@@ -104,10 +116,11 @@ public class Powerup  {
         this.BTcontroller = BTcontroller;
         switch (type) {
             case PowerupType.UPBALL:
-                System.out.println("ditmecuocdoi");
+                System.out.println("UPBALL");
                 runTimeEffect(type.getDuration(), BTcontroller::upBall, BTcontroller::resetBall);
                 break;
             case PowerupType.UPPADDLE:
+                System.out.println("UPPADDLE");
                 runTimeEffect(type.getDuration(), BTcontroller::upPaddle, BTcontroller::resetPaddle);
                 break;
             case PowerupType.SHEILD:
