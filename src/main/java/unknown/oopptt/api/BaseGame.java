@@ -14,6 +14,12 @@ import java.util.concurrent.ThreadLocalRandom;
 public class BaseGame {
     private GameScreen_controller controller;
     private BattleScreenController BTcontroller;
+    public static int randomIndex = -1 ;
+    public static int random;
+
+
+
+
     public BaseGame(BattleScreenController BTcontroller){
         this.BTcontroller = BTcontroller;
     }
@@ -76,7 +82,7 @@ public class BaseGame {
 
             balllogic.updateSpeedX(dirX);
             balllogic.updateSpeedY(dirY);
-            System.out.println(dirX + " " + dirY);
+            //System.out.println(dirX + " " + dirY);
         }
 
     }
@@ -126,18 +132,36 @@ public class BaseGame {
                 rv.setVisible(false);
                 root.getChildren().remove(rv);
                 bricks.remove(i);
-
-                if (shouldDrop(0.5)) {
-                    Powerup p = new Powerup(rv.getBoundsInParent().getCenterX(), rv.getBoundsInParent().getCenterY());
+                boolean rand = false;
+                if(this.random == 0){
+                    rand = shouldDrop(0.8);
+                    if(rand == true){
+                        this.random = 1;
+                    }
+                    else {
+                        this.random = -1;
+                    }
+                }
+                if(this.random == 1){
+                    rand = true;
+                }
+                if(this.random == -1){
+                    rand = false;
+                }
+                if (rand) {
+                    Powerup p = new Powerup(rv.getBoundsInParent().getCenterX(), rv.getBoundsInParent().getCenterY(),randomIndex);
+                    this.randomIndex = p.getRandomIndex();
                     root.getChildren().add(p.getImageView());
+                    System.out.println(this.randomIndex + "    " + p.getRandomIndex());
                     powerups.add(p);
                 }
+
             }
             break;
         }
     }
 
-    boolean shouldDrop(double p) {
+    public boolean shouldDrop(double p) {
         return ThreadLocalRandom.current().nextDouble() < p; // p ∈ [0..1]
     }
 

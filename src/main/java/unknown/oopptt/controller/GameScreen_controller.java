@@ -137,7 +137,7 @@ public class GameScreen_controller {
                     int type = Integer.parseInt(data[col]);
                     if (type > 0) {
                         int newX = startX + col * 33;
-                        int newY = startY + row * 15;
+                        int newY = startY + row * 25;
                         Brick new_Brick = new Brick(newX,newY,type);
                         gameBricks.add(new_Brick);
                         layout_game.getChildren().add(new_Brick.getImageView());
@@ -157,17 +157,17 @@ public class GameScreen_controller {
     public void initialize() {
 
         // Giãn gamePane full stack_root
-        System.out.println(gameBackground.getBoundsInParent().getWidth() +  " " + gameBackground.getBoundsInParent().getHeight());
+       // System.out.println(gameBackground.getBoundsInParent().getWidth() +  " " + gameBackground.getBoundsInParent().getHeight());
         stack_root.setAlignment(Pos.CENTER);
         // setlayout game
-        Platform.runLater(()-> {
-            System.out.println(stack_root.localToScene(stack_root.getBoundsInLocal()));
-
-            System.out.println(layout_game.localToScene(layout_game.getBoundsInLocal()));
-            System.out.println(layout_game.localToScene(layout_game.getBoundsInParent()));
-
-            System.out.println(layout_game.getBoundsInParent().getWidth() + " " + layout_game.getBoundsInParent().getHeight());
-        });
+//        Platform.runLater(()-> {
+//            System.out.println(stack_root.localToScene(stack_root.getBoundsInLocal()));
+//
+//            System.out.println(layout_game.localToScene(layout_game.getBoundsInLocal()));
+//            System.out.println(layout_game.localToScene(layout_game.getBoundsInParent()));
+//
+//            System.out.println(layout_game.getBoundsInParent().getWidth() + " " + layout_game.getBoundsInParent().getHeight());
+//        });
 //        setBackground_Video();
         set_Background();
 
@@ -176,7 +176,7 @@ public class GameScreen_controller {
         // di chuyển paddle
 
 
-        //startgameloop();
+        startgameloop();
         setOnMouse_Paddle();
 
     }
@@ -205,7 +205,7 @@ public class GameScreen_controller {
                                         gameBackground.getBoundsInParent().getMaxX()- paddleLogic.getWidth() / 2)
                         )
                 );
-                System.out.println(newX);
+                //System.out.println(newX);
                 paddleLogic.setLocation(newX);
             });
 
@@ -235,15 +235,16 @@ public class GameScreen_controller {
                 ballLogic.setLocation(newX);
                 ballLogic.setPosinPaddle();
             } else {
-                if (baseGame.outBall(ballLogic, gameBackground)) {
-                    gameBall.remove(i);
-                    layout_game.getChildren().remove(ballLogic.getImageView());
-                    continue;
-                }
+//                if (baseGame.outBall(ballLogic, gameBackground)) {
+//                    gameBall.remove(i);
+//                    layout_game.getChildren().remove(ballLogic.getImageView());
+//                    continue;
+//                }
+                baseGame.random = 0;
                 baseGame.brickCollision(ballLogic,gameBricks,layout_game, gamePowerup);
                 baseGame.paddleballCollision(ballLogic, paddleLogic, isCatch);
                 baseGame.wallCollision(ballLogic,gameBackground);
-                System.out.println("ngusi" + ballLogic.getSpeedX() + " " + ballLogic.getSpeedY());
+               // System.out.println("ngusi" + ballLogic.getSpeedX() + " " + ballLogic.getSpeedY());
                 ballLogic.updatePos(dt);
             }
         }
@@ -281,7 +282,7 @@ public class GameScreen_controller {
                     shooter.tryFire();
                 }
                 double dt = (now - lasts) / 1e9;
-                System.out.println("frame" + dt);
+               // System.out.println("frame" + dt);
                 lasts = now;
                 shooter.update(dt,gameBricks);
                 gameBall(dt);

@@ -41,7 +41,7 @@ public class BattleScreenController {
     private SpecialPaddle specialPaddle1;
     BaseGame baseGame1 = new BaseGame(this);
     Sheild sheild = new Sheild();
-    Shooter shooter;
+    Shooter shooter1;
 
     private boolean inPaddle2 = true;
     private boolean isCatch2 = false;
@@ -53,6 +53,7 @@ public class BattleScreenController {
     Sheild sheild2 = new Sheild();
     private SpecialPaddle specialPaddle2;
     BaseGame baseGame2 = new BaseGame(this);
+    Shooter shooter2;
 
     private int pos;
 
@@ -108,30 +109,22 @@ public class BattleScreenController {
         if (client != null) client.close();
     }
 
-    private void set_Player2_BackGround()
-    {
+    private void set_Player2_BackGround() {
+
+
         Platform.runLater(()-> {
             screenP2.setImage(new Image(background_Game));
+
             paddleLogic2 = new Paddle(screenP2.getBoundsInParent().getCenterX(), screenP2.getBoundsInParent().getMaxY() - 20);
             player_2.getChildren().add(paddleLogic2.getImageView());
+            specialPaddle1 = new SpecialPaddle(paddleLogic2);
+
             Ball first_ball = new Ball(paddleLogic2.getPos_x(),paddleLogic2.getPos_y() - 2,1,0);
             gameBall2.add(first_ball);
             player_2.getChildren().add(first_ball.getImageView());
+            powerBall2 = new PowerBall(gameBall2);
+            shooter2 = new Shooter(200, 2, 1,3,player_2, paddleLogic2.getImageView(),20);
 
-            powerBall2 = new PowerBall(gameBall1);
-
-        });
-    }
-    private void set_Move_Opponent(){
-        Platform.runLater(() -> {
-            int low = (int) screenP2.getBoundsInParent().getMinX();
-            int high = (int) screenP2.getBoundsInParent().getMaxX();
-            int i = 0;
-            while (i <= high && i >= low) {
-                paddleLogic2.setLocation(i);
-                if (i == high) i = low;
-                i++;
-            }
         });
     }
 
@@ -154,6 +147,7 @@ public class BattleScreenController {
                 //System.out.println(newX);
                 paddleLogic1.setLocation(newX);
                 client.send("Move:"+Integer.toString(newX));
+                paddleLogic2.setLocation(paddleLogic1.getPos_x());
             });
 
         });
@@ -172,7 +166,7 @@ public class BattleScreenController {
             gameBall1.add(first_ball);
             player_1.getChildren().add(first_ball.getImageView());
             powerBall1 = new PowerBall(gameBall1);
-            shooter = new Shooter(200, 2, 1,3,player_1, paddleLogic1.getImageView(),20);
+            shooter1 = new Shooter(200, 2, 1,3,player_1, paddleLogic1.getImageView(),20);
 
             upMap();
         });
@@ -236,31 +230,57 @@ public class BattleScreenController {
             return;
         }
         for (int i = gameBall1.size() - 1; i >= 0; i--) {
-            Ball ballLogic = gameBall1.get(i);
-            if (ballLogic.isSticky()) {
-                double newX = paddleLogic1.getPos_x() + ballLogic.getPosinPaddle();
+            Ball ballLogic1 = gameBall1.get(i);
+            Ball ballLogic2 = gameBall2.get(i);
+            if (ballLogic1.isSticky()) {
+                double newX = paddleLogic1.getPos_x() + ballLogic1.getPosinPaddle();
                 if (newX > paddleLogic1.getImageView().getBoundsInParent().getMaxX() ||
                         newX < paddleLogic1.getImageView().getBoundsInParent().getMinX()) {
                     newX = Math.max(paddleLogic1.getImageView().getBoundsInParent().getMinX(),
                             Math.min(paddleLogic1.getImageView().getBoundsInParent().getMaxX(), paddleLogic1.getWidth()));
-                    ballLogic.updateSpeedX(-ballLogic.getSpeedX());
+                    ballLogic1.updateSpeedX(-ballLogic1.getSpeedX());
                 }
-                ballLogic.setLocation(newX);
-                ballLogic.setPosinPaddle();
+                ballLogic1.setLocation(newX);
+                ballLogic1.setPosinPaddle();
+
+                ballLogic2.setLocation(newX);
+                ballLogic2.setPosinPaddle();
             } else {
-                if (baseGame1.outBall(ballLogic, screenP1)) {
-                    gameBall1.remove(i);
-                    player_1.getChildren().remove(ballLogic.getImageView());
-                    continue;
-                }
-                baseGame1.brickCollision(ballLogic,gameBricks1,player_1, gamePowerup1);
-                baseGame1.paddleballCollision(ballLogic, paddleLogic1, isCatch1);
-                baseGame1.wallCollision(ballLogic,screenP1);
-                ballLogic.updatePos(dt);
+//                if (baseGame1.outBall(ballLogic1, screenP1)) {
+//                    gameBall1.remove(i);
+//                    player_1.getChildren().remove(ballLogic1.getImageView());
+//                    continue;
+//                }
+//                if (baseGame2.outBall(ballLogic1, screenP2)) {
+//                    gameBall2.remove(i);
+//                    player_2.getChildren().remove(ballLogic2.getImageView());
+//                    continue;
+//                }
+                baseGame1.random = 0;
+                baseGame1.randomIndex = -1;
+                baseGame1.brickCollision(ballLogic1,gameBricks1,player_1, gamePowerup1);
+                baseGame1.paddleballCollision(ballLogic1, paddleLogic1, isCatch1);
+                baseGame1.wallCollision(ballLogic1,screenP1);
+                ballLogic1.updatePos(dt);
+
+                baseGame2.random = baseGame1.random;
+                baseGame2.randomIndex = baseGame1.randomIndex;
+                baseGame2.brickCollision(ballLogic2,gameBricks2,player_2, gamePowerup1);
+                //System.out.println(baseGame2.shouldDrop());
+                baseGame2.paddleballCollision(ballLogic2, paddleLogic2, isCatch2);
+                baseGame2.wallCollision(ballLogic2,screenP2);
+                ballLogic2.updatePos(dt);
+//                if(ballLogic1.getPos_y() == ballLogic2.getPos_y()){
+//                    System.out.println(true);
+//                }
+//                else {
+//                    System.out.println(false);
+//                }
+                //paddleLogic2.setLocation(paddleLogic1.getPos_x());
             }
         }
     }
-    private void setGamePowerup() {
+    private void setGamePowerup1() {
         for (int i = gamePowerup1.size() - 1; i >= 0; i--) {
             Powerup powerup = gamePowerup1.get(i);
             if (baseGame1.paddlePUCollision(powerup,paddleLogic1,"BTS")) {
@@ -270,6 +290,23 @@ public class BattleScreenController {
                 if (baseGame1.outPowerup(powerup, screenP1)) {
                     gamePowerup1.remove(powerup);
                     player_1.getChildren().remove(powerup.getImageView());
+                    continue;
+                }
+                powerup.movedown();
+            }
+
+        }
+    }
+    private void setGamePowerup2() {
+        for (int i = gamePowerup2.size() - 1; i >= 0; i--) {
+            Powerup powerup = gamePowerup2.get(i);
+            if (baseGame2.paddlePUCollision(powerup,paddleLogic2,"BTS")) {
+                gamePowerup2.remove(powerup);
+                player_2.getChildren().remove(powerup.getImageView());
+            } else {
+                if (baseGame2.outPowerup(powerup, screenP2)) {
+                    gamePowerup2.remove(powerup);
+                    player_2.getChildren().remove(powerup.getImageView());
                     continue;
                 }
                 powerup.movedown();
@@ -293,7 +330,8 @@ public class BattleScreenController {
 //                }
                 //shooter.update(dt,gameBricks1);
                 gameBall(dt);
-                setGamePowerup();
+               // setGamePowerup1();
+               // setGamePowerup2();
             }
         };
         timer.start();
