@@ -36,7 +36,7 @@ public class PowerBall {
             newB1.updateSpeedX(-nowB.getSpeedX());
 
             Ball newB2 =  new Ball(nowB);
-            newB2.updateSpeedY(-nowB.getSpeedXY());
+            newB2.updateSpeedY(-nowB.getSpeedY());
 
             balls.add(newB1);
             balls.add(newB2);
