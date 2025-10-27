@@ -23,7 +23,7 @@ import java.util.List;
 
 public class BattleScreenController {
     private static String background_Game = new File("src/main/resources/graphic/background10.jpg").toURI().toString();
-    private static File mapBrick1 =  new File("src/main/resources/map/map1.txt");
+    private static File mapBrick =  new File("src/main/resources/map/map1.txt");
 
     private GameClient client;
     private String playerName = "Me";
@@ -117,7 +117,7 @@ public class BattleScreenController {
 
             paddleLogic2 = new Paddle(screenP2.getBoundsInParent().getCenterX(), screenP2.getBoundsInParent().getMaxY() - 20);
             player_2.getChildren().add(paddleLogic2.getImageView());
-            specialPaddle1 = new SpecialPaddle(paddleLogic2);
+            specialPaddle2 = new SpecialPaddle(paddleLogic2);
 
             Ball first_ball = new Ball(paddleLogic2.getPos_x(),paddleLogic2.getPos_y() - 2,1,0);
             gameBall2.add(first_ball);
@@ -175,7 +175,7 @@ public class BattleScreenController {
     private void upMap() {
         int startX = 175;
         int startY = 200;
-        try (BufferedReader br = new BufferedReader(new FileReader(mapBrick1))) {
+        try (BufferedReader br = new BufferedReader(new FileReader(mapBrick))) {
             String line;
             int row = 0;
             while ((line = br.readLine()) != null) {
@@ -200,7 +200,7 @@ public class BattleScreenController {
         }
 
 
-        try (BufferedReader br = new BufferedReader(new FileReader(mapBrick1))) {
+        try (BufferedReader br = new BufferedReader(new FileReader(mapBrick))) {
             String line;
             int row = 0;
             while ((line = br.readLine()) != null) {
@@ -213,7 +213,6 @@ public class BattleScreenController {
                         Brick new_Brick = new Brick(newX,newY,type);
                         gameBricks2.add(new_Brick);
                         player_2.getChildren().add(new_Brick.getImageView());
-                        //Player_2.getChildren().add(new_Brick.getImageView());
                     }
                 }
                 row = row + 1;
@@ -257,25 +256,28 @@ public class BattleScreenController {
 //                    continue;
 //                }
                 baseGame1.random = 0;
+                // randomIndex -1 sẽ random bất kì, từ 0 đến 8 sẽ là đúng cái PU đó
                 baseGame1.randomIndex = -1;
                 baseGame1.brickCollision(ballLogic1,gameBricks1,player_1, gamePowerup1);
                 baseGame1.paddleballCollision(ballLogic1, paddleLogic1, isCatch1);
                 baseGame1.wallCollision(ballLogic1,screenP1);
                 ballLogic1.updatePos(dt);
+                client.send("Random:"+Integer.toString(baseGame1.random));
+                client.send("RandomIndex:"+Integer.toString(baseGame1.randomIndex));
 
                 baseGame2.random = baseGame1.random;
                 baseGame2.randomIndex = baseGame1.randomIndex;
-                baseGame2.brickCollision(ballLogic2,gameBricks2,player_2, gamePowerup1);
+                baseGame2.brickCollision(ballLogic2,gameBricks2,player_2, gamePowerup2);
                 //System.out.println(baseGame2.shouldDrop());
                 baseGame2.paddleballCollision(ballLogic2, paddleLogic2, isCatch2);
                 baseGame2.wallCollision(ballLogic2,screenP2);
                 ballLogic2.updatePos(dt);
-//                if(ballLogic1.getPos_y() == ballLogic2.getPos_y()){
-//                    System.out.println(true);
-//                }
-//                else {
-//                    System.out.println(false);
-//                }
+                if(ballLogic1.getPos_y() == ballLogic2.getPos_y()){
+                    System.out.println(true);
+                }
+                else {
+                    System.out.println(false);
+                }
                 //paddleLogic2.setLocation(paddleLogic1.getPos_x());
             }
         }
@@ -283,7 +285,7 @@ public class BattleScreenController {
     private void setGamePowerup1() {
         for (int i = gamePowerup1.size() - 1; i >= 0; i--) {
             Powerup powerup = gamePowerup1.get(i);
-            if (baseGame1.paddlePUCollision(powerup,paddleLogic1,"BTS")) {
+            if (baseGame1.paddlePUCollision(powerup,paddleLogic1,"BTS1")) {
                 gamePowerup1.remove(powerup);
                 player_1.getChildren().remove(powerup.getImageView());
             } else {
@@ -300,7 +302,7 @@ public class BattleScreenController {
     private void setGamePowerup2() {
         for (int i = gamePowerup2.size() - 1; i >= 0; i--) {
             Powerup powerup = gamePowerup2.get(i);
-            if (baseGame2.paddlePUCollision(powerup,paddleLogic2,"BTS")) {
+            if (baseGame2.paddlePUCollision(powerup,paddleLogic2,"BTS2")) {
                 gamePowerup2.remove(powerup);
                 player_2.getChildren().remove(powerup.getImageView());
             } else {
@@ -330,31 +332,51 @@ public class BattleScreenController {
 //                }
                 //shooter.update(dt,gameBricks1);
                 gameBall(dt);
-               // setGamePowerup1();
-               // setGamePowerup2();
+                setGamePowerup1();
+                setGamePowerup2();
             }
         };
         timer.start();
     }
-    public void upBall() {powerBall1.upBall();}
+    public void upBall1() {powerBall1.upBall();}
 
-    public void resetBall() {powerBall1.downBall();}
+    public void resetBall1() {powerBall1.downBall();}
 
-    public void slowBall() {powerBall1.slowBall();}
+    public void slowBall1() {powerBall1.slowBall();}
 
-    public void resetSlowBall() {powerBall1.normalBall();}
+    public void resetSlowBall1() {powerBall1.normalBall();}
 
-    public void openSheild() {sheild1.openSheild(gameBricks1, player_1, screenP1);}
+    public void openSheild1() {sheild1.openSheild(gameBricks1, player_1, screenP1);}
 
-    public void moreBall() {powerBall1.moreBall(player_1);}
+    public void moreBall1() {powerBall1.moreBall(player_1);}
 
-    public void upPaddle() {specialPaddle1.upPaddle();}
+    public void upPaddle1() {specialPaddle1.upPaddle();}
 
-    public void resetPaddle() {specialPaddle1.downPaddle();}
+    public void resetPaddle1() {specialPaddle1.downPaddle();}
 
-
-    public void catchBall() {
+    public void catchBall1() {
         isCatch1 = !isCatch1;
+    }
+
+
+    public void upBall2() {powerBall2.upBall();}
+
+    public void resetBall2() {powerBall2.downBall();}
+
+    public void slowBall2() {powerBall2.slowBall();}
+
+    public void resetSlowBall2() {powerBall2.normalBall();}
+
+    public void openSheild2() {sheild1.openSheild(gameBricks2, player_2, screenP2);}
+
+    public void moreBall2() {powerBall2.moreBall(player_2);}
+
+    public void upPaddle2() {specialPaddle2.upPaddle();}
+
+    public void resetPaddle2() {specialPaddle2.downPaddle();}
+
+    public void catchBall2() {
+        isCatch2 = !isCatch2;
     }
 
 

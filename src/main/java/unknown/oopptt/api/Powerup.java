@@ -112,35 +112,63 @@ public class Powerup  {
             Platform.runLater(endEffect);
         }).start();
     }
-    public void WhenCollison(BattleScreenController BTcontroller) {
+    public void WhenCollison(BattleScreenController BTcontroller,boolean player) {
         this.BTcontroller = BTcontroller;
-        switch (type) {
-            case PowerupType.UPBALL:
-                System.out.println("UPBALL");
-                runTimeEffect(type.getDuration(), BTcontroller::upBall, BTcontroller::resetBall);
-                break;
-            case PowerupType.UPPADDLE:
-                System.out.println("UPPADDLE");
-                runTimeEffect(type.getDuration(), BTcontroller::upPaddle, BTcontroller::resetPaddle);
-                break;
-            case PowerupType.SHEILD:
-                BTcontroller.openSheild();
-                break;
-            case  PowerupType.MOREBALL:
-                BTcontroller.moreBall();
-                break;
-            case PowerupType.SLOW:
-                runTimeEffect(type.getDuration(), BTcontroller::slowBall, BTcontroller::resetSlowBall);
-                break;
-            case PowerupType.CATCHBALL:
-                runTimeEffect(type.getDuration(),  BTcontroller::catchBall, BTcontroller::catchBall);
-                break;
-            case PowerupType.GUN:
-                //runTimeEffect(type.getDuration(), controller::gun, controller:: resetGun);
-                break;
+        if (player) {
+            switch (type) {
+                case PowerupType.UPBALL:
+                    System.out.println("UPBALL");
+                    runTimeEffect(type.getDuration(), BTcontroller::upBall1, BTcontroller::resetBall1);
+                    break;
+                case PowerupType.UPPADDLE:
+                    System.out.println("UPPADDLE");
+                    runTimeEffect(type.getDuration(), BTcontroller::upPaddle1, BTcontroller::resetPaddle1);
+                    break;
+                case PowerupType.SHEILD:
+                    BTcontroller.openSheild1();
+                    break;
+                case PowerupType.MOREBALL:
+                    BTcontroller.moreBall1();
+                    break;
+                case PowerupType.SLOW:
+                    runTimeEffect(type.getDuration(), BTcontroller::slowBall1, BTcontroller::resetSlowBall1);
+                    break;
+                case PowerupType.CATCHBALL:
+                    runTimeEffect(type.getDuration(), BTcontroller::catchBall1, BTcontroller::catchBall1);
+                    break;
+                case PowerupType.GUN:
+                    //runTimeEffect(type.getDuration(), controller::gun, controller:: resetGun);
+                    break;
+
+            }
+        } else {
+            switch (type) {
+                case PowerupType.UPBALL:
+                    System.out.println("UPBALL");
+                    runTimeEffect(type.getDuration(), BTcontroller::upBall2, BTcontroller::resetBall2);
+                    break;
+                case PowerupType.UPPADDLE:
+                    System.out.println("UPPADDLE");
+                    runTimeEffect(type.getDuration(), BTcontroller::upPaddle2, BTcontroller::resetPaddle2);
+                    break;
+                case PowerupType.SHEILD:
+                    BTcontroller.openSheild2();
+                    break;
+                case PowerupType.MOREBALL:
+                    BTcontroller.moreBall2();
+                    break;
+                case PowerupType.SLOW:
+                    runTimeEffect(type.getDuration(), BTcontroller::slowBall2, BTcontroller::resetSlowBall2);
+                    break;
+                case PowerupType.CATCHBALL:
+                    runTimeEffect(type.getDuration(), BTcontroller::catchBall2, BTcontroller::catchBall2);
+                    break;
+                case PowerupType.GUN:
+                    //runTimeEffect(type.getDuration(), controller::gun, controller:: resetGun);
+                    break;
+            }
 
         }
-
     }
 
     public void WhenCollison(GameScreen_controller controller) {

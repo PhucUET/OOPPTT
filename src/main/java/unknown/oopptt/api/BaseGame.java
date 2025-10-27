@@ -91,8 +91,11 @@ public class BaseGame {
             if(keydefine.equals("GS")) {
                 p.WhenCollison(controller);
             }
-            if(keydefine.equals("BTS")) {
-                p.WhenCollison(BTcontroller);
+            if(keydefine.equals("BTS1")) {
+                p.WhenCollison(BTcontroller,true);
+            }
+            if(keydefine.equals("BTS2")) {
+                p.WhenCollison(BTcontroller,false);
             }
             return true;
         }
@@ -134,7 +137,7 @@ public class BaseGame {
                 bricks.remove(i);
                 boolean rand = false;
                 if(this.random == 0){
-                    rand = shouldDrop(0.8);
+                    rand = shouldDrop(0.2);
                     if(rand == true){
                         this.random = 1;
                     }
@@ -152,7 +155,7 @@ public class BaseGame {
                     Powerup p = new Powerup(rv.getBoundsInParent().getCenterX(), rv.getBoundsInParent().getCenterY(),randomIndex);
                     this.randomIndex = p.getRandomIndex();
                     root.getChildren().add(p.getImageView());
-                    System.out.println(this.randomIndex + "    " + p.getRandomIndex());
+                   //System.out.println(this.randomIndex + "    " + p.getRandomIndex());
                     powerups.add(p);
                 }
 
