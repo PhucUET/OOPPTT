@@ -32,6 +32,7 @@ public class BattleScreenController {
     private int move_Of_Paddle;
     private int indexPU;
     private int random_PU;
+    private int ballStick;
 
     private boolean inPaddle1 = true;
     private boolean isCatch1 = false;
@@ -100,18 +101,25 @@ public class BattleScreenController {
         client = new GameClient(serverIP, serverPort, playerName, msg -> {
             Platform.runLater(() -> {
                 // Ở đây bạn có thể xử lý thông tin từ server
+                System.out.println("Server: " + msg);
                 switch (msg.charAt(0)) {
                     case 'M':
                         String move = msg.substring(5);
                         setMove_Of_Paddle(Integer.parseInt(move));
+                        break;
                     case 'I':
-                        String IndexPU = msg.substring(7);
+                        String IndexPU = msg.substring(8);
                         setIndexPU(Integer.parseInt(IndexPU));
+                        break;
                     case 'R':
-                        String random = msg.substring(8);
+                        String random = msg.substring(9);
                         setRandom_PU(Integer.parseInt(random));
+                        break;
+                    case 'B':
+                        String ballStick = msg.substring(10);
+                        setBallStick(Integer.parseInt(ballStick));
+                        break;
                 }
-                System.out.println("Server: " + msg);
             });
         });
 
@@ -160,7 +168,7 @@ public class BattleScreenController {
                 //System.out.println(newX);
                 paddleLogic1.setLocation(newX);
                 client.send("Move:"+Integer.toString(newX));
-                //paddleLogic2.setLocation(paddleLogic1.getPos_x());
+                paddleLogic2.setLocation(newX);
             });
 
         });
@@ -253,8 +261,9 @@ public class BattleScreenController {
                 }
                 ballLogic1.setLocation(newX);
                 ballLogic1.setPosinPaddle();
+                client.send("BallStick:"+Integer.toString((int) newX));
 
-                ballLogic2.setLocation(getMove_Of_Paddle());
+                ballLogic2.setLocation(getBallStick());
                 ballLogic2.setPosinPaddle();
             } else {
 //                if (baseGame1.outBall(ballLogic1, screenP1)) {
@@ -274,25 +283,26 @@ public class BattleScreenController {
                 baseGame1.paddleballCollision(ballLogic1, paddleLogic1, isCatch1);
                 baseGame1.wallCollision(ballLogic1,screenP1);
                 ballLogic1.updatePos(dt);
-//                client.send("RandomPU:"+Integer.toString(baseGame1.random));
-//                client.send("IndexPU:"+Integer.toString(baseGame1.randomIndex));
+                client.send("RandomPU:"+Integer.toString(baseGame1.random));
+                client.send("IndexPU:"+Integer.toString(baseGame1.randomIndex));
 
 //                baseGame2.random = getRandom_PU();
 //                baseGame2.randomIndex = getIndexPU();
-//                baseGame2.random = baseGame1.random;
-//                baseGame2.randomIndex = baseGame1.randomIndex;
-//                baseGame2.brickCollision(ballLogic2,gameBricks2,player_2, gamePowerup2);
-//                //System.out.println(baseGame2.shouldDrop());
-//                baseGame2.paddleballCollision(ballLogic2, paddleLogic2, isCatch2);
-//                baseGame2.wallCollision(ballLogic2,screenP2);
-//                ballLogic2.updatePos(dt);
+                baseGame2.random = baseGame1.random;
+                baseGame2.randomIndex = baseGame1.randomIndex;
+                baseGame2.brickCollision(ballLogic2,gameBricks2,player_2, gamePowerup2);
+                //System.out.println(baseGame2.shouldDrop());
+                baseGame2.paddleballCollision(ballLogic2, paddleLogic2, isCatch2);
+                baseGame2.wallCollision(ballLogic2,screenP2);
+                ballLogic2.updatePos(dt);
 //                if(ballLogic1.getPos_y() == ballLogic2.getPos_y()){
 //                    System.out.println(true);
 //                }
 //                else {
 //                    System.out.println(false);
 //                }
-                paddleLogic2.setLocation(getMove_Of_Paddle());
+                System.out.println(getMove_Of_Paddle());
+                //paddleLogic2.setLocation(paddleLogic1.getPos_x());
             }
         }
     }
@@ -313,23 +323,23 @@ public class BattleScreenController {
 
         }
     }
-//    private void setGamePowerup2() {
-//        for (int i = gamePowerup2.size() - 1; i >= 0; i--) {
-//            Powerup powerup = gamePowerup2.get(i);
-//            if (baseGame2.paddlePUCollision(powerup,paddleLogic2,"BTS2")) {
-//                gamePowerup2.remove(powerup);
-//                player_2.getChildren().remove(powerup.getImageView());
-//            } else {
-//                if (baseGame2.outPowerup(powerup, screenP2)) {
-//                    gamePowerup2.remove(powerup);
-//                    player_2.getChildren().remove(powerup.getImageView());
-//                    continue;
-//                }
-//                powerup.movedown();
-//            }
-//
-//        }
-//    }
+    private void setGamePowerup2() {
+        for (int i = gamePowerup2.size() - 1; i >= 0; i--) {
+            Powerup powerup = gamePowerup2.get(i);
+            if (baseGame2.paddlePUCollision(powerup,paddleLogic2,"BTS2")) {
+                gamePowerup2.remove(powerup);
+                player_2.getChildren().remove(powerup.getImageView());
+            } else {
+                if (baseGame2.outPowerup(powerup, screenP2)) {
+                    gamePowerup2.remove(powerup);
+                    player_2.getChildren().remove(powerup.getImageView());
+                    continue;
+                }
+                powerup.movedown();
+            }
+
+        }
+    }
     private void startgameloop() {
         AnimationTimer timer = new AnimationTimer() {
             private Long lasts = 0L;
@@ -347,10 +357,18 @@ public class BattleScreenController {
                 //shooter.update(dt,gameBricks1);
                 gameBall(dt);
                 setGamePowerup1();
-//              setGamePowerup2();
+                setGamePowerup2();
             }
         };
         timer.start();
+    }
+
+    public int getBallStick() {
+        return ballStick;
+    }
+
+    public void setBallStick(int ballStick) {
+        this.ballStick = ballStick;
     }
 
     public int getIndexPU() {
