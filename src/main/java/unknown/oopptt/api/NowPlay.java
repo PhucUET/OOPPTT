@@ -60,7 +60,7 @@ public class NowPlay extends Manage {
 
     //enum là kiểu dữ liệu liệt kê, để liệt kê các mode game
     public enum Mode {
-        SOLO, MULTI, PK
+        SOLO, PK
     }
 
     private final Map<String, Player> players = new LinkedHashMap<>();

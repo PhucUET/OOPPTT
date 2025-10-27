@@ -1,173 +1,158 @@
 package unknown.oopptt.api;
 
+import org.json.JSONArray;
+import org.json.JSONObject;
+
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.nio.charset.StandardCharsets;
-import java.sql.*;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 public class Data extends Manage {
-
-    /**
-     * Đảm bảo người chơi tồn tại trong bảng players.
-     * Nếu chưa có, sẽ tự động thêm mới.
-     */
-    private void ensurePlayerExists(String playerName) throws SQLException {
-        String checkSQL = "SELECT name FROM players WHERE name = ?";
-        String insertSQL = "INSERT INTO players (name) VALUES (?)";
-
-        try (Connection conn = Database.getConnection();
-             PreparedStatement psCheck = conn.prepareStatement(checkSQL)) {
-
-            psCheck.setString(1, playerName);
-            ResultSet rs = psCheck.executeQuery();
-
-            if (!rs.next()) { // nếu chưa tồn tại
-                try (PreparedStatement psInsert = conn.prepareStatement(insertSQL)) {
-                    psInsert.setString(1, playerName);
-                    psInsert.executeUpdate();
-                    System.out.println("Added new player: " + playerName);
-                }
-            }
-        }
-    }
-
-    /**
-     * Lưu điểm của người chơi vào bảng highscores.
-     * Tự động thêm người chơi mới nếu chưa tồn tại.
-     */
-    public void saveScore(String playerName, int score, int highScore, String mode) {
-        String sql = "INSERT INTO highscores (player_name, score, highscore, mode) VALUES (?, ?, ?, ?)";
-
-        try {
-            // đảm bảo player tồn tại trước khi insert
-            ensurePlayerExists(playerName);
-
-            try (Connection conn = Database.getConnection();
-                 PreparedStatement ps = conn.prepareStatement(sql)) {
-
-                ps.setString(1, playerName);
-                ps.setInt(2, score);
-                ps.setInt(3, highScore);
-                ps.setString(4, mode);
-                ps.executeUpdate();
-
-                System.out.printf("Saved score for %s | Score=%d | High=%d | Mode=%s%n",
-                        playerName, score, highScore, mode);
-
-                uploadToGoogleSheets(playerName, score, highScore, mode);
-            }
-
-        } catch (SQLException e) {
-            System.err.println("Error saving score: " + e.getMessage());
-        }
-    }
-
-    /**
-     * Lấy danh sách top N người chơi có điểm cao nhất.
-     * Gộp theo người chơi để tránh trùng lặp.
-     */
-    public List<String> getTopScores(int limit) {
-        List<String> top = new ArrayList<>();
-        String sql = """
-                SELECT player_name, MAX(highscore) AS best
-                FROM highscores
-                GROUP BY player_name
-                ORDER BY best DESC
-                LIMIT ?
-                """;
-
-        try (Connection conn = Database.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
-
-            ps.setInt(1, limit);
-            ResultSet rs = ps.executeQuery();
-
-            while (rs.next()) {
-                String name = rs.getString("player_name");
-                int best = rs.getInt("best");
-                top.add(name + " - " + best);
-            }
-
-        } catch (SQLException e) {
-            System.err.println("Error loading top scores: " + e.getMessage());
-        }
-
-        return top;
-    }
-
-    /**
-     * Lấy điểm cao nhất của một người chơi cụ thể.
-     */
-    public int getPlayerHighScore(String playerName) {
-        String sql = "SELECT MAX(highscore) AS best FROM highscores WHERE player_name = ?";
-        try (Connection conn = Database.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
-
-            ps.setString(1, playerName);
-            ResultSet rs = ps.executeQuery();
-            if (rs.next()) {
-                return rs.getInt("best");
-            }
-
-        } catch (SQLException e) {
-            System.err.println("Error fetching highscore: " + e.getMessage());
-        }
-        return 0;
-    }
-
-    /**
-     * Xóa toàn bộ dữ liệu điểm (reset highscores).
-     */
-    @Override
-    public void reset() {
-        String sql = "DELETE FROM highscores";
-
-        try (Connection conn = Database.getConnection();
-             Statement st = conn.createStatement()) {
-
-            st.executeUpdate(sql);
-            System.out.println("Data reset: cleared highscores table.");
-
-        } catch (SQLException e) {
-            System.err.println("Error resetting data: " + e.getMessage());
-        }
-    }
 
     private static final String SCRIPT_URL =
             "https://script.google.com/macros/s/AKfycbwnvhxGNndF8LUSxJW7I-hDCxWv5aWd0ouQdiTS9PxksOsi4DwOb1xU2GmLLXu-RV8ZTQ/exec";
 
-    public void uploadToGoogleSheets(String playerName, int score, int highscore, String mode) {
+    /**
+     * Lưu điểm của người chơi hiện tại lên Google Sheets.
+     */
+    public void saveScore(String playerName, int score, int highScore, String mode) {
         try {
+            //tạo kết nối HTTP
             URL url = new URL(SCRIPT_URL);
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+            //mở 1 kết nối đến gg apps script bằng phương thức post
             conn.setRequestMethod("POST");
+            //gửi dữ liệu dạng json
             conn.setRequestProperty("Content-Type", "application/json");
+            //cho phép gửi nội dung kèm theo
             conn.setDoOutput(true);
 
-            // JSON body
+            //tạo nội dung json
             String json = String.format(
                     "{\"player_name\":\"%s\",\"score\":%d,\"highscore\":%d,\"mode\":\"%s\"}",
-                    playerName, score, highscore, mode
+                    playerName, score, highScore, mode
             );
 
+            //gửi dữ liệu đi, mở OutputStream đến sever
             try (OutputStream os = conn.getOutputStream()) {
-                os.write(json.getBytes("UTF-8"));
+                os.write(json.getBytes("UTF-8")); //
             }
 
             int responseCode = conn.getResponseCode();
             if (responseCode == 200) {
-                System.out.println("✅ Sent data to Google Sheets successfully!");
+                System.out.println("Gửi dữ liệu lên Google Sheets thành công!");
             } else {
-                System.out.println("⚠️ Google Sheets returned code: " + responseCode);
+                System.out.println("Google Sheets trả về mã: " + responseCode);
             }
 
             conn.disconnect();
 
         } catch (Exception e) {
-            e.printStackTrace();
+            System.err.println("Lỗi khi gửi dữ liệu: " + e.getMessage());
         }
+    }
+
+    /**
+     * Tạm thời lưu top điểm trong bộ nhớ RAM (không cần SQL)
+     * để hiển thị bảng xếp hạng nhanh trong cùng phiên chơi.
+     */
+    private final List<String> localScores = new ArrayList<>();
+
+    public void addLocalScore(String player, int score) {
+        localScores.add(player + " - " + score);
+    }
+
+    public List<String> getLocalScores() {
+        return new ArrayList<>(localScores);
+    }
+
+    /**
+     * Lấy bảng xếp hạng highscore toàn cầu (chỉ chế độ SOLO)
+     * từ Google Sheets và sắp xếp giảm dần.
+     */
+    public List<String> fetchGlobalHighScores() {
+        List<String> topList = new ArrayList<>();
+        try {
+            URL url = new URL(SCRIPT_URL);
+            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+            conn.setRequestMethod("GET");
+
+            // Đọc dữ liệu phản hồi từ Apps Script
+            BufferedReader reader = new BufferedReader(
+                    new InputStreamReader(conn.getInputStream(), "UTF-8")
+            );
+            StringBuilder response = new StringBuilder();
+            String line;
+            while ((line = reader.readLine()) != null)
+                response.append(line);
+            reader.close();
+
+            // Phân tích JSON
+            JSONArray arr = new JSONArray(response.toString());
+
+            // Map để gom điểm cao nhất theo tên
+            Map<String, Integer> playerHighscores = new HashMap<>();
+
+            for (int i = 0; i < arr.length(); i++) {
+                JSONObject obj = arr.getJSONObject(i);
+                String mode = obj.optString("mode", "");
+                String name = obj.optString("player_name", "Unknown");
+                int highscore = obj.optInt("highscore", 0);
+
+                // Chỉ lấy dữ liệu chế độ SOLO
+                if (mode.equalsIgnoreCase("SOLO")) {
+                    // Nếu tên đã tồn tại -> lấy điểm cao hơn
+                    playerHighscores.merge(name, highscore, Math::max);
+                }
+            }
+
+            // Chuyển thành danh sách PlayerRecord để sắp xếp
+            List<PlayerRecord> records = new ArrayList<>();
+            for (Map.Entry<String, Integer> entry : playerHighscores.entrySet()) {
+                records.add(new PlayerRecord(entry.getKey(), entry.getValue()));
+            }
+
+            // Sắp xếp giảm dần theo điểm
+            records.sort(Comparator.comparingInt(PlayerRecord::getHighscore).reversed());
+
+            // Lấy top 10 người
+            int rank = 1;
+            for (PlayerRecord p : records.subList(0, Math.min(10, records.size()))) {
+                topList.add(rank++ + ". " + p.getName() + " - " + p.getHighscore() + " điểm");
+            }
+
+        } catch (Exception e) {
+            System.err.println("❌ Lỗi khi lấy dữ liệu từ Google Sheets: " + e.getMessage());
+        }
+
+        return topList;
+    }
+
+    /**
+     * Lớp phụ trợ để lưu tạm player & điểm cao nhất.
+     */
+    private static class PlayerRecord {
+        private final String name;
+        private final int highscore;
+
+        public PlayerRecord(String name, int highscore) {
+            this.name = name;
+            this.highscore = highscore;
+        }
+
+        public String getName() { return name; }
+        public int getHighscore() { return highscore; }
+    }
+
+    /**
+     * Xóa dữ liệu cục bộ (RAM). Không ảnh hưởng dữ liệu trên Google Sheets.
+     */
+    @Override
+    public void reset() {
+        localScores.clear();
+        System.out.println("Dữ liệu cục bộ đã được reset (Sheets vẫn giữ nguyên).");
     }
 }
