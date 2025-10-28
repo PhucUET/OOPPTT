@@ -22,13 +22,6 @@ public class Shooter {
     private boolean enabled = false;
     private double timeSinceLastShoot;
 
-    private static final class Bullet{
-        double x, y;
-        double vy;
-        final ImageView imageView;
-        boolean alive;
-        Bullet(ImageView imageView){this.imageView = imageView;}
-    }
 
     private final Deque<Bullet> bulletPool = new ArrayDeque<>();
     private final List<Bullet> active = new ArrayList<>();
@@ -52,6 +45,7 @@ public class Shooter {
             game_Layout.getChildren().add(bullet.imageView);
         }
     }
+
 
     public void setEnabled(boolean enabled) {
         this.enabled = enabled;

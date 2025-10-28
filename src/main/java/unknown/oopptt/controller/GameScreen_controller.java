@@ -20,78 +20,102 @@ import javafx.util.Duration;
 import unknown.oopptt.api.*;
 
 import java.io.*;
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.spi.AbstractResourceBundleProvider;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.util.*;
+import java.util.concurrent.ThreadLocalRandom;
+import java.util.stream.Stream;
 
 public class GameScreen_controller {
-    private static String background_Video = new File("src/main/resources/graphic/video1.mp4").toURI().toString();
-    private static String background_Game = new File("src/main/resources/graphic/background10.jpg").toURI().toString();
-    private static File mapBrick1 = new File("src/main/resources/map/map1.txt");
-    final double LOGICAL_WIDTH = 800;
-    final double LOGICAL_HEIGHT = 600;
 
-    private final static int SCNENE_WIDTH = 1440;
-    private final static int SCENE_HEIGHT = 810;
+    // === Constants / Assets ==================================================
+    private static final String BG_VIDEO_PATH = new File("src/main/resources/graphic/video1.mp4").toURI().toString();
+    private static final String BG_IMAGE_PATH = new File("src/main/resources/graphic/background10.jpg").toURI().toString();
+    private static final File MAP_FILE = new File("src/main/resources/map/map1.txt");
+
+    // Logical sizes (nếu bạn thực sự cần scale theo StackPane thì có thể dùng sau)
+    private static final double LOGICAL_WIDTH  = 800;
+    private static final double LOGICAL_HEIGHT = 600;
+
+    // Brick cell size (đang dùng 60x30 trong upMap)
+    private static final int BRICK_CELL_W = 60;
+    private static final int BRICK_CELL_H = 30;
+
+    // ========================================================================
+
     private boolean inPaddle = true;
-    List<Brick> gameBricks = new LinkedList<Brick>();
-    List<Powerup> gamePowerup = new LinkedList<>();
-    Sheild sheild = new Sheild();
-    Shooter shooter;
+    private final List<Brick> gameBricks = new LinkedList<>();
+    private final List<Powerup> gamePowerup = new LinkedList<>();
+    private final Sheild sheild = new Sheild();
+    private Shooter shooter;
 
-    BaseGame baseGame = new BaseGame(this);
+    private final BaseGame baseGame = new BaseGame(this);
 
-    @FXML
-    private StackPane stack_root;
-    @FXML
-    private MediaView mediaView;
-    @FXML
-    private ImageView gameBackground;
-    @FXML
-    private Paddle paddleLogic;
+    @FXML private StackPane stack_root;
+    @FXML private MediaView mediaView;
+    @FXML private ImageView gameBackground;
+    @FXML private Paddle paddleLogic;
 
-    private List<Ball> gameBall = new ArrayList<Ball>();
-    PowerBall powerBall;
+    private final List<Ball> gameBall = new ArrayList<>();
+    private PowerBall powerBall;
     private SpecialPaddle specialPaddle;
 
-    @FXML
-    AnchorPane gamePane;
-    @FXML
-    Pane layout_game;
-    @FXML
-    Group gameGroup;
+    @FXML AnchorPane gamePane;
+    @FXML Pane layout_game;
+    @FXML Group gameGroup;
+
     private boolean isCatch = false;
     private MediaPlayer mediaPlayer;
     private MediaPlayer mediaPlayer1;
 
+    // dt của frame gần nhất (nếu cần cho handler khác dùng)
+    private double udt = 0.0;
 
-    private void set_Background() {
+    // Cache biên chơi để không gọi getBoundsInParent liên tục
+    private double fieldMinX, fieldMaxX, fieldMinY, fieldMaxY;
 
+    // ======================= INIT ============================================
+    @FXML
+    public void initialize() {
+        stack_root.setAlignment(Pos.CENTER);
+        // Nếu bạn không dùng video nền thì comment setBackground_Video()
+        // setBackground_Video();
 
-        Platform.runLater(()-> {
-            gameBackground.setImage(new Image(background_Game));
+        set_Background();      // tạo paddle/ball/shooter + map
+        setOnMouse_Paddle();   // input
+        startGameLoop();       // game loop
+    }
 
-            paddleLogic = new Paddle(gameBackground.getBoundsInParent().getCenterX(), gameBackground.getBoundsInParent().getMaxY() - 20);
-            layout_game.getChildren().add(paddleLogic.getImageView());
-            specialPaddle = new SpecialPaddle(paddleLogic);
+    private void preloadAssets() {
+        ImageCache.loadFolder("src/main/resources/graphic/Brick1");
+        ImageCache.loadFolder("src/main/resources/graphic/Brick2");
+        ImageCache.loadFolder("src/main/resources/graphic/Brick3");
+        ImageCache.loadFolder("src/main/resources/graphic/EnemyIdle");
+        ImageCache.loadFolder("src/main/resources/graphic/EnemyMove");
+        ImageCache.loadFolder("src/main/resources/graphic/dropbrick1");
+    }
 
-            Ball first_ball = new Ball(paddleLogic.getPos_x(),paddleLogic.getPos_y() - 2,1,0);
-            gameBall.add(first_ball);
-            layout_game.getChildren().add(first_ball.getImageView());
-            powerBall = new PowerBall(gameBall);
-            shooter = new Shooter(200, 2, 1,3,layout_game, paddleLogic.getImageView(),20);
+    // ======================= BACKGROUND / VIDEO ==============================
+    private void setBackground_Video() {
+        mediaPlayer  = new MediaPlayer(new Media(BG_VIDEO_PATH));
+        mediaPlayer1 = new MediaPlayer(new Media(BG_VIDEO_PATH));
 
-            upMap();
-        });
+        mediaView.setPreserveRatio(true);
+        mediaView.fitWidthProperty().bind(stack_root.widthProperty());
+        mediaView.fitHeightProperty().bind(stack_root.heightProperty());
+
+        chain(mediaPlayer, mediaPlayer1, mediaView);
+        chain(mediaPlayer1, mediaPlayer, mediaView);
+
+        mediaView.setMediaPlayer(mediaPlayer);
+        mediaPlayer.play();
     }
 
     private void chain(MediaPlayer a, MediaPlayer b, MediaView view) {
         a.setOnReady(() -> {
             Duration total = a.getMedia().getDuration();
             a.currentTimeProperty().addListener((obs, oldTime, newTime) -> {
-                if (total.greaterThan(Duration.ZERO)
-                        && newTime.greaterThan(total.subtract(Duration.millis(200)))) {
+                if (total.greaterThan(Duration.ZERO) && newTime.greaterThan(total.subtract(Duration.millis(200)))) {
                     if (b.getStatus() != MediaPlayer.Status.PLAYING) {
                         Platform.runLater(() -> {
                             view.setMediaPlayer(b);
@@ -106,184 +130,146 @@ public class GameScreen_controller {
         });
     }
 
-    void setBackground_Video() {
-        mediaPlayer =  new MediaPlayer(new Media(background_Video));
-        mediaPlayer1 =  new MediaPlayer(new Media(background_Video));
+    // ======================= SCENE SETUP =====================================
+    private void set_Background() {
+        // 1) Set image nền
+        gameBackground.setImage(new Image(BG_IMAGE_PATH));
 
+        // 2) Tính biên chơi sau khi ImageView có Image
+        //    Dùng layout_game size làm gốc; ở đây ta lấy bounds của background ngay thời điểm này
+        //    Nếu bạn có scale/resize, nên lắng nghe thay đổi và cập nhật lại bounds.
+        Platform.runLater(() -> {
+            Bounds b = gameBackground.getBoundsInParent();
+            fieldMinX = b.getMinX();
+            fieldMaxX = b.getMaxX();
+            fieldMinY = b.getMinY();
+            fieldMaxY = b.getMaxY();
+        });
 
-        mediaView.setPreserveRatio(true);
-        mediaView.fitWidthProperty().bind(stack_root.widthProperty());
-        mediaView.fitHeightProperty().bind(stack_root.heightProperty());
+        // 3) Paddle
+        paddleLogic = new Paddle(
+                gameBackground.getBoundsInParent().getCenterX(),
+                gameBackground.getBoundsInParent().getMaxY() - 30
+        );
+        layout_game.getChildren().add(paddleLogic.getImageView());
+        specialPaddle = new SpecialPaddle(paddleLogic);
 
-        chain(mediaPlayer, mediaPlayer1, mediaView);
+        // 4) Ball
+        Ball first_ball = new Ball(paddleLogic.getPos_x(), paddleLogic.getPos_y() - 2, 0.1, 0, layout_game);
+        gameBall.add(first_ball);
+        //System.out.println(first_ball.getImageView().getBoundsInParent().getWidth() + " " + first_ball.getImageView().getBoundsInParent().getHeight());
+        layout_game.getChildren().add(first_ball.getImageView());
+        powerBall = new PowerBall(gameBall);
 
-        chain(mediaPlayer1, mediaPlayer, mediaView);
+        // 5) Shooter
+        shooter = new Shooter(200, 2, 1, 3, layout_game, paddleLogic.getImageView(), 20);
 
-        mediaView.setMediaPlayer(mediaPlayer);
-        mediaPlayer.play();
+        // 6) Map
+        upMap();
     }
 
-
-
+    // ======================= MAP LOAD (OPTIMIZED) ============================
     private void upMap() {
-        int startX = 0;
-        int startY = 0;
-        try (BufferedReader br = new BufferedReader(new FileReader(mapBrick1))) {
-            String line;
-            int row = 0;
-            while ((line = br.readLine()) != null) {
-                String[] data = line.split("\\t");
+        final int startX = 0;
+        final int startY = 0;
+
+        if (!MAP_FILE.exists() || !MAP_FILE.isFile()) {
+            throw new RuntimeException("Map file not found: " + MAP_FILE.getAbsolutePath());
+        }
+
+        try (Stream<String> lines = Files.lines(MAP_FILE.toPath(), StandardCharsets.UTF_8)) {
+            final int[] row = {0};
+            lines.forEach(line -> {
+                // Chuẩn hóa: tách theo mọi khoảng trắng (tab, space...)
+                String[] data = line.trim().split("\\s+");
                 for (int col = 0; col < data.length; col++) {
-                    int type = Integer.parseInt(data[col]);
+                    if (data[col].isEmpty()) continue;
+                    int type = safeParse(data[col]); // tránh NumberFormatException
                     if (type > 0) {
-                        int newX = startX + col * 33;
-                        int newY = startY + row * 15;
-                        Brick new_Brick = new Brick(newX,newY,type);
+                        int newX = startX + col * BRICK_CELL_W;
+                        int newY = startY + row[0] * BRICK_CELL_H;
+                        Brick new_Brick = new Brick(newX, newY, type);
                         gameBricks.add(new_Brick);
                         layout_game.getChildren().add(new_Brick.getImageView());
                     }
                 }
-                row = row + 1;
-            }
-        } catch (FileNotFoundException e) {
-            throw new RuntimeException(e);
+                row[0]++;
+            });
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
 
-
-    @FXML
-    public void initialize() {
-
-        // Giãn gamePane full stack_root
-        System.out.println(gameBackground.getBoundsInParent().getWidth() +  " " + gameBackground.getBoundsInParent().getHeight());
-        stack_root.setAlignment(Pos.CENTER);
-        // setlayout game
-        Platform.runLater(()-> {
-            System.out.println(stack_root.localToScene(stack_root.getBoundsInLocal()));
-
-            System.out.println(layout_game.localToScene(layout_game.getBoundsInLocal()));
-            System.out.println(layout_game.localToScene(layout_game.getBoundsInParent()));
-
-            System.out.println(layout_game.getBoundsInParent().getWidth() + " " + layout_game.getBoundsInParent().getHeight());
-        });
-//        setBackground_Video();
-        set_Background();
-
-
-
-        // di chuyển paddle
-
-
-        startgameloop();
-        setOnMouse_Paddle();
-
+    private int safeParse(String s) {
+        try {
+            // Xử lý chuỗi bẩn kiểu "1   0" hoặc chứa ký tự trắng
+            return Integer.parseInt(s.trim().replaceAll("\\s+", ""));
+        } catch (NumberFormatException e) {
+            // Nếu thật sự là 2 số dính trong 1 token thì bạn cần quy ước map rõ ràng hơn
+            // Ở đây mặc định về 0 để không crash
+            return 0;
+        }
     }
 
-
-
-    /**
-     * paddle di chuyển.
-     */
-
+    // ======================= INPUT (PADDLE) ==================================
     private void setOnMouse_Paddle() {
         layout_game.setCursor(Cursor.NONE);
-        Platform.runLater(() -> {
-            layout_game.setOnMouseClicked(event -> {
+
+        // Click: thả bóng (tắt sticky)
+        layout_game.setOnMouseClicked(event -> {
+            if (event.getButton() == MouseButton.PRIMARY) {
                 for (Ball ball : gameBall) {
                     ball.setSticky(false);
-
                 }
-
-            });
-            layout_game.setOnMouseMoved(event -> {
-                int newX = (int) Math.round(
-                        Math.max(
-                                gameBackground.getBoundsInParent().getMinX() + paddleLogic.getWidth() / 2,
-                                Math.min(event.getX() - paddleLogic.getWidth() / 2,
-                                        gameBackground.getBoundsInParent().getMaxX()- paddleLogic.getWidth() / 2)
-                        )
-                );
-                System.out.println(newX);
-                paddleLogic.setLocation(newX);
-            });
-
+            }
         });
 
+        // Move: cập nhật vị trí paddle mượt (dùng clamp với cache bounds)
+        layout_game.setOnMouseMoved(event -> {
+            final double halfW = paddleLogic.getWidth() / 2.0;
 
-    }
-
-    /**
-     * Bóng di chuyển
-     */
-
-    private void gameBall(double dt) {
-        if  (gameBall.size() == 0) {
-            return;
-        }
-        for (int i = gameBall.size() - 1; i >= 0; i--) {
-            Ball ballLogic = gameBall.get(i);
-            if (ballLogic.isSticky()) {
-                double newX = paddleLogic.getPos_x() + ballLogic.getPosinPaddle();
-                if (newX > paddleLogic.getImageView().getBoundsInParent().getMaxX() ||
-                        newX < paddleLogic.getImageView().getBoundsInParent().getMinX()) {
-                    newX = Math.max(paddleLogic.getImageView().getBoundsInParent().getMinX(),
-                            Math.min(paddleLogic.getImageView().getBoundsInParent().getMaxX(), paddleLogic.getWidth()));
-                    ballLogic.updateSpeedX(-ballLogic.getSpeedX());
-                }
-                ballLogic.setLocation(newX);
-                ballLogic.setPosinPaddle();
-            } else {
-                if (baseGame.outBall(ballLogic, gameBackground)) {
-                    gameBall.remove(i);
-                    layout_game.getChildren().remove(ballLogic.getImageView());
-                    continue;
-                }
-                baseGame.brickCollision(ballLogic,gameBricks,layout_game, gamePowerup);
-                baseGame.paddleballCollision(ballLogic, paddleLogic, isCatch);
-                baseGame.wallCollision(ballLogic,gameBackground);
-                System.out.println("ngusi" + ballLogic.getSpeedX() + " " + ballLogic.getSpeedY());
-                ballLogic.updatePos(dt);
-            }
-        }
-    }
-
-    private void setGamePowerup() {
-        for (int i = gamePowerup.size() - 1; i >= 0; i--) {
-            Powerup powerup = gamePowerup.get(i);
-            if (baseGame.paddlePUCollision(powerup,paddleLogic)) {
-                gamePowerup.remove(powerup);
-                layout_game.getChildren().remove(powerup.getImageView());
-            } else {
-                if (baseGame.outPowerup(powerup, gameBackground)) {
-                    gamePowerup.remove(powerup);
-                    layout_game.getChildren().remove(powerup.getImageView());
-                    continue;
-                }
-                powerup.movedown();
+            // Nếu bounds chưa có (vừa khởi tạo), fallback sang bounds hiện tại
+            double minX = fieldMinX;
+            double maxX = fieldMaxX;
+            if (maxX <= minX) {
+                Bounds b = gameBackground.getBoundsInParent();
+                minX = b.getMinX();
+                maxX = b.getMaxX();
             }
 
-        }
+            double target = clamp(event.getX() - halfW, minX + halfW, maxX - halfW);
+            paddleLogic.setLocation(target, udt);
+        });
     }
 
+    private static double clamp(double v, double lo, double hi) {
+        return (v < lo) ? lo : (v > hi) ? hi : v;
+    }
 
-    private void startgameloop() {
+    // ======================= GAME LOOP =======================================
+    private void startGameLoop() {
         AnimationTimer timer = new AnimationTimer() {
-            private Long lasts = 0L;
+            private long lastNs = 0L;
+
             @Override
             public void handle(long now) {
-                if (lasts == 0) {
-                    lasts = now;
+                if (lastNs == 0L) {
+                    lastNs = now;
                     return;
                 }
+
+                double dt = (now - lastNs) / 1e9; // giây
+                lastNs = now;
+
+                if (dt < 0.1) {
+                    gameBricksUp(dt);
+                }
+
+                update(dt);                // cập nhật state chung (udt, animation phụ...)
                 if (shooter.getEnabled()) {
                     shooter.tryFire();
                 }
-                double dt = (now - lasts) / 1e9;
-                System.out.println("frame" + dt);
-                lasts = now;
-                shooter.update(dt,gameBricks);
+                shooter.update(dt, gameBricks);
                 gameBall(dt);
                 setGamePowerup();
             }
@@ -291,33 +277,103 @@ public class GameScreen_controller {
         timer.start();
     }
 
-
-    public void upBall() {powerBall.upBall();}
-
-    public void resetBall() {powerBall.downBall();}
-
-    public void slowBall() {powerBall.slowBall();}
-
-    public void resetSlowBall() {powerBall.normalBall();}
-
-    public void openSheild() {sheild.openSheild(gameBricks, layout_game, gameBackground);}
-
-    public void moreBall() {powerBall.moreBall(layout_game);}
-
-    public void upPaddle() {specialPaddle.upPaddle();}
-
-    public void resetPaddle() {specialPaddle.downPaddle();}
-
-
-    public void catchBall() {
-        isCatch = !isCatch;
+    private void update(double dt) {
+        udt = dt; // nếu Paddle/Ball cần dùng dt từ nơi khác
     }
 
-    public void enableGun() {
-        shooter.setEnabled(true);
+    private boolean shouldDrop(double probability) {
+        return ThreadLocalRandom.current().nextDouble() < probability;
     }
 
-    public void unEnableGun() {
-        shooter.setEnabled(false);
+    private void gameBricksUp(double dt) {
+        for (int i = gameBricks.size() - 1; i >= 0; i--) {
+            Brick brick = gameBricks.get(i);
+            if (brick.isWait()) {
+                if (brick.dropBrick(dt)) {
+                    layout_game.getChildren().remove(brick.getImageView());
+                    gameBricks.remove(i);
+                    if (shouldDrop(0.5)) {
+                        Powerup p = new Powerup(
+                                brick.getImageView().getBoundsInParent().getCenterX(), brick.getImageView().getBoundsInParent().getCenterY());
+                        layout_game.getChildren().add(p.getImageView());
+                        gamePowerup.add(p);
+                    }
+                }
+            }
+            brick.updateAnimation(dt);
+        }
     }
+    int cnt = 0;
+    private void gameBall(double dt) {
+        if (gameBall.isEmpty()) return;
+
+        for (int i = gameBall.size() - 1; i >= 0; i--) {
+            Ball ballLogic = gameBall.get(i);
+            if (ballLogic.isSticky()) {
+                double newX = paddleLogic.getPos_x() + ballLogic.getOffsetOnPaddle();
+
+                // tránh trôi ra ngoài paddle
+                Bounds pb = paddleLogic.getImageView().getBoundsInParent();
+                if (newX > pb.getMaxX() || newX < pb.getMinX()) {
+                    newX = clamp(newX, pb.getMinX(), pb.getMaxX());
+                    ballLogic.setSpeedX(-ballLogic.getSpeedX());
+                }
+
+                ballLogic.setLocation(newX, dt);
+                ballLogic.addOffsetOnPaddle(dt);
+                //System.out.println(ballLogic.getImageView().getBoundsInParent().getMinX() + " " + ballLogic.getImageView().getBoundsInParent().getMinX());
+                continue;
+            }
+            //System.out.println(ballLogic.getImageView().getBoundsInParent().getMinX() + " " + ballLogic.getImageView().getBoundsInParent().getMinX() + " " + ballLogic.getImageView().getBoundsInParent().getWidth() + " " + ballLogic.getImageView().getBoundsInParent().getHeight());
+            if (baseGame.outBall(ballLogic.getImageView().getBoundsInParent(), gameBackground)) {
+                gameBall.remove(i);
+                layout_game.getChildren().remove(ballLogic.getImageView());
+                continue;
+            }
+
+            baseGame.brickCollision(ballLogic, gameBricks);
+            baseGame.paddleballCollision(ballLogic, paddleLogic, isCatch);
+
+            baseGame.wallCollision(ballLogic, gameBackground);
+
+            ballLogic.updatePos(dt);
+        }
+
+    }
+
+    private void setGamePowerup() {
+        for (int i = gamePowerup.size() - 1; i >= 0; i--) {
+            Powerup pu = gamePowerup.get(i);
+            if (baseGame.paddlePUCollision(pu, paddleLogic)) {
+                gamePowerup.remove(i);
+                layout_game.getChildren().remove(pu.getImageView());
+                continue;
+            }
+            if (baseGame.outPowerup(pu, gameBackground)) {
+                gamePowerup.remove(i);
+                layout_game.getChildren().remove(pu.getImageView());
+                continue;
+            }
+            pu.movedown();
+        }
+    }
+
+    // ======================= POWER / CONTROL API =============================
+    public void upBall()             { powerBall.upBall(); }
+    public void resetBall()          { powerBall.downBall(); }
+    public void slowBall()           { powerBall.slowBall(); }
+    public void resetSlowBall()      { powerBall.normalBall(); }
+    public void openSheild()         { sheild.openSheild(gameBricks, layout_game, gameBackground); }
+    public void moreBall()           { powerBall.moreBall(layout_game); }
+
+    public void upPaddle() {
+        if (paddleLogic.getWidth() * 2 <= gameBackground.getBoundsInParent().getWidth() / 2.0)  {
+            specialPaddle.upPaddle();
+        }
+    }
+
+    public void resetPaddle()        { specialPaddle.downPaddle(); }
+    public void catchBall()          { isCatch = !isCatch; }
+    public void enableGun()          { shooter.setEnabled(true); }
+    public void unEnableGun()        { shooter.setEnabled(false); }
 }

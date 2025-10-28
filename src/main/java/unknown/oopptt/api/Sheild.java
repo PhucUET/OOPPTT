@@ -10,9 +10,5 @@ public class Sheild {
         Brick newsheild = new Brick(backgroundGame.getBoundsInParent().getMinX(),
                 backgroundGame.getBoundsInParent().getMaxY() - 5,layout_game.getLayoutBounds().getWidth(),2,1);
         bricks.add(newsheild);
-        layout_game.getChildren().add(newsheild.getImageView());
-        System.out.println(layout_game.getBoundsInParent().getMinX() + " " + layout_game.getBoundsInParent().getMinY());
-        System.out.println(layout_game.localToScene(layout_game.getBoundsInLocal()));
-        System.out.println(layout_game.localToScene(layout_game.getBoundsInParent()));
     }
 }

@@ -2,47 +2,97 @@ package unknown.oopptt.api;
 
 import javafx.scene.layout.Pane;
 
+import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
+/**
+ * Quản lý các hiệu ứng Power-up liên quan đến bóng trong game.
+ * Bao gồm: tăng kích thước, giảm tốc, phục hồi tốc độ, nhân đôi bóng.
+ */
 public class PowerBall {
+
     private final List<Ball> balls;
+
+    // Giới hạn an toàn
+    private static final double MIN_SPEED_SCALE = 150.0;
+    private static final double MAX_SPEED_SCALE = 600.0;
+    private static final int MAX_BALLS = 12;
+    private static final int DEFAULT_SIZE = 15;
+    private static final int BIG_SIZE = 25;
+    private static final int SMALL_SIZE = 10;
+
     public PowerBall(List<Ball> balls) {
         this.balls = balls;
     }
+
     public void upBall() {
-        for (Ball ballLogic : balls) {
-            ballLogic.changeBallsize(20);
+        for (Ball ball : balls) {
+            ball.changeSize(BIG_SIZE);
         }
     }
+
     public void downBall() {
-        for (Ball ballLogic : balls) {
-            ballLogic.changeBallsize(10);
+        for (Ball ball : balls) {
+            ball.changeSize(DEFAULT_SIZE);
         }
     }
+
+
     public void slowBall() {
-        for (Ball ballLogic : balls) {
-            ballLogic.setSpeedXY(ballLogic.getSpeedXY() + 2);
+        for (Ball ball : balls) {
+            double newSpeed = Math.max(MIN_SPEED_SCALE, ball.getSpeedScale() * 0.8);
+            ball.setSpeedScale(newSpeed);
         }
     }
+
     public void normalBall() {
-        for (Ball ballLogic : balls) {
-            ballLogic.setSpeedXY(ballLogic.getSpeedXY() - 2);
+        for (Ball ball : balls) {
+            ball.setSpeedScale(DEFAULT_SPEED);
         }
     }
+
+    public void speedUpBall() {
+        for (Ball ball : balls) {
+            double newSpeed = Math.min(MAX_SPEED_SCALE, ball.getSpeedScale() * 1.2);
+            ball.setSpeedScale(newSpeed);
+        }
+    }
+
     public void moreBall(Pane root) {
-        for (int i = balls.size() - 1; i >= 0; i--) {
-            Ball nowB = balls.get(i);
-            Ball newB1 = new Ball(nowB);
-            newB1.updateSpeedX(-nowB.getSpeedX());
+        if (balls.size() >= MAX_BALLS) return;
 
-            Ball newB2 =  new Ball(nowB);
-            newB2.updateSpeedY(-nowB.getSpeedXY());
+        List<Ball> newBalls = new ArrayList<>();
 
-            balls.add(newB1);
-            balls.add(newB2);
+        for (Ball original : balls) {
+            Ball left = new Ball(original);
+            Ball right = new Ball(original);
 
-            root.getChildren().addAll(newB1.getImageView(), newB2.getImageView());
+            left.setSpeedX(-original.getSpeedX());
+            right.setSpeedX(original.getSpeedX());
+
+            left.setSpeedY(original.getSpeedY() * 0.9);
+            right.setSpeedY(original.getSpeedY() * 1.1);
+
+            newBalls.add(left);
+            newBalls.add(right);
+        }
+
+        while (balls.size() + newBalls.size() > MAX_BALLS) {
+            newBalls.remove(newBalls.size() - 1);
+        }
+
+        balls.addAll(newBalls);
+        for (Ball b : newBalls) {
+            root.getChildren().add(b.getImageView());
         }
     }
 
+    private static final double DEFAULT_SPEED = 360.0;
+
+    public void resetSpeedAll() {
+        for (Ball ball : balls) {
+            ball.setSpeedScale(DEFAULT_SPEED);
+        }
+    }
 }
