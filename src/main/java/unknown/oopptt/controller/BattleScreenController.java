@@ -33,6 +33,7 @@ public class BattleScreenController {
     private int indexPU;
     private int random_PU;
     private int ballStick;
+    private boolean stillStick = true;
 
     private boolean inPaddle1 = true;
     private boolean isCatch1 = false;
@@ -101,7 +102,6 @@ public class BattleScreenController {
         client = new GameClient(serverIP, serverPort, playerName, msg -> {
             Platform.runLater(() -> {
                 // Ở đây bạn có thể xử lý thông tin từ server
-                System.out.println("Server: " + msg);
                 switch (msg.charAt(0)) {
                     case 'M':
                         String move = msg.substring(5);
@@ -118,6 +118,10 @@ public class BattleScreenController {
                     case 'B':
                         String ballStick = msg.substring(10);
                         setBallStick(Integer.parseInt(ballStick));
+                        break;
+                    case 'S':
+                        String isStick = msg.substring(6);
+                        setStillStick(Boolean.parseBoolean(isStick));
                         break;
                 }
             });
@@ -168,7 +172,7 @@ public class BattleScreenController {
                 //System.out.println(newX);
                 paddleLogic1.setLocation(newX);
                 client.send("Move:"+Integer.toString(newX));
-                paddleLogic2.setLocation(newX);
+                paddleLogic2.setLocation(getMove_Of_Paddle());
             });
 
         });
@@ -251,6 +255,19 @@ public class BattleScreenController {
         for (int i = gameBall1.size() - 1; i >= 0; i--) {
             Ball ballLogic1 = gameBall1.get(i);
             Ball ballLogic2 = gameBall2.get(i);
+            if(isStillStick()) {
+                ballLogic2.setLocation(getBallStick());
+                ballLogic2.setPosinPaddle();
+            }
+            else {
+                baseGame2.random = getRandom_PU();
+                baseGame2.randomIndex = getIndexPU();
+                baseGame2.brickCollision(ballLogic2,gameBricks2,player_2, gamePowerup2);
+                //System.out.println(baseGame2.shouldDrop());
+                baseGame2.paddleballCollision(ballLogic2, paddleLogic2, isCatch2);
+                baseGame2.wallCollision(ballLogic2,screenP2);
+                ballLogic2.updatePos(dt);
+            }
             if (ballLogic1.isSticky()) {
                 double newX = paddleLogic1.getPos_x() + ballLogic1.getPosinPaddle();
                 if (newX > paddleLogic1.getImageView().getBoundsInParent().getMaxX() ||
@@ -262,10 +279,20 @@ public class BattleScreenController {
                 ballLogic1.setLocation(newX);
                 ballLogic1.setPosinPaddle();
                 client.send("BallStick:"+Integer.toString((int) newX));
-
-                ballLogic2.setLocation(getBallStick());
-                ballLogic2.setPosinPaddle();
-            } else {
+                client.send("Stick:"+Boolean.toString(ballLogic1.isSticky()));
+            }
+            else {
+                client.send("Stick:"+Boolean.toString(ballLogic1.isSticky()));
+                baseGame1.random = 0;
+                // randomIndex -1 sẽ random bất kì, từ 0 đến 8 sẽ là đúng cái PU đó
+                baseGame1.randomIndex = -1;
+                baseGame1.brickCollision(ballLogic1,gameBricks1,player_1, gamePowerup1);
+                baseGame1.paddleballCollision(ballLogic1, paddleLogic1, isCatch1);
+                baseGame1.wallCollision(ballLogic1,screenP1);
+                ballLogic1.updatePos(dt);
+                client.send("RandomPU:"+Integer.toString(baseGame1.random));
+                client.send("IndexPU:"+Integer.toString(baseGame1.randomIndex));
+            }
 //                if (baseGame1.outBall(ballLogic1, screenP1)) {
 //                    gameBall1.remove(i);
 //                    player_1.getChildren().remove(ballLogic1.getImageView());
@@ -276,25 +303,16 @@ public class BattleScreenController {
 //                    player_2.getChildren().remove(ballLogic2.getImageView());
 //                    continue;
 //                }
-                baseGame1.random = 0;
-                // randomIndex -1 sẽ random bất kì, từ 0 đến 8 sẽ là đúng cái PU đó
-                baseGame1.randomIndex = -1;
-                baseGame1.brickCollision(ballLogic1,gameBricks1,player_1, gamePowerup1);
-                baseGame1.paddleballCollision(ballLogic1, paddleLogic1, isCatch1);
-                baseGame1.wallCollision(ballLogic1,screenP1);
-                ballLogic1.updatePos(dt);
-                client.send("RandomPU:"+Integer.toString(baseGame1.random));
-                client.send("IndexPU:"+Integer.toString(baseGame1.randomIndex));
 
-//                baseGame2.random = getRandom_PU();
-//                baseGame2.randomIndex = getIndexPU();
-                baseGame2.random = baseGame1.random;
-                baseGame2.randomIndex = baseGame1.randomIndex;
-                baseGame2.brickCollision(ballLogic2,gameBricks2,player_2, gamePowerup2);
-                //System.out.println(baseGame2.shouldDrop());
-                baseGame2.paddleballCollision(ballLogic2, paddleLogic2, isCatch2);
-                baseGame2.wallCollision(ballLogic2,screenP2);
-                ballLogic2.updatePos(dt);
+
+//
+//                baseGame2.random = baseGame1.random;
+//                baseGame2.randomIndex = baseGame1.randomIndex;
+//                baseGame2.brickCollision(ballLogic2,gameBricks2,player_2, gamePowerup2);
+//                //System.out.println(baseGame2.shouldDrop());
+//                baseGame2.paddleballCollision(ballLogic2, paddleLogic2, isCatch2);
+//                baseGame2.wallCollision(ballLogic2,screenP2);
+//                ballLogic2.updatePos(dt);
 //                if(ballLogic1.getPos_y() == ballLogic2.getPos_y()){
 //                    System.out.println(true);
 //                }
@@ -303,7 +321,7 @@ public class BattleScreenController {
 //                }
                 System.out.println(getMove_Of_Paddle());
                 //paddleLogic2.setLocation(paddleLogic1.getPos_x());
-            }
+
         }
     }
     private void setGamePowerup1() {
@@ -393,6 +411,14 @@ public class BattleScreenController {
 
     public void setRandom_PU(int random_PU) {
         this.random_PU = random_PU;
+    }
+
+    public boolean isStillStick() {
+        return stillStick;
+    }
+
+    public void setStillStick(boolean stillStick) {
+        this.stillStick = stillStick;
     }
 
     public void upBall1() {powerBall1.upBall();}

@@ -56,7 +56,7 @@ public  class Ball extends GameEntity {
     public void updatePos(double dt) {
         double speedx = this.speedX * dt * speedXY;
         double speedy = this.speedY * dt * speedXY;
-        System.out.println("speedx: " + speedx +  " speedy: " + speedy);
+       // System.out.println("speedx: " + speedx +  " speedy: " + speedy);
         this.pos_x += speedx;
         this.pos_y += speedy;
         ball.setCenterX(ball.getCenterX() + speedx);

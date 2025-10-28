@@ -234,20 +234,22 @@ public class GameScreen_controller {
                 }
                 ballLogic.setLocation(newX);
                 ballLogic.setPosinPaddle();
-            } else {
+                continue;
+            }
+
 //                if (baseGame.outBall(ballLogic, gameBackground)) {
 //                    gameBall.remove(i);
 //                    layout_game.getChildren().remove(ballLogic.getImageView());
 //                    continue;
 //                }
-                baseGame.random = 0;
-                baseGame.randomIndex =3;
-                baseGame.brickCollision(ballLogic,gameBricks,layout_game, gamePowerup);
-                baseGame.paddleballCollision(ballLogic, paddleLogic, isCatch);
-                baseGame.wallCollision(ballLogic,gameBackground);
-               // System.out.println("ngusi" + ballLogic.getSpeedX() + " " + ballLogic.getSpeedY());
-                ballLogic.updatePos(dt);
-            }
+            baseGame.random = 0;
+            baseGame.randomIndex = -1;
+            baseGame.brickCollision(ballLogic, gameBricks, layout_game, gamePowerup);
+            baseGame.paddleballCollision(ballLogic, paddleLogic, isCatch);
+            baseGame.wallCollision(ballLogic, gameBackground);
+            // System.out.println("ngusi" + ballLogic.getSpeedX() + " " + ballLogic.getSpeedY());
+            ballLogic.updatePos(dt);
+
         }
     }
 
