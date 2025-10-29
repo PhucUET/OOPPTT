@@ -27,13 +27,14 @@ public class BattleScreenController {
 
     private GameClient client;
     private String playerName = "Me";
-    private String serverIP = "127.0.0.1";  // IP LAN server
+    private String serverIP = "172.20.10.4";  // IP LAN server
     private int serverPort = 5000;
     private int move_Of_Paddle;
     private boolean stillStick = true;
     private int indexPU;
     private int random_PU;
     private int ballStick;
+    private double durationTime;
 
     private boolean inPaddle1 = true;
     private boolean isCatch1 = false;
@@ -124,6 +125,10 @@ public class BattleScreenController {
                         String isStick = msg.substring(6);
                         setStillStick(Boolean.parseBoolean(isStick));
                         break;
+                    case 'D':
+                        String durationTime = msg.substring(3);
+                        setDurationTime(Double.parseDouble(durationTime));
+                        break;
                 }
             });
         });
@@ -174,7 +179,8 @@ public class BattleScreenController {
                 //System.out.println(newX);
                 paddleLogic1.setLocation(newX);
                 client.send("Move:"+Integer.toString(newX));
-                paddleLogic2.setLocation(getMove_Of_Paddle());
+
+
             });
 
         });
@@ -189,7 +195,13 @@ public class BattleScreenController {
             player_1.getChildren().add(paddleLogic1.getImageView());
             specialPaddle1 = new SpecialPaddle(paddleLogic1);
 
+
+
+
+            
+
             Ball first_ball = new Ball(paddleLogic1.getPos_x(),paddleLogic1.getPos_y() - 2,1,0);
+            setBallStick((int) paddleLogic1.getPos_x());
             gameBall1.add(first_ball);
             player_1.getChildren().add(first_ball.getImageView());
             powerBall1 = new PowerBall(gameBall1);
@@ -251,6 +263,7 @@ public class BattleScreenController {
     }
 
     private void gameBall(double dt) {
+        client.send("DT:"+Double.toString(dt));
         for (int i = gameBall1.size() - 1; i >= 0; i--) {
             Ball ballLogic1 = null;
             if(gameBall1.size() >= i) {
@@ -287,6 +300,7 @@ public class BattleScreenController {
         }
         for (int i = gameBall2.size() - 1; i >= 0; i--) {
             Ball ballLogic2 = null;
+            paddleLogic2.setLocation(getMove_Of_Paddle());
             if(gameBall2.size() >= i) {
                 ballLogic2 = gameBall2.get(i);
             }
@@ -300,7 +314,7 @@ public class BattleScreenController {
                 baseGame2.brickCollision(ballLogic2,gameBricks2,player_2, gamePowerup2);
                 baseGame2.paddleballCollision(ballLogic2, paddleLogic2, isCatch2);
                 baseGame2.wallCollision(ballLogic2,screenP2);
-                ballLogic2.updatePos(dt);
+                ballLogic2.updatePos(getDurationTime());
             }
         }
     }
@@ -359,6 +373,14 @@ public class BattleScreenController {
             }
         };
         timer.start();
+    }
+
+    public double getDurationTime() {
+        return durationTime;
+    }
+
+    public void setDurationTime(double durationTime) {
+        this.durationTime = durationTime;
     }
 
     public int getBallStick() {
