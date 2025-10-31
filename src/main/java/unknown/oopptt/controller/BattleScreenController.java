@@ -16,6 +16,9 @@ import unknown.oopptt.api.Brick;
 import unknown.oopptt.net.client.GameClient;
 
 import java.io.*;
+import java.net.Inet4Address;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
@@ -26,8 +29,8 @@ public class BattleScreenController {
     private static File mapBrick =  new File("src/main/resources/map/map1.txt");
 
     private GameClient client;
-    private String playerName = "Me";
-    private String serverIP = "172.20.10.4";  // IP LAN server
+    private String playerName = "Thuy";
+    private String serverIP;  // IP LAN server
     private int serverPort = 5000;
     private int move_Of_Paddle;
     private boolean stillStick = true;
@@ -71,6 +74,7 @@ public class BattleScreenController {
         this.pos = pos;
     }
 
+
     @FXML
     private StackPane stack_root;
     @FXML
@@ -90,6 +94,7 @@ public class BattleScreenController {
     @FXML
     public void initialize()
     {
+        setServerIP();
         connectToServer();
         //setPos((int) screenP1.getBoundsInParent().getCenterX());
         set_Player1_BackGround();
@@ -99,6 +104,16 @@ public class BattleScreenController {
 
     }
 
+    public void setServerIP(){
+        InetAddress ip = null;
+        try {
+            ip = InetAddress.getLocalHost();
+        } catch (UnknownHostException e) {
+            throw new RuntimeException(e);
+        }
+        this.serverIP = "172.20.10.4";
+        System.out.println("Server IP: " + this.serverIP);
+    }
     private void connectToServer() {
         client = new GameClient(serverIP, serverPort, playerName, msg -> {
             Platform.runLater(() -> {
@@ -109,14 +124,6 @@ public class BattleScreenController {
                         String move = msg.substring(5);
                         setMove_Of_Paddle(Integer.parseInt(move));
                         break;
-                    case 'I':
-                        String IndexPU = msg.substring(8);
-                        setIndexPU(Integer.parseInt(IndexPU));
-                        break;
-                    case 'R':
-                        String random = msg.substring(9);
-                        setRandom_PU(Integer.parseInt(random));
-                        break;
                     case 'B':
                         String ballStick = msg.substring(10);
                         setBallStick(Integer.parseInt(ballStick));
@@ -124,10 +131,6 @@ public class BattleScreenController {
                     case 'S':
                         String isStick = msg.substring(6);
                         setStillStick(Boolean.parseBoolean(isStick));
-                        break;
-                    case 'D':
-                        String durationTime = msg.substring(3);
-                        setDurationTime(Double.parseDouble(durationTime));
                         break;
                 }
             });
@@ -263,7 +266,7 @@ public class BattleScreenController {
     }
 
     private void gameBall(double dt) {
-        client.send("DT:"+Double.toString(dt));
+
         for (int i = gameBall1.size() - 1; i >= 0; i--) {
             Ball ballLogic1 = null;
             if(gameBall1.size() >= i) {
@@ -283,18 +286,10 @@ public class BattleScreenController {
                 client.send("Stick:"+Boolean.toString(ballLogic1.isSticky()));
             }
             else {
-                baseGame1.random = 0;
-                // randomIndex -1 sẽ random bất kì, từ 0 đến 8 sẽ là đúng cái PU đó
-                baseGame1.randomIndex = -1;
                 baseGame1.brickCollision(ballLogic1,gameBricks1,player_1, gamePowerup1);
                 baseGame1.paddleballCollision(ballLogic1, paddleLogic1, isCatch1);
                 baseGame1.wallCollision(ballLogic1,screenP1);
                 ballLogic1.updatePos(dt);
-                if(baseGame1.random == 1) {
-                    client.send("RandomPU:"+Integer.toString(baseGame1.random));
-                    client.send("IndexPU:"+Integer.toString(baseGame1.randomIndex));
-                    System.out.println(baseGame1.randomIndex);
-                }
             }
                 //paddleLogic2.setLocation(paddleLogic1.getPos_x());
         }
@@ -309,12 +304,10 @@ public class BattleScreenController {
                 ballLogic2.setPosinPaddle();
             }
             else {
-                baseGame2.random = getRandom_PU();
-                baseGame2.randomIndex = getIndexPU();
                 baseGame2.brickCollision(ballLogic2,gameBricks2,player_2, gamePowerup2);
                 baseGame2.paddleballCollision(ballLogic2, paddleLogic2, isCatch2);
                 baseGame2.wallCollision(ballLogic2,screenP2);
-                ballLogic2.updatePos(getDurationTime());
+                ballLogic2.updatePos(0.016);
             }
         }
     }
@@ -357,11 +350,8 @@ public class BattleScreenController {
             private Long lasts = 0L;
             @Override
             public void handle(long now) {
-                if (lasts == 0) {
-                    lasts = now;
-                    return;
-                }
-                double dt = (now - lasts) / 1e9;
+
+                double dt = 0.016;
                 lasts = now;
 //                if (shooter.getEnabled()) {
 //                    shooter.tryFire();
@@ -369,7 +359,7 @@ public class BattleScreenController {
                 //shooter.update(dt,gameBricks1);
                 gameBall(dt);
                 setGamePowerup1();
-                setGamePowerup2();
+//                setGamePowerup2();
             }
         };
         timer.start();

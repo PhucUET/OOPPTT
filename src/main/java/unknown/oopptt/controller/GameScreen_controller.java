@@ -242,8 +242,6 @@ public class GameScreen_controller {
 //                    layout_game.getChildren().remove(ballLogic.getImageView());
 //                    continue;
 //                }
-            baseGame.random = 0;
-            baseGame.randomIndex = -1;
             baseGame.brickCollision(ballLogic, gameBricks, layout_game, gamePowerup);
             baseGame.paddleballCollision(ballLogic, paddleLogic, isCatch);
             baseGame.wallCollision(ballLogic, gameBackground);

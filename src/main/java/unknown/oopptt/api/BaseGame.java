@@ -14,12 +14,6 @@ import java.util.concurrent.ThreadLocalRandom;
 public class BaseGame {
     private GameScreen_controller controller;
     private BattleScreenController BTcontroller;
-    public static int randomIndex = -1 ;
-    public static int random;
-
-
-
-
     public BaseGame(BattleScreenController BTcontroller){
         this.BTcontroller = BTcontroller;
     }
@@ -136,24 +130,9 @@ public class BaseGame {
                 root.getChildren().remove(rv);
                 bricks.remove(i);
                 boolean rand = false;
-                if(this.random == 0){
-                    rand = shouldDrop(0.2);
-                    if(rand == true){
-                        this.random = 1;
-                    }
-                    else {
-                        this.random = -1;
-                    }
-                }
-                if(this.random == 1){
-                    rand = true;
-                }
-                if(this.random == -1){
-                    rand = false;
-                }
-                if (rand) {
-                    Powerup p = new Powerup(rv.getBoundsInParent().getCenterX(), rv.getBoundsInParent().getCenterY(),randomIndex);
-                    this.randomIndex = p.getRandomIndex();
+
+                if (shouldDrop(0.1)) {
+                    Powerup p = new Powerup(rv.getBoundsInParent().getCenterX(), rv.getBoundsInParent().getCenterY());
                     root.getChildren().add(p.getImageView());
                    //System.out.println(this.randomIndex + "    " + p.getRandomIndex());
                     powerups.add(p);

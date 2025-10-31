@@ -52,17 +52,14 @@ public class Powerup  {
         }
 
     }
-    public PowerupType randomUniform(int index) {
+    public PowerupType randomUniform() {
         PowerupType[] vals = PowerupType.values();
-        if(index == -1) {
-            index = ThreadLocalRandom.current().nextInt(vals.length);
-        }
-        setRandomIndex(index);
-        return vals[index];
+        int i = ThreadLocalRandom.current().nextInt(vals.length);
+        return vals[i];
     }
 
-    public Powerup(double pos_x, double pos_y,int randomIndex) {
-        this.type = randomUniform(randomIndex);
+    public Powerup(double pos_x, double pos_y) {
+        this.type = randomUniform();
         this.pos_x = pos_x;
         this.pos_y = pos_y;
         switch (type) {
