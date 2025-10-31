@@ -29,7 +29,7 @@ public class ImageCache {
             Arrays.sort(files, Comparator.comparing(File::getName));
             List<Image> list = new ArrayList<>();
             for (File f : files) {
-                list.add(load(f.getAbsolutePath())); // dùng cache ảnh đơn lẻ
+                list.add(load(f.getAbsolutePath()));
             }
             System.out.println("✅ Cached " + list.size() + " frames from " + path);
             return list;

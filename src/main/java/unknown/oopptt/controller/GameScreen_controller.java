@@ -46,6 +46,7 @@ public class GameScreen_controller {
     private boolean inPaddle = true;
     private final List<Brick> gameBricks = new LinkedList<>();
     private final List<Powerup> gamePowerup = new LinkedList<>();
+    private final List<Enemy> gameEnemies = new LinkedList<>();
     private final Sheild sheild = new Sheild();
     private Shooter shooter;
 
@@ -166,6 +167,7 @@ public class GameScreen_controller {
 
         // 6) Map
         upMap();
+
     }
 
     // ======================= MAP LOAD (OPTIMIZED) ============================
@@ -198,6 +200,9 @@ public class GameScreen_controller {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+        ShooterEnemy meow = new ShooterEnemy(250, 300, 50,50,layout_game, paddleLogic.getImageView());
+        gameEnemies.add(meow);
+        layout_game.getChildren().add(meow.getImageView());
     }
 
     private int safeParse(String s) {
@@ -271,6 +276,7 @@ public class GameScreen_controller {
                 }
                 shooter.update(dt, gameBricks);
                 gameBall(dt);
+                enemyGame(dt);
                 setGamePowerup();
             }
         };
@@ -303,7 +309,26 @@ public class GameScreen_controller {
             brick.updateAnimation(dt);
         }
     }
-    int cnt = 0;
+
+    private void enemyGame(double dt) {
+        for (int i = gameEnemies.size() - 1; i >= 0; i--) {
+            Enemy enemy = gameEnemies.get(i);
+            if (enemy.getHp() == 0) {
+                layout_game.getChildren().remove(enemy.getImageView());
+                gameEnemies.remove(i);
+            }
+            if (enemy instanceof ShooterEnemy) {
+                ShooterEnemy shooterEnemy = (ShooterEnemy) enemy;
+                shooterEnemy.update(dt);
+            }
+            if (enemy instanceof BasicEnemy) {
+                BasicEnemy  basicEnemy = (BasicEnemy) enemy;
+                basicEnemy.update(dt);
+            }
+
+        }
+    }
+
     private void gameBall(double dt) {
         if (gameBall.isEmpty()) return;
 
@@ -333,7 +358,7 @@ public class GameScreen_controller {
 
             baseGame.brickCollision(ballLogic, gameBricks);
             baseGame.paddleballCollision(ballLogic, paddleLogic, isCatch);
-
+            baseGame.enemyCollision(ballLogic,gameEnemies);
             baseGame.wallCollision(ballLogic, gameBackground);
 
             ballLogic.updatePos(dt);

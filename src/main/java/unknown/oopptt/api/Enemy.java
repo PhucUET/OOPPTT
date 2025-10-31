@@ -18,6 +18,19 @@ public class Enemy extends GameEntity {
     }
 
 
+
+    public int oneHit() {
+        hp -= 50;
+        if (hp <= 0) {
+            hp = 0;
+            return this.point;
+        }
+        return 0;
+    }
+
+
+
+
     public double getSpeedY() {
         return speedY;
     }
