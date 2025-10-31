@@ -25,6 +25,7 @@ public class Brick extends GameEntity {
     private final ArrayList<Integer> pointList = new ArrayList<Integer>(Arrays.asList(50, 100, 150, 200));
     private double timeDrop = 0.3;
     private boolean wait = false;
+    private int Point = 100;
     private static String Get_type(int t) {
         String type = "";
         switch (t) {
@@ -47,6 +48,14 @@ public class Brick extends GameEntity {
             return true;
         }
         return false;
+    }
+
+    public int getHitPoints() {
+        return hitPoints;
+    }
+
+    public void setHitPoints(int hitPoints) {
+        this.hitPoints = hitPoints;
     }
 
     public boolean isWait() {

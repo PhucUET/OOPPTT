@@ -19,11 +19,5 @@ public class BasicEnemy extends Enemy {
     public void update(double dt) {
         this.pos_x += dt * speedX;
     }
-    public int oneHit() {
-        hp -= 50;
-        if (hp <= 0) {
-            return this.point;
-        }
-        return 0;
-    }
+
 }
