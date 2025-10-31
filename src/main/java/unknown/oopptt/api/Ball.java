@@ -1,262 +1,94 @@
 package unknown.oopptt.api;
+import unknown.oopptt.physic.CollisionInfo;
+import java.awt.*;
 
-import javafx.animation.FadeTransition;
-import javafx.scene.effect.DropShadow;
-import javafx.scene.image.ImageView;
-import javafx.scene.layout.Pane;
-import javafx.scene.paint.Color;
-import javafx.scene.shape.Circle;
-import javafx.util.Duration;
-import java.io.File;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
 
-/**
- * Class Ball – đại diện cho quả bóng / thiên thạch trong game Arkanoid.
- * Có hiệu ứng quầng sáng, vệt cháy, và tia lửa nhỏ khi bay.
- */
 public class Ball extends GameEntity {
-
-    // ====== CONSTANTS ======
-    private static final String BALL_FOLDER = "src/main/resources/graphic/Ball";
-    private static final double BASE_SPEED = 360.0;
-    private static final int BALL_SIZE = 20;
-
-    // ====== MOVEMENT ======
-    private double speedX;
-    private double speedY;
-    private double speedScale = BASE_SPEED;
-
-    // ====== STATE ======
-    private boolean sticky = true;   // đang dính paddle
-    private double offsetOnPaddle = 0;
-
-    // ====== GRAPHIC ======
-    private final Circle hitCircle = new Circle(BALL_SIZE / 2.0);
-    private final DropShadow fireGlow;      // quầng sáng
-    private final List<FireSpark> sparks = new ArrayList<>();
-    private double trailTimer = 0;
-    private Pane effectLayer;               // nơi vẽ vệt lửa, tia lửa
-
-    // ============================================================== //
-    // Constructors
-    // ============================================================== //
-
-    public Ball(double x, double y, double speedX, double speedY, Pane effectLayer) {
-        super(x, y, BALL_SIZE, BALL_SIZE, BALL_FOLDER);
-        this.speedX = speedX;
-        this.speedY = speedY;
+    public double speed = 400.0;
 
 
-        // hiệu ứng ánh sáng xung quanh thiên thạch
-        fireGlow = new DropShadow();
-        fireGlow.setRadius(10);
-        fireGlow.setSpread(0.6);
-        fireGlow.setColor(Color.ORANGERED);
-        imageView.setEffect(fireGlow);
-        this.effectLayer = effectLayer;
+    // ---------- Tham số & hàm hỗ trợ để tránh thẳng đứng + random ----------
+    private static final double MAX_DEFLECT_DEG = 60.0; // lệch tối đa
+    private static final double MIN_DEFLECT_DEG = 12.0; // lệch tối thiểu để tránh thẳng đứng
+    private static final double JITTER_DEG = 8.0; // ngẫu nhiên thêm/bớt
+
+
+    private static double toRad(double deg) { return deg * Math.PI / 180.0; }
+
+
+    private static double enforceMinDeflect(double angleRad, double minRad) {
+        double s = Math.signum(angleRad);
+        if (s == 0) s = (Math.random() < 0.5 ? -1 : 1);
+        double a = Math.abs(angleRad);
+        if (a < minRad) a = minRad;
+        return s * a;
     }
 
-    /**
-     * Copy constructor – tạo 1 bóng mới từ bóng gốc
-     */
-    public Ball(Ball other) {
-        super(other.getPos_x(), other.getPos_y(), BALL_SIZE, BALL_SIZE, BALL_FOLDER);
-        this.speedX = other.speedX;
-        this.speedY = other.speedY;
-        this.speedScale = other.speedScale;
-        this.sticky = false;
-        this.effectLayer = other.effectLayer;
 
-        fireGlow = new DropShadow();
-        fireGlow.setRadius(10);
-        fireGlow.setSpread(0.6);
-        fireGlow.setColor(Color.ORANGERED);
-        imageView.setEffect(fireGlow);
+    private static double clamp(double x, double lo, double hi) {
+        return Math.max(lo, Math.min(hi, x));
+    }
+// -----------------------------------------------------------------------
+
+
+    public Ball(String id, double x, double y, double radius) {
+        super(id, "ball", x, y, radius * 2.0, radius * 2.0);
     }
 
-    // ============================================================== //
-    // Hiệu ứng / setup layer
-    // ============================================================== //
 
-    /**
-     * Gán lớp hiệu ứng (Pane) để vẽ vệt sáng và tia lửa
-     */
-    public void attachEffectLayer(Pane layer) {
-        this.effectLayer = layer;
+    public double radius() { return w / 2.0; }
+
+
+    @Override public void render(Graphics2D g) {
+        g.setColor(new Color(230, 230, 240));
+        g.fillOval((int)(x), (int)(y), (int)(w), (int)(h));
     }
 
-    /**
-     * Tạo vệt cháy mờ phía sau thiên thạch
-     */
-    private void spawnTrail() {
-        if (effectLayer == null) return;
 
-        ImageView trail = new ImageView(imageView.getImage());
-        trail.setFitWidth(imageView.getFitWidth() * 0.9);
-        trail.setFitHeight(imageView.getFitHeight() * 0.9);
-        trail.setTranslateX(imageView.getTranslateX());
-        trail.setTranslateY(imageView.getTranslateY());
-        trail.setOpacity(0.5);
-        trail.setEffect(fireGlow);
+    @Override public void onCollision(GameEntity other, CollisionInfo info) {
+// Phản xạ gương theo pháp tuyến (cho tường/brick)
+        double dot = vx * info.normalX + vy * info.normalY;
+        vx = vx - 2 * dot * info.normalX;
+        vy = vy - 2 * dot * info.normalY;
 
-        effectLayer.getChildren().add(trail);
 
-        FadeTransition fade = new FadeTransition(Duration.seconds(0.4), trail);
-        fade.setFromValue(0.5);
-        fade.setToValue(0.0);
-        fade.setOnFinished(e -> effectLayer.getChildren().remove(trail));
-        fade.play();
-    }
+// Nếu va vào paddle: tính lại góc bật ra để KHÔNG thẳng đứng + có random
+        if ("paddle".equals(other.kind)) {
+            double contactX = info.contactX;
+            double centerPaddle = other.x + other.w / 2.0;
+            double rel = (Double.isNaN(contactX) ? (this.x + this.w/2.0) : contactX) - centerPaddle;
+            rel /= (other.w / 2.0); // [-1, 1]
+            rel = clamp(rel, -1.0, 1.0);
 
-    /**
-     * Sinh tia lửa nhỏ bay tỏa ra từ thiên thạch
-     */
-    private void spawnSpark() {
-        if (effectLayer == null) return;
-        FireSpark spark = new FireSpark(imageView);
-        sparks.add(spark);
-        effectLayer.getChildren().add(spark.node);
-    }
 
-    /**
-     * Cập nhật tia lửa
-     */
-    private void updateSparks(double dt) {
-        if (sparks.isEmpty()) return;
-        Iterator<FireSpark> it = sparks.iterator();
-        while (it.hasNext()) {
-            FireSpark s = it.next();
-            s.update(dt);
-            if (s.life <= 0) {
-                effectLayer.getChildren().remove(s.node);
-                it.remove();
+// Góc cơ sở theo vị trí tiếp xúc
+            double baseAngle = toRad(MAX_DEFLECT_DEG) * rel;
+
+
+// Jitter ngẫu nhiên
+            double jitter = toRad(JITTER_DEG) * (Math.random() * 2.0 - 1.0);
+
+
+// Tổng góc lệch so với phương thẳng đứng
+            double angle = baseAngle + jitter;
+
+
+// Ép góc tối thiểu để tránh thẳng đứng
+            double minDeflect = toRad(MIN_DEFLECT_DEG);
+            angle = enforceMinDeflect(angle, minDeflect);
+
+
+// Bảo toàn tốc độ, bắn lên trên
+            double speedNow = Math.hypot(vx, vy);
+            if (speedNow < 1e-6) speedNow = this.speed;
+            vx = speedNow * Math.sin(angle);
+            vy = -Math.abs(speedNow * Math.cos(angle));
+
+
+// Nếu vẫn gần thẳng đứng (vx nhỏ), nêm thêm chút lệch nhỏ
+            if (Math.abs(vx) < 20.0) {
+                vx = (Math.random() < 0.5 ? -1 : 1) * 20.0;
             }
         }
-    }
-
-    // ============================================================== //
-    // Update logic
-    // ============================================================== //
-
-    /**
-     * Cập nhật vị trí bóng mỗi frame
-     */
-    public void updatePos(double dt) {
-        //if (sticky) return;
-
-        double dx = speedX * dt * speedScale;
-        double dy = speedY * dt * speedScale;
-
-        pos_x += dx;
-        pos_y += dy;
-
-        // cập nhật ImageView (UI)
-        imageView.setTranslateX(pos_x - BALL_SIZE / 2.0);
-        imageView.setTranslateY(pos_y - BALL_SIZE / 2.0);
-
-        // cập nhật hitbox (logic)
-        hitCircle.setCenterX(pos_x);
-        hitCircle.setCenterY(pos_y);
-
-        // sinh hiệu ứng thiên thạch
-        trailTimer += dt;
-        if (trailTimer > 0.03) {
-            spawnTrail();
-            if (Math.random() < 0.3) spawnSpark();
-            trailTimer = 0;
-        }
-        updateSparks(dt);
-
-        updateAnimation(dt);
-    }
-
-    /**
-     * Khi bóng đang dính vào paddle và paddle di chuyển
-     */
-    @Override
-    public void setLocation(double newX, double dt) {
-        this.pos_x = newX;
-        imageView.setTranslateX(newX - BALL_SIZE / 2.0);
-        updateAnimation(dt);
-    }
-
-    @Override
-    public void update() {
-        // Không dùng trong Ball, để override khi cần sau này
-    }
-
-    // ============================================================== //
-    // Game interaction helpers
-    // ============================================================== //
-
-    /**
-     * Dừng bóng trên paddle
-     */
-    public void stopBall(double offsetX) {
-        this.speedX = 1;
-        this.speedY = 0;
-        this.offsetOnPaddle = offsetX;
-        this.sticky = true;
-    }
-
-    /**
-     * Gỡ dính khỏi paddle
-     */
-    public void release() {
-        this.sticky = false;
-    }
-
-    /**
-     * Thay đổi kích thước bóng (power-up)
-     */
-    public void changeSize(int newSize) {
-        imageView.setFitWidth(newSize);
-        imageView.setFitHeight(newSize);
-    }
-
-    // ============================================================== //
-    // Getters / Setters
-    // ============================================================== //
-
-    public boolean isSticky() {
-        return sticky;
-    }
-
-    public void setSticky(boolean sticky) {
-        this.sticky = sticky;
-    }
-
-    public double getSpeedX() {
-        return speedX;
-    }
-
-    public void setSpeedX(double speedX) {
-        this.speedX = speedX;
-    }
-
-    public double getSpeedY() {
-        return speedY;
-    }
-
-    public void setSpeedY(double speedY) {
-        this.speedY = speedY;
-    }
-
-    public double getSpeedScale() {
-        return speedScale;
-    }
-
-    public void setSpeedScale(double newSpeed) {
-        speedScale = newSpeed;
-    }
-
-    public void addOffsetOnPaddle(double dt) {
-        offsetOnPaddle += dt * speedX * speedScale;
-    }
-
-    public double getOffsetOnPaddle() {
-        return offsetOnPaddle;
     }
 }

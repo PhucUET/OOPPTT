@@ -1,14 +1,7 @@
 package unknown.oopptt.api;
 
+import java.awt.*;
 
-import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
-import javafx.scene.shape.Rectangle;
-
-import java.io.File;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 
 public class Brick extends GameEntity {
     private static String brick1 = new File("src/main/resources/graphic/Brick1").toString();
@@ -42,13 +35,6 @@ public class Brick extends GameEntity {
         return type;
     }
 
-    public boolean dropBrick(double dt) {
-        timeDrop -= dt;
-        if (timeDrop <= 0) {
-            return true;
-        }
-        return false;
-    }
 
     public int getHitPoints() {
         return hitPoints;
@@ -62,51 +48,20 @@ public class Brick extends GameEntity {
         return wait;
     }
 
-    public void setWait(boolean wait) {
-        this.wait = wait;
+
+    @Override public void render(Graphics2D g) {
+        g.setColor(color);
+        g.fillRect((int)x, (int)y, (int)w, (int)h);
+// viền
+        g.setColor(new Color(0, 0, 0, 60));
+        g.drawRect((int)x, (int)y, (int)w, (int)h);
     }
 
-    public Brick(double x, double y, int t) {
-        super(x + widthBrick/2, y + heightBrick/2, widthBrick, heightBrick, Get_type(t));
-        hitPoints = t;
-        typeBrick = t;
-    }
 
-    public Brick(double x, double y, double width, double height , int t) {
-        super(x + width/2, y + height/2 , width, height, Get_type(t));
-        hitPoints = t;
-        typeBrick = t;
-    }
-
-    public boolean hit() {
-        if (typeBrick == 1) {
-            setAnimation(brick1Broken);
+    @Override public void onCollision(GameEntity other, unknown.oopptt.physic.CollisionInfo info) {
+        if ("ball".equals(other.kind)) {
+            hp -= 1;
+            if (hp <= 0) destroy();
         }
-        if (typeBrick == 2) {
-            setAnimation(brick2Broken);
-        }
-        if (typeBrick == 3) {
-            setAnimation(brick3Broken);
-        }
-        hitPoints--;
-        if (hitPoints == 0) {
-            return false;
-        }
-        return true;
-    }
-    /**
-     * Xử lý khi gạch bị bóng chạm.
-     * @return Loại PowerUp nếu gạch bị phá, ngược lại trả về null.
-     */
-    //public abstract boolean hit();
-
-    @Override
-    public void update() {
-
-    }
-
-    @Override
-    public void setLocation(double v, double dt) {
-
     }
 }
