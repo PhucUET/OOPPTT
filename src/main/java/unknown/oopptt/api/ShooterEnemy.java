@@ -7,7 +7,7 @@ import javafx.scene.layout.Pane;
 import java.io.File;
 
 public class ShooterEnemy extends Enemy{
-    private static String path = new File("src/main/resources/graphic/Plafom").toString();
+    private static String path = new File("src/main/resources/graphic/EnemyShoot/Plazma_cannon_platform.png").toString();
     private static String pathCanon = new File("src/main/resources/graphic/EnemyShoot/Plazma_cannon_head1.png").toURI().toString();
     private Shooter shooter;
     private final Pane gameLayout;

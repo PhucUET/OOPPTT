@@ -94,6 +94,8 @@ public class GameScreen_controller {
         ImageCache.loadFolder("src/main/resources/graphic/EnemyIdle");
         ImageCache.loadFolder("src/main/resources/graphic/EnemyMove");
         ImageCache.loadFolder("src/main/resources/graphic/dropbrick1");
+        ImageCache.loadFolder("src/main/resources/graphic/dropbrick2");
+        ImageCache.loadFolder("src/main/resources/graphic/dropbrick3");
     }
 
     // ======================= BACKGROUND / VIDEO ==============================
