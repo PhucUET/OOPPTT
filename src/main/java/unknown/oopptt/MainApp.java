@@ -15,7 +15,7 @@ public class MainApp extends Application {
     @Override
     public void start(Stage primaryStage) throws Exception {
 
-        FXMLLoader loader = new FXMLLoader(getClass().getResource("/unknown/oopptt/BattleScreen.fxml"));
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("/unknown/oopptt/MainMenu.fxml"));
         Parent root = loader.load();
         primaryStage.setTitle("Hola");
         primaryStage.setFullScreen(true);
@@ -25,3 +25,8 @@ public class MainApp extends Application {
         primaryStage.show();
     }
 }
+
+
+
+
+

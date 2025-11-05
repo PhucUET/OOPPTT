@@ -31,6 +31,9 @@ public class GameScreen_controller {
     private static File mapBrick1 = new File("src/main/resources/map/map1.txt");
     final double LOGICAL_WIDTH = 800;
     final double LOGICAL_HEIGHT = 600;
+    private final java.util.Set<javafx.scene.input.KeyCode> keys = new java.util.HashSet<>();
+    private javafx.animation.Timeline kbLoop;
+    private static final double PADDLE_SPEED = 350.0;
 
     private final static int SCNENE_WIDTH = 1440;
     private final static int SCENE_HEIGHT = 810;
@@ -177,11 +180,10 @@ public class GameScreen_controller {
 
 
         startgameloop();
+        setOnKeyboard_Paddle();
         setOnMouse_Paddle();
 
     }
-
-
 
     /**
      * paddle di chuyển.
@@ -213,6 +215,65 @@ public class GameScreen_controller {
 
 
     }
+
+    private void setOnKeyboard_Paddle() {
+        // đảm bảo node nhận focus để bắt phím
+        layout_game.setFocusTraversable(true);
+        Platform.runLater(layout_game::requestFocus);
+
+        // Lắng nghe phím nhấn/thả
+        layout_game.setOnKeyPressed(e -> {
+            keys.add(e.getCode());
+            // Space: thả bóng khỏi sticky (giống click chuột)
+            if (e.getCode() == javafx.scene.input.KeyCode.SPACE) {
+                for (Ball ball : gameBall) {
+                    ball.setSticky(false);
+                    //client.send("Stick:" + ball.isSticky());
+                }
+            }
+        });
+
+        layout_game.setOnKeyReleased(e -> keys.remove(e.getCode()));
+
+        // Vòng lặp nhỏ 60FPS cập nhật vị trí theo phím
+        if (kbLoop != null) kbLoop.stop();
+        kbLoop = new javafx.animation.Timeline(
+                new javafx.animation.KeyFrame(javafx.util.Duration.millis(16), ev -> {
+                    double vx = 0.0;
+
+                    // A/LEFT sang trái, D/RIGHT sang phải
+                    if (keys.contains(javafx.scene.input.KeyCode.A) || keys.contains(javafx.scene.input.KeyCode.LEFT)) {
+                        vx -= PADDLE_SPEED;
+                    }
+                    if (keys.contains(javafx.scene.input.KeyCode.D) || keys.contains(javafx.scene.input.KeyCode.RIGHT)) {
+                        vx += PADDLE_SPEED;
+                    }
+
+                    if (vx != 0.0) {
+                        // dt xấp xỉ 1/60s
+                        double dt = 1.0 / 60.0;
+
+                        // Lấy vị trí "left X" hiện tại của paddle (chính là thứ bạn truyền vào setLocation)
+                        double currX = paddleLogic.getPos_x(); // hoặc phương thức tương đương để đọc left X hiện tại
+
+                        // Tính giới hạn biên theo đúng công thức clamp bạn đang dùng
+                        double minLeft = gameBackground.getBoundsInParent().getMinX() + paddleLogic.getWidth() / 2.0;
+                        double maxLeft = gameBackground.getBoundsInParent().getMaxX() - paddleLogic.getWidth() / 2.0;
+
+                        // Di chuyển theo vận tốc & dt, rồi clamp
+                        double nextX = currX + vx * dt;
+                        int newX = (int) Math.round(Math.max(minLeft, Math.min(nextX, maxLeft)));
+
+                        // Cập nhật paddle + gửi mạng
+                        paddleLogic.setLocation(newX);
+
+                    }
+                })
+        );
+        kbLoop.setCycleCount(javafx.animation.Animation.INDEFINITE);
+        kbLoop.play();
+    }
+
 
     /**
      * Bóng di chuyển
@@ -270,7 +331,7 @@ public class GameScreen_controller {
     }
 
 
-    private void startgameloop() {
+    void startgameloop() {
         AnimationTimer timer = new AnimationTimer() {
             private Long lasts = 0L;
             @Override
