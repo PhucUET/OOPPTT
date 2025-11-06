@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.scene.control.Button?>
-<?import javafx.scene.control.Label?>
 <?import javafx.scene.image.Image?>
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.BorderPane?>
@@ -41,7 +40,7 @@
                            <font>
                               <Font size="18.0" />
                            </font></Button>
-                                <Button fx:id="btnEsc" blendMode="COLOR_DODGE" onAction="#onEscape" prefHeight="40.0" prefWidth="48.0" text="ESC" />
+                                <Button fx:id="btnEsc" blendMode="COLOR_DODGE" onAction="#onEscape" prefHeight="40.0" prefWidth="48.0" text="𝐄𝐒𝐂" />
                             </children>
                         </HBox>
                     </children>
@@ -67,7 +66,6 @@
                     <StackPane fx:id="paneCenter" GridPane.columnIndex="2">
                         <children>
                             <ImageView fx:id="imgCenter" fitHeight="500" fitWidth="450" preserveRatio="true" />
-                            <Label fx:id="lblCenter" style="-fx-font-size: 18px; -fx-font-weight: bold;" />
                         </children>
                     </StackPane>
 
@@ -88,25 +86,26 @@
                     <!-- Ô trái (thumbnail) -->
                     <VBox fx:id="paneLeft" alignment="CENTER_RIGHT">
                         <children>
-                            <ImageView fx:id="imgLeft" fitHeight="180" fitWidth="100" preserveRatio="true" />
-                            <Label fx:id="lblLeft" />
+                            <ImageView fx:id="imgLeft" blendMode="EXCLUSION" fitHeight="180" fitWidth="100" preserveRatio="true" />
                         </children>
                     </VBox>
 
                     <!-- Ô phải (thumbnail) -->
                     <VBox fx:id="paneRight" alignment="CENTER_LEFT" GridPane.columnIndex="4">
                         <children>
-                            <ImageView fx:id="imgRight" fitHeight="180" fitWidth="100" preserveRatio="true" />
-                            <Label fx:id="lblRight" />
+                            <ImageView fx:id="imgRight" blendMode="EXCLUSION" fitHeight="180" fitWidth="100" preserveRatio="true" />
                         </children>
                     </VBox>
 
                 </GridPane>
             </center>
          <bottom>
-            <StackPane prefHeight="100.0" prefWidth="200.0" BorderPane.alignment="CENTER">
+            <StackPane alignment="TOP_CENTER" prefHeight="100.0" prefWidth="200.0" BorderPane.alignment="TOP_CENTER">
                <children>
-                  <Button fx:id="btnSelect" blendMode="COLOR_DODGE" mnemonicParsing="false" onAction="#onSelectCenter" prefHeight="41.0" prefWidth="150.0" text="Play" />
+                  <Button fx:id="btnSelect" blendMode="COLOR_DODGE" mnemonicParsing="false" onAction="#onSelectCenter" prefHeight="41.0" prefWidth="200.0" text="(◞‸◟)☞ 𝐏𝐋𝐀𝐘">
+                     <font>
+                        <Font size="20.0" />
+                     </font></Button>
                </children>
             </StackPane>
          </bottom>

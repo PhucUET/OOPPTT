@@ -33,7 +33,7 @@ public class BattleScreenController {
     public Object startGameLoop;
 
     private GameClient client;
-    private String playerName = "Thuy";
+    private String playerName = "Trung";
     private String serverIP;
     private final int serverPort = 5000;
 
@@ -216,6 +216,12 @@ public class BattleScreenController {
         // Lắng nghe phím nhấn/thả
         player_1.setOnKeyPressed(e -> {
             keys.add(e.getCode());
+
+
+
+
+
+
             // Space: thả bóng khỏi sticky (giống click chuột)
             if (e.getCode() == javafx.scene.input.KeyCode.SPACE) {
                 for (Ball ball : gameBall1) {
