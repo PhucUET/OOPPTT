@@ -34,6 +34,7 @@ public class BattleScreenController {
 
     private GameClient client;
     private String playerName = "Thuy";
+    private String serverIP;
     private final int serverPort = 5000;
 
     private boolean stillStick = true;
@@ -182,7 +183,7 @@ public class BattleScreenController {
     }
 
     // =============================================================
-    // 6️⃣ ĐIỀU KHIỂN PADDLE
+    // 6️⃣ ĐIỀU KHIỂN PADDLE (CHUỘT)
     // =============================================================
     private void setOnMouse_Paddle() {
         player_1.setCursor(Cursor.NONE);

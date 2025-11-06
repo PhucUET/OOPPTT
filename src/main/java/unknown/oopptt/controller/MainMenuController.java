@@ -63,7 +63,7 @@ public class MainMenuController {
             Scene scene = stage.getScene();
             scene.setRoot(root);
             // nếu cần, gọi requestFocus cho node đầu tiên của màn mới
-            root.requestFocus();
+           // root.requestFocus();
         } catch (Exception ex) {
             ex.printStackTrace();
         }

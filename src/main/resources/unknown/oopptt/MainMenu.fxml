@@ -29,7 +29,7 @@
                <children>
                   <ImageView fitHeight="118.0" fitWidth="384.0" pickOnBounds="true" preserveRatio="true">
                      <image>
-                        <Image url="@../../graphic/Gemini_Generated_Image_neztfzneztfznezt.png" />
+                        <Image url="@../../graphic/BG.png" />
                      </image>
                   </ImageView>
                </children>

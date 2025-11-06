@@ -5,6 +5,7 @@ module unknown.oopptt {
     requires javafx.graphics;
     requires java.desktop;
     requires java.sql;
+    requires javafx.base;
 
     opens unknown.oopptt to javafx.graphics;
     opens unknown.oopptt.controller to javafx.fxml;
