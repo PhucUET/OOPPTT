@@ -98,40 +98,6 @@ public class GameScreen_controller {
         ImageCache.loadFolder("src/main/resources/graphic/dropbrick3");
     }
 
-    // ======================= BACKGROUND / VIDEO ==============================
-    private void setBackground_Video() {
-        mediaPlayer  = new MediaPlayer(new Media(BG_VIDEO_PATH));
-        mediaPlayer1 = new MediaPlayer(new Media(BG_VIDEO_PATH));
-
-        mediaView.setPreserveRatio(true);
-        mediaView.fitWidthProperty().bind(stack_root.widthProperty());
-        mediaView.fitHeightProperty().bind(stack_root.heightProperty());
-
-        chain(mediaPlayer, mediaPlayer1, mediaView);
-        chain(mediaPlayer1, mediaPlayer, mediaView);
-
-        mediaView.setMediaPlayer(mediaPlayer);
-        mediaPlayer.play();
-    }
-
-    private void chain(MediaPlayer a, MediaPlayer b, MediaView view) {
-        a.setOnReady(() -> {
-            Duration total = a.getMedia().getDuration();
-            a.currentTimeProperty().addListener((obs, oldTime, newTime) -> {
-                if (total.greaterThan(Duration.ZERO) && newTime.greaterThan(total.subtract(Duration.millis(200)))) {
-                    if (b.getStatus() != MediaPlayer.Status.PLAYING) {
-                        Platform.runLater(() -> {
-                            view.setMediaPlayer(b);
-                            b.seek(Duration.ZERO);
-                            b.play();
-                            a.stop();
-                            a.seek(Duration.ZERO);
-                        });
-                    }
-                }
-            });
-        });
-    }
 
     // ======================= SCENE SETUP =====================================
     private void set_Background() {
@@ -158,7 +124,7 @@ public class GameScreen_controller {
         specialPaddle = new SpecialPaddle(paddleLogic);
 
         // 4) Ball
-        Ball first_ball = new Ball(paddleLogic.getPos_x(), paddleLogic.getPos_y() - 2, 0.1, 0, layout_game);
+        Ball first_ball = new Ball(paddleLogic.getPos_x(), paddleLogic.getPos_y() - 5, 0.3, 0, layout_game);
         gameBall.add(first_ball);
         //System.out.println(first_ball.getImageView().getBoundsInParent().getWidth() + " " + first_ball.getImageView().getBoundsInParent().getHeight());
         layout_game.getChildren().add(first_ball.getImageView());
@@ -339,7 +305,6 @@ public class GameScreen_controller {
             if (ballLogic.isSticky()) {
                 double newX = paddleLogic.getPos_x() + ballLogic.getOffsetOnPaddle();
 
-                // tránh trôi ra ngoài paddle
                 Bounds pb = paddleLogic.getImageView().getBoundsInParent();
                 if (newX > pb.getMaxX() || newX < pb.getMinX()) {
                     newX = clamp(newX, pb.getMinX(), pb.getMaxX());
@@ -348,7 +313,6 @@ public class GameScreen_controller {
 
                 ballLogic.setLocation(newX, dt);
                 ballLogic.addOffsetOnPaddle(dt);
-                //System.out.println(ballLogic.getImageView().getBoundsInParent().getMinX() + " " + ballLogic.getImageView().getBoundsInParent().getMinX());
                 continue;
             }
             //System.out.println(ballLogic.getImageView().getBoundsInParent().getMinX() + " " + ballLogic.getImageView().getBoundsInParent().getMinX() + " " + ballLogic.getImageView().getBoundsInParent().getWidth() + " " + ballLogic.getImageView().getBoundsInParent().getHeight());
