@@ -32,7 +32,7 @@ public class Data extends Manage {
 
             //tạo nội dung json
             String json = String.format(
-                    "{\"player_name\"😕"%s\",\"score\":%d,\"highscore\":%d,\"mode\"😕"%s\"}",
+                    "{\"player_name\":\"%s\",\"score\":%d,\"highscore\":%d,\"mode\":\"%s\"}",
                     playerName, score, highScore, mode
             );
 
