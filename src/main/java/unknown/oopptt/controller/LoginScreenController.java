@@ -2,6 +2,8 @@ package unknown.oopptt.controller;
 
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
+import javafx.scene.image.ImageView;
+import javafx.scene.layout.AnchorPane;
 import unknown.oopptt.api.Data;
 
 public class LoginScreenController {
@@ -14,6 +16,13 @@ public class LoginScreenController {
 
     @FXML
     private Label lblMessage;
+
+
+    @FXML
+    private ImageView background;
+
+    @FXML
+    private AnchorPane root;
 
     private final Data data = new Data();
 
@@ -47,5 +56,11 @@ public class LoginScreenController {
     private void openRegister() {
         lblMessage.setText("Chuyển sang màn hình đăng ký");
         // Sau này bạn có thể dùng lệnh chuyển Scene ở đây
+    }
+    @FXML
+    public void initialize() {
+        System.out.println(root.sceneToLocal(root.getBoundsInParent()));
+        System.out.println(root.getBoundsInParent().getWidth() + " " +  root.getBoundsInParent().getHeight());
+        System.out.println(background.getBoundsInParent().getMinX() + " " +  background.getBoundsInParent().getMinY());
     }
 }
