@@ -56,11 +56,7 @@ public class Data extends Manage {
         }
     }
 
-    /**
-     * ==============================
-     *  ĐĂNG KÝ NGƯỜI DÙNG
-     * ==============================
-     */
+    //đăng ký
     public String register(String username, String password) {
         try {
             URL url = new URL(SCRIPT_URL);
@@ -87,16 +83,12 @@ public class Data extends Manage {
             return "ERROR";
 
         } catch (Exception e) {
-            System.err.println("❌ Lỗi khi đăng ký: " + e.getMessage());
+            System.err.println("Lỗi khi đăng ký: " + e.getMessage());
             return "ERROR";
         }
     }
 
-    /**
-     * ==============================
-     *  ĐĂNG NHẬP NGƯỜI DÙNG
-     * ==============================
-     */
+    //đăng nhập
     public String login(String username, String password) {
         try {
             String query = String.format("action=login&username=%s&password=%s",
@@ -116,7 +108,7 @@ public class Data extends Manage {
             return "ERROR";
 
         } catch (Exception e) {
-            System.err.println("❌ Lỗi khi đăng nhập: " + e.getMessage());
+            System.err.println("Lỗi khi đăng nhập: " + e.getMessage());
             return "ERROR";
         }
     }
@@ -193,7 +185,7 @@ public class Data extends Manage {
             }
 
         } catch (Exception e) {
-            System.err.println("❌ Lỗi khi lấy dữ liệu từ Google Sheets: " + e.getMessage());
+            System.err.println("Lỗi khi lấy dữ liệu từ Google Sheets: " + e.getMessage());
         }
 
         return topList;
