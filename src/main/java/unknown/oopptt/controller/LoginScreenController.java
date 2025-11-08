@@ -63,30 +63,15 @@ public class LoginScreenController {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/unknown/oopptt/RegisterScreen.fxml"));
             Parent rootNew = loader.load();
 
-            // Lấy scene hiện tại
-            Scene scene = txtUsername.getScene();
-            Stage stage = (Stage) scene.getWindow();
+            // Lấy stage hiện tại
+            Stage stage = (Stage) txtUsername.getScene().getWindow();
 
-            // Tạo hiệu ứng mờ dần cho giao diện cũ
-            javafx.animation.FadeTransition fadeOut = new javafx.animation.FadeTransition(javafx.util.Duration.millis(500), scene.getRoot());
-            fadeOut.setFromValue(1.0);
-            fadeOut.setToValue(0.0);
+            // Tạo scene mới và gán thẳng
+            Scene newScene = new Scene(rootNew);
+            stage.setFullScreen(false);
+            stage.setScene(newScene);
 
-            fadeOut.setOnFinished(event -> {
-                // Khi fadeOut xong thì chuyển scene mới
-                Scene newScene = new Scene(rootNew);
-                stage.setScene(newScene);
-                stage.setFullScreen(true);
-
-                // Sau khi gán scene mới, fadeIn để mờ dần hiện ra
-                javafx.animation.FadeTransition fadeIn = new javafx.animation.FadeTransition(javafx.util.Duration.millis(500), rootNew);
-                fadeIn.setFromValue(0.0);
-                fadeIn.setToValue(1.0);
-                fadeIn.play();
-            });
-
-            // Bắt đầu hiệu ứng mờ dần biến mất
-            fadeOut.play();
+            stage.show();
 
         } catch (Exception e) {
             e.printStackTrace();
