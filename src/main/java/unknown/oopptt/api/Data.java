@@ -8,6 +8,7 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.net.URLEncoder;
 import java.util.*;
 
 public class Data extends Manage {
@@ -32,7 +33,7 @@ public class Data extends Manage {
 
             //tạo nội dung json
             String json = String.format(
-                    "{\"player_name\":\"%s\",\"score\":%d,\"highscore\":%d,\"mode\":\"%s\"}",
+                    "{\"action\":\"save_score\",\"player_name\":\"%s\",\"score\":%d,\"highscore\":%d,\"mode\":\"%s\"}",
                     playerName, score, highScore, mode
             );
 
@@ -54,6 +55,73 @@ public class Data extends Manage {
             System.err.println("Lỗi khi gửi dữ liệu: " + e.getMessage());
         }
     }
+
+    /**
+     * ==============================
+     *  ĐĂNG KÝ NGƯỜI DÙNG
+     * ==============================
+     */
+    public String register(String username, String password) {
+        try {
+            URL url = new URL(SCRIPT_URL);
+            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+            conn.setRequestMethod("POST");
+            conn.setRequestProperty("Content-Type", "application/json");
+            conn.setDoOutput(true);
+
+            String json = String.format(
+                    "{\"action\":\"register\",\"username\":\"%s\",\"password\":\"%s\"}",
+                    username, password
+            );
+
+            try (OutputStream os = conn.getOutputStream()) {
+                os.write(json.getBytes("UTF-8"));
+            }
+
+            BufferedReader reader = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+            String response = reader.readLine();
+            reader.close();
+
+            if (response.contains("REGISTER_OK")) return "REGISTER_OK";
+            if (response.contains("EXISTS")) return "EXISTS";
+            return "ERROR";
+
+        } catch (Exception e) {
+            System.err.println("❌ Lỗi khi đăng ký: " + e.getMessage());
+            return "ERROR";
+        }
+    }
+
+    /**
+     * ==============================
+     *  ĐĂNG NHẬP NGƯỜI DÙNG
+     * ==============================
+     */
+    public String login(String username, String password) {
+        try {
+            String query = String.format("action=login&username=%s&password=%s",
+                    URLEncoder.encode(username, "UTF-8"),
+                    URLEncoder.encode(password, "UTF-8"));
+
+            URL url = new URL(SCRIPT_URL + "?" + query);
+            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+            conn.setRequestMethod("GET");
+
+            BufferedReader reader = new BufferedReader(new InputStreamReader(conn.getInputStream(), "UTF-8"));
+            String response = reader.readLine();
+            reader.close();
+
+            if (response.contains("LOGIN_OK")) return "LOGIN_OK";
+            if (response.contains("INVALID")) return "INVALID";
+            return "ERROR";
+
+        } catch (Exception e) {
+            System.err.println("❌ Lỗi khi đăng nhập: " + e.getMessage());
+            return "ERROR";
+        }
+    }
+
+
 
     /**
      * Tạm thời lưu top điểm trong bộ nhớ RAM (không cần SQL)
