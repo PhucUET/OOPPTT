@@ -21,7 +21,6 @@ public class LoginScreenController {
     @FXML
     private Label lblMessage;
 
-
     @FXML
     private ImageView background;
 
@@ -29,6 +28,26 @@ public class LoginScreenController {
     private AnchorPane root;
 
     private final Data data = new Data();
+
+    private void goToMenuRotate() {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/unknown/oopptt/MenuRotate.fxml"));
+            Parent rotateRoot = loader.load();
+
+            // Lấy stage hiện tại
+            Stage stage = (Stage) txtUsername.getScene().getWindow();
+
+            // Tạo scene mới và gán trực tiếp
+            Scene scene = new Scene(rotateRoot);
+            stage.setFullScreen(true);
+            stage.setScene(scene);
+            stage.show();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            lblMessage.setText("Lỗi tải màn hình MenuRotate!");
+        }
+    }
 
     /**
      * Xử lý khi người dùng nhấn nút "Đăng nhập"
@@ -47,7 +66,10 @@ public class LoginScreenController {
         String result = data.login(username, password);
 
         switch (result) {
-            case "LOGIN_OK" -> lblMessage.setText("Đăng nhập thành công!");
+            case "LOGIN_OK" -> {
+                lblMessage.setText("Đăng nhập thành công!");
+                goToMenuRotate();
+            }
             case "INVALID" -> lblMessage.setText("Sai tên hoặc mật khẩu!");
             default -> lblMessage.setText("Lỗi kết nối tới server!");
         }
