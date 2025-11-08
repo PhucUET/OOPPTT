@@ -1,7 +1,5 @@
 package unknown.oopptt.physic;
 
-import unknown.oopptt.api.GameEntity;
-
 
 public class CollisionSystem {
 
