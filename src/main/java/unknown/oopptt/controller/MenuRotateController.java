@@ -19,6 +19,8 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+import unknown.oopptt.api.SoundManager;
+
 public class MenuRotateController {
 
     @FXML private StackPane root;
@@ -71,6 +73,7 @@ public class MenuRotateController {
 
     @FXML
     public void onRotateLeft() {
+        SoundManager.playSoundEffect("click.mp3");
         // Left -> Center (xoay trái)
         Collections.rotate(order, -1);
         render();
@@ -78,19 +81,30 @@ public class MenuRotateController {
 
     @FXML
     public void onRotateRight() {
+        SoundManager.playSoundEffect("click.mp3");
         // Right -> Center (xoay phải)
         Collections.rotate(order, 1);
         render();
     }
 
+    boolean sound = true;
     @FXML
     public void onToggleMute() {
+        SoundManager.playSoundEffect("click.mp3");
+        if(sound == true) {
+            SoundManager.stopBackgroundMusic();
+            sound = false;
+        } else {
+            SoundManager.playBackgroundMusic("menuBgrMusic.mp3");
+            sound = true;
+        }
         btnMute.setText(btnMute.getText().equals("🔊") ? "🔇" : "🔊");
         // TODO: nối với AudioManager thực tế
     }
 
     @FXML
     public void onEscape() {
+        SoundManager.playSoundEffect("click.mp3");
         // TODO: quay lại Title hoặc thoát hẳn
         Platform.exit();
     }
@@ -103,6 +117,7 @@ public class MenuRotateController {
         handleSelect(null);
     }
     private void handleSelect(ActionEvent e) {
+        SoundManager.playSoundEffect("click.mp3");
         Mode center = order.get(1);
         switch (center) {
             case ADVENTURE -> startAdventure(e);
@@ -114,16 +129,19 @@ public class MenuRotateController {
     /* ================== Navigation stubs ================== */
 
     private void startAdventure(ActionEvent e) {
+        SoundManager.playSoundEffect("click.mp3");
         switchTo("/unknown/oopptt/GameScreen.fxml", e);
         // TODO: load AdventureScreen.fxml và setRoot
     }
 
     private void goBattle(ActionEvent e) {
+        SoundManager.playSoundEffect("click.mp3");
         switchTo("/unknown/oopptt/BattleScreen.fxml", e);
         // TODO: load BattleScreen.fxml và setRoot
     }
 
     private void openHelp() {
+        SoundManager.playSoundEffect("click.mp3");
         System.out.println("Open Help");
         // TODO: load Help.fxml và setRoot
     }

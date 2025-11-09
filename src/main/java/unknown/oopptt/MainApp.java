@@ -5,6 +5,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
+import unknown.oopptt.api.SoundManager;
 
 public class MainApp extends Application {
 
@@ -23,6 +24,7 @@ public class MainApp extends Application {
         primaryStage.setScene(scene);
 
         primaryStage.show();
+        SoundManager.playBackgroundMusic("loginMusic.mp3");
     }
 }
 

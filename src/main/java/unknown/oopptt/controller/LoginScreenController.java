@@ -9,6 +9,7 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
 import unknown.oopptt.api.Data;
+import unknown.oopptt.api.SoundManager;
 
 public class LoginScreenController {
 
@@ -43,6 +44,8 @@ public class LoginScreenController {
             stage.setScene(scene);
             stage.show();
 
+            SoundManager.playBackgroundMusic("menuBgrMusic.mp3");
+
         } catch (Exception e) {
             e.printStackTrace();
             lblMessage.setText("Lỗi tải màn hình MenuRotate!");
@@ -57,7 +60,10 @@ public class LoginScreenController {
         String username = txtUsername.getText().trim();
         String password = txtPassword.getText().trim();
 
+        SoundManager.playSoundEffect("click.mp3");
+
         if (username.isEmpty() || password.isEmpty()) {
+            SoundManager.playSoundEffect("error.mp3");
             lblMessage.setText("Vui lòng nhập đầy đủ thông tin!");
             return;
         }
@@ -68,10 +74,18 @@ public class LoginScreenController {
         switch (result) {
             case "LOGIN_OK" -> {
                 lblMessage.setText("Đăng nhập thành công!");
+                //SoundManager.stopBackgroundMusic();
+                SoundManager.playSoundEffect("clickLoginRegister.mp3");
                 goToMenuRotate();
             }
-            case "INVALID" -> lblMessage.setText("Sai tên hoặc mật khẩu!");
-            default -> lblMessage.setText("Lỗi kết nối tới server!");
+            case "INVALID" -> {
+                SoundManager.playSoundEffect("error.mp3");
+                lblMessage.setText("Sai tên hoặc mật khẩu!");
+            }
+            default -> {
+                SoundManager.playSoundEffect("error.mp3");
+                lblMessage.setText("Lỗi kết nối tới server!");
+            }
         }
     }
 
@@ -93,10 +107,12 @@ public class LoginScreenController {
             stage.setFullScreen(false);
             stage.setScene(newScene);
 
+            SoundManager.playSoundEffect("click.mp3");
             stage.show();
 
         } catch (Exception e) {
             e.printStackTrace();
+            SoundManager.playSoundEffect("error.mp3");
             lblMessage.setText("Lỗi khi mở màn hình đăng ký!");
         }
     }

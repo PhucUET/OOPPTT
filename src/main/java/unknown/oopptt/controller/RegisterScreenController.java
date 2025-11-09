@@ -9,6 +9,7 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
 import unknown.oopptt.api.Data;
+import unknown.oopptt.api.SoundManager;
 
 public class RegisterScreenController {
 
@@ -36,12 +37,16 @@ public class RegisterScreenController {
         String password = txtPassword.getText().trim();
         String confirm = txtConfirmPassword.getText().trim();
 
+        SoundManager.playSoundEffect("click.mp3");
+
         if (username.isEmpty() || password.isEmpty() || confirm.isEmpty()) {
+            SoundManager.playSoundEffect("error.mp3");
             lblMessage.setText("Vui lòng nhập đầy đủ thông tin!");
             return;
         }
 
         if (!password.equals(confirm)) {
+            SoundManager.playSoundEffect("error.mp3");
             lblMessage.setText("Mật khẩu không khớp!");
             return;
         }
@@ -49,15 +54,25 @@ public class RegisterScreenController {
         String result = data.register(username, password);
 
         switch (result) {
-            case "REGISTER_OK" -> lblMessage.setText("Đăng ký thành công!");
-            case "EXISTS" -> lblMessage.setText("Tài khoản đã tồn tại!");
-            default -> lblMessage.setText("Lỗi kết nối hoặc không thể đăng ký!");
+            case "REGISTER_OK" -> {
+                SoundManager.playSoundEffect("clickLoginRegister.mp3");
+                lblMessage.setText("Đăng ký thành công!");
+            }
+            case "EXISTS" -> {
+                SoundManager.playSoundEffect("error.mp3");
+                lblMessage.setText("Tài khoản đã tồn tại!");
+            }
+            default -> {
+                SoundManager.playSoundEffect("error.mp3");
+                lblMessage.setText("Lỗi kết nối hoặc không thể đăng ký!");
+            }
         }
     }
 
     @FXML
     private void openLogin() {
         try {
+            SoundManager.playSoundEffect("click.mp3");
             // Tải file LoginScreen.fxml
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/unknown/oopptt/LoginScreen.fxml"));
             Parent loginRoot = loader.load();
@@ -73,6 +88,7 @@ public class RegisterScreenController {
 
         } catch (Exception e) {
             e.printStackTrace();
+            SoundManager.playSoundEffect("error.mp3");
             lblMessage.setText("Lỗi khi mở màn hình đăng nhập!");
         }
     }
