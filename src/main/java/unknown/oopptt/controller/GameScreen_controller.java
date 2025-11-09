@@ -1,14 +1,20 @@
 package unknown.oopptt.controller;
 
+import javafx.animation.Animation;
 import javafx.animation.AnimationTimer;
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.geometry.Bounds;
 import javafx.geometry.Pos;
 import javafx.scene.Cursor;
 import javafx.scene.Group;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.KeyCode;
 import javafx.scene.input.MouseButton;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.Pane;
@@ -20,184 +26,163 @@ import javafx.util.Duration;
 import unknown.oopptt.api.*;
 
 import java.io.*;
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.util.*;
 import java.util.spi.AbstractResourceBundleProvider;
+import java.io.File;
+import java.util.stream.Stream;
 
 public class GameScreen_controller {
+
+    // =========================================================
+    // 1) HẰNG SỐ / TÀI NGUYÊN
+    // =========================================================
     private static String background_Video = new File("src/main/resources/graphic/video1.mp4").toURI().toString();
-    private static String background_Game = new File("src/main/resources/graphic/background10.jpg").toURI().toString();
-    private static File mapBrick1 = new File("src/main/resources/map/map1.txt");
-    final double LOGICAL_WIDTH = 800;
+    private static String background_Game  = new File("src/main/resources/graphic/background10.jpg").toURI().toString();
+    private static File mapBrick1          = new File("src/main/resources/map/map2.txt");
+
+    final double LOGICAL_WIDTH  = 800;
     final double LOGICAL_HEIGHT = 600;
-    private final java.util.Set<javafx.scene.input.KeyCode> keys = new java.util.HashSet<>();
-    private javafx.animation.Timeline kbLoop;
-    private static final double PADDLE_SPEED = 350.0;
+    final int BRICK_CELL_W = 56;
+    final int BRICK_CELL_H = 26;
 
     private final static int SCNENE_WIDTH = 1440;
     private final static int SCENE_HEIGHT = 810;
+    private static final double PADDLE_SPEED = 350.0;
+
+    // =========================================================
+    // 2) STATE GAMEPLAY & ĐỐI TƯỢNG CỐT LÕI
+    // =========================================================
+    private Level level = Level.getInstance();
     private boolean inPaddle = true;
+    private boolean isCatch = false;
+
     List<Brick> gameBricks = new LinkedList<Brick>();
     List<Powerup> gamePowerup = new LinkedList<>();
-    Sheild sheild = new Sheild();
-    Shooter shooter;
-
-    BaseGame baseGame = new BaseGame(this);
-
-    @FXML
-    private StackPane stack_root;
-    @FXML
-    private MediaView mediaView;
-    @FXML
-    private ImageView gameBackground;
-    @FXML
-    private Paddle paddleLogic;
-
     private List<Ball> gameBall = new ArrayList<Ball>();
     PowerBall powerBall;
     private SpecialPaddle specialPaddle;
+    Sheild sheild = new Sheild();
+    Shooter shooter;
+    BaseGame baseGame = new BaseGame(this);
 
-    @FXML
-    AnchorPane gamePane;
-    @FXML
-    Pane layout_game;
-    @FXML
-    Group gameGroup;
-    private boolean isCatch = false;
+    // =========================================================
+    // 3) THAM CHIẾU UI (FXML)
+    // =========================================================
+    @FXML private StackPane stack_root;
+    @FXML private MediaView mediaView;
+    @FXML private ImageView gameBackground;
+    @FXML private Paddle paddleLogic;
+
+    @FXML AnchorPane gamePane;
+    @FXML Pane layout_game;
+    @FXML Group gameGroup;
+
+    @FXML private StackPane endGameOverlay;
+    @FXML private Label scoreLabel;
+    @FXML private Button btnEscape, btnRestart, btnNext;
+
+    // =========================================================
+    // 4) INPUT STATE (BÀN PHÍM)
+    // =========================================================
+    private final Set<KeyCode> keys = new HashSet<>();
+    private Timeline kbLoop;
+
+    // =========================================================
+    // 5) MEDIA PLAYER
+    // =========================================================
     private MediaPlayer mediaPlayer;
     private MediaPlayer mediaPlayer1;
 
+    // =========================================================
+    // 6) LIFECYCLE: initialize()
+    // =========================================================
+    @FXML
+    public void initialize() {
+        stack_root.setAlignment(Pos.CENTER);
+        // setBackground_Video(); // nếu muốn video nều
+        level.start();
+        set_Background();
+        startgameloop();
+        setOnKeyboard_Paddle();
+        setOnMouse_Paddle();
+    }
 
+    // =========================================================
+    // 7) KHỞI TẠO NỀN, PADDLE, BALL, SHOOTER, MAP
+    // =========================================================
     private void set_Background() {
-
-
-        Platform.runLater(()-> {
+        Platform.runLater(() -> {
             gameBackground.setImage(new Image(background_Game));
 
-            paddleLogic = new Paddle(gameBackground.getBoundsInParent().getCenterX(), gameBackground.getBoundsInParent().getMaxY() - 20);
+            paddleLogic = new Paddle(
+                    gameBackground.getBoundsInParent().getCenterX(),
+                    gameBackground.getBoundsInParent().getMaxY() - 20
+            );
             layout_game.getChildren().add(paddleLogic.getImageView());
             specialPaddle = new SpecialPaddle(paddleLogic);
 
-            Ball first_ball = new Ball(paddleLogic.getPos_x(),paddleLogic.getPos_y() - 2,1,0);
+            Ball first_ball = new Ball(paddleLogic.getPos_x(), paddleLogic.getPos_y() - 2, 1, 0);
             gameBall.add(first_ball);
             layout_game.getChildren().add(first_ball.getImageView());
             powerBall = new PowerBall(gameBall);
-            shooter = new Shooter(200, 2, 1,3,layout_game, paddleLogic.getImageView(),20);
 
-            upMap();
+            shooter = new Shooter(200, 2, 1, 3, layout_game, paddleLogic.getImageView(), 20);
+            upMap(level.getMap());
         });
     }
 
-    private void chain(MediaPlayer a, MediaPlayer b, MediaView view) {
-        a.setOnReady(() -> {
-            Duration total = a.getMedia().getDuration();
-            a.currentTimeProperty().addListener((obs, oldTime, newTime) -> {
-                if (total.greaterThan(Duration.ZERO)
-                        && newTime.greaterThan(total.subtract(Duration.millis(200)))) {
-                    if (b.getStatus() != MediaPlayer.Status.PLAYING) {
-                        Platform.runLater(() -> {
-                            view.setMediaPlayer(b);
-                            b.seek(Duration.ZERO);
-                            b.play();
-                            a.stop();
-                            a.seek(Duration.ZERO);
-                        });
-                    }
-                }
-            });
-        });
-    }
+    // =========================================================
+    // 8) MAP & TIỆN ÍCH ĐỌC MAP
+    // =========================================================
+    private void upMap(File MAP_FILE) {
+        final int startX = 0;
+        final int startY = 0;
 
-    void setBackground_Video() {
-        mediaPlayer =  new MediaPlayer(new Media(background_Video));
-        mediaPlayer1 =  new MediaPlayer(new Media(background_Video));
-
-
-        mediaView.setPreserveRatio(true);
-        mediaView.fitWidthProperty().bind(stack_root.widthProperty());
-        mediaView.fitHeightProperty().bind(stack_root.heightProperty());
-
-        chain(mediaPlayer, mediaPlayer1, mediaView);
-
-        chain(mediaPlayer1, mediaPlayer, mediaView);
-
-        mediaView.setMediaPlayer(mediaPlayer);
-        mediaPlayer.play();
-    }
-
-
-
-    private void upMap() {
-        int startX = 0;
-        int startY = 0;
-        try (BufferedReader br = new BufferedReader(new FileReader(mapBrick1))) {
-            String line;
-            int row = 0;
-            while ((line = br.readLine()) != null) {
-                String[] data = line.split("\\t");
+        if (!MAP_FILE.exists() || !MAP_FILE.isFile()) {
+            throw new RuntimeException(MAP_FILE + " not found");
+        }
+        try (Stream<String> lines = Files.lines(MAP_FILE.toPath(), StandardCharsets.UTF_8)) {
+            final int[] row = {0};
+            lines.forEach(line -> {
+                String[] data = line.trim().split("\\s+");
                 for (int col = 0; col < data.length; col++) {
-                    int type = Integer.parseInt(data[col]);
-                    if (type > 0) {
-                        int newX = startX + col * 33;
-                        int newY = startY + row * 25;
-                        Brick new_Brick = new Brick(newX,newY,type);
+                    if (data[col].isEmpty()) continue;
+                    int type = safeParse(data[col]);
+                    if (type > 0 && type < 10) {
+                        int newX = startX + col * BRICK_CELL_W;
+                        int newY = startY + row[0] * BRICK_CELL_H;
+                        Brick new_Brick = new Brick(newX, newY, type);
                         gameBricks.add(new_Brick);
                         layout_game.getChildren().add(new_Brick.getImageView());
                     }
                 }
-                row = row + 1;
-            }
-        } catch (FileNotFoundException e) {
-            throw new RuntimeException(e);
+                row[0]++;
+            });
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
 
-
-    @FXML
-    public void initialize() {
-
-        // Giãn gamePane full stack_root
-       // System.out.println(gameBackground.getBoundsInParent().getWidth() +  " " + gameBackground.getBoundsInParent().getHeight());
-        stack_root.setAlignment(Pos.CENTER);
-        // setlayout game
-//        Platform.runLater(()-> {
-//            System.out.println(stack_root.localToScene(stack_root.getBoundsInLocal()));
-//
-//            System.out.println(layout_game.localToScene(layout_game.getBoundsInLocal()));
-//            System.out.println(layout_game.localToScene(layout_game.getBoundsInParent()));
-//
-//            System.out.println(layout_game.getBoundsInParent().getWidth() + " " + layout_game.getBoundsInParent().getHeight());
-//        });
-//        setBackground_Video();
-        set_Background();
-
-
-
-        // di chuyển paddle
-
-
-        startgameloop();
-        setOnKeyboard_Paddle();
-        setOnMouse_Paddle();
-
+    private int safeParse(String s) {
+        try {
+            return Integer.parseInt(s.trim().replaceAll("\\s+", ""));
+        } catch (NumberFormatException e) {
+            return 0;
+        }
     }
 
-    /**
-     * paddle di chuyển.
-     */
-
+    // =========================================================
+    // 9) INPUT: CHUỘT & BÀN PHÍM
+    // =========================================================
     private void setOnMouse_Paddle() {
         layout_game.setCursor(Cursor.NONE);
         Platform.runLater(() -> {
             layout_game.setOnMouseClicked(event -> {
                 for (Ball ball : gameBall) {
                     ball.setSticky(false);
-
                 }
-
             });
             layout_game.setOnMouseMoved(event -> {
                 int newX = (int) Math.round(
@@ -207,78 +192,111 @@ public class GameScreen_controller {
                                         gameBackground.getBoundsInParent().getMaxX()- paddleLogic.getWidth() / 2)
                         )
                 );
-                //System.out.println(newX);
                 paddleLogic.setLocation(newX);
             });
-
         });
-
-
     }
 
     private void setOnKeyboard_Paddle() {
-        // đảm bảo node nhận focus để bắt phím
         layout_game.setFocusTraversable(true);
         Platform.runLater(layout_game::requestFocus);
 
-        // Lắng nghe phím nhấn/thả
         layout_game.setOnKeyPressed(e -> {
             keys.add(e.getCode());
-            // Space: thả bóng khỏi sticky (giống click chuột)
-            if (e.getCode() == javafx.scene.input.KeyCode.SPACE) {
+            if (e.getCode() == KeyCode.SPACE) {
                 for (Ball ball : gameBall) {
                     ball.setSticky(false);
-                    //client.send("Stick:" + ball.isSticky());
                 }
             }
         });
 
         layout_game.setOnKeyReleased(e -> keys.remove(e.getCode()));
 
-        // Vòng lặp nhỏ 60FPS cập nhật vị trí theo phím
         if (kbLoop != null) kbLoop.stop();
-        kbLoop = new javafx.animation.Timeline(
-                new javafx.animation.KeyFrame(javafx.util.Duration.millis(16), ev -> {
+        kbLoop = new Timeline(
+                new KeyFrame(Duration.millis(16), ev -> {
                     double vx = 0.0;
-
-                    // A/LEFT sang trái, D/RIGHT sang phải
-                    if (keys.contains(javafx.scene.input.KeyCode.A) || keys.contains(javafx.scene.input.KeyCode.LEFT)) {
-                        vx -= PADDLE_SPEED;
-                    }
-                    if (keys.contains(javafx.scene.input.KeyCode.D) || keys.contains(javafx.scene.input.KeyCode.RIGHT)) {
-                        vx += PADDLE_SPEED;
-                    }
+                    if (keys.contains(KeyCode.A) || keys.contains(KeyCode.LEFT))  vx -= PADDLE_SPEED;
+                    if (keys.contains(KeyCode.D) || keys.contains(KeyCode.RIGHT)) vx += PADDLE_SPEED;
 
                     if (vx != 0.0) {
-                        // dt xấp xỉ 1/60s
                         double dt = 1.0 / 60.0;
+                        double currX = paddleLogic.getPos_x();
 
-                        // Lấy vị trí "left X" hiện tại của paddle (chính là thứ bạn truyền vào setLocation)
-                        double currX = paddleLogic.getPos_x(); // hoặc phương thức tương đương để đọc left X hiện tại
-
-                        // Tính giới hạn biên theo đúng công thức clamp bạn đang dùng
                         double minLeft = gameBackground.getBoundsInParent().getMinX() + paddleLogic.getWidth() / 2.0;
                         double maxLeft = gameBackground.getBoundsInParent().getMaxX() - paddleLogic.getWidth() / 2.0;
 
-                        // Di chuyển theo vận tốc & dt, rồi clamp
                         double nextX = currX + vx * dt;
                         int newX = (int) Math.round(Math.max(minLeft, Math.min(nextX, maxLeft)));
-
-                        // Cập nhật paddle + gửi mạng
                         paddleLogic.setLocation(newX);
-
                     }
                 })
         );
-        kbLoop.setCycleCount(javafx.animation.Animation.INDEFINITE);
+        kbLoop.setCycleCount(Animation.INDEFINITE);
         kbLoop.play();
     }
 
+    // =========================================================
+    // 10) GAME LOOP & CẬP NHẬT FRAME
+    // =========================================================
+    private void showEndGameScreen() {
+        layout_game.getChildren().remove(paddleLogic.getImageView());
+        for(Ball ball : gameBall){
+            layout_game.getChildren().remove(ball.getImageView());
+        }
+        gameBall.clear();
+        for(Powerup PU : gamePowerup){
+            layout_game.getChildren().remove(PU.getImageView());
+        }
+        gamePowerup.clear();
+        Platform.runLater(() -> {
+            scoreLabel.setText("Your Score: " + 0);
+            endGameOverlay.setVisible(true);
+        });
 
-    /**
-     * Bóng di chuyển
-     */
+        btnEscape.setOnAction(e -> System.exit(0));
+        btnRestart.setOnAction(e -> restartLevel());
+        btnNext.setOnAction(e -> loadNextLevel());
+    }
+    public void loadNextLevel() {
+        endGameOverlay.setVisible(false);
+        level.nextLevel();
+        set_Background();
 
+    }
+    public void restartLevel() {
+        endGameOverlay.setVisible(false);
+        set_Background();
+    }
+    void startgameloop() {
+        AnimationTimer timer = new AnimationTimer() {
+            private Long lasts = 0L;
+            @Override
+            public void handle(long now) {
+                if (lasts == 0) {
+                    lasts = now;
+                    return;
+                }
+                if (shooter.getEnabled()) {
+                    shooter.tryFire();
+                }
+                double dt = (now - lasts) / 1e9;
+                lasts = now;
+
+                shooter.update(dt,gameBricks);
+                gameBall(dt);
+                setGamePowerup();
+                if(gameBricks.isEmpty()){
+                    showEndGameScreen();
+                }
+            }
+        };
+        timer.start();
+    }
+
+    // =========================================================
+    // 11) CẬP NHẬT BÓNG & POWER-UP
+    // =========================================================
     private void gameBall(double dt) {
         if  (gameBall.size() == 0) {
             return;
@@ -298,17 +316,15 @@ public class GameScreen_controller {
                 continue;
             }
 
-//                if (baseGame.outBall(ballLogic, gameBackground)) {
-//                    gameBall.remove(i);
-//                    layout_game.getChildren().remove(ballLogic.getImageView());
-//                    continue;
-//                }
+//          if (baseGame.outBall(ballLogic, gameBackground)) {
+//              gameBall.remove(i);
+//              layout_game.getChildren().remove(ballLogic.getImageView());
+//              continue;
+//          }
             baseGame.brickCollision(ballLogic, gameBricks, layout_game, gamePowerup);
             baseGame.paddleballCollision(ballLogic, paddleLogic, isCatch);
             baseGame.wallCollision(ballLogic, gameBackground);
-            // System.out.println("ngusi" + ballLogic.getSpeedX() + " " + ballLogic.getSpeedY());
             ballLogic.updatePos(dt);
-
         }
     }
 
@@ -326,61 +342,22 @@ public class GameScreen_controller {
                 }
                 powerup.movedown();
             }
-
         }
     }
 
-
-    void startgameloop() {
-        AnimationTimer timer = new AnimationTimer() {
-            private Long lasts = 0L;
-            @Override
-            public void handle(long now) {
-                if (lasts == 0) {
-                    lasts = now;
-                    return;
-                }
-                if (shooter.getEnabled()) {
-                    shooter.tryFire();
-                }
-                double dt = (now - lasts) / 1e9;
-               // System.out.println("frame" + dt);
-                lasts = now;
-                shooter.update(dt,gameBricks);
-                gameBall(dt);
-                setGamePowerup();
-            }
-        };
-        timer.start();
-    }
-
-
+    // =========================================================
+    // 12) API POWER-UPS / PADDLE (PUBLIC)
+    // =========================================================
     public void upBall() {powerBall.upBall();}
-
     public void resetBall() {powerBall.downBall();}
-
     public void slowBall() {powerBall.slowBall();}
-
     public void resetSlowBall() {powerBall.normalBall();}
-
     public void openSheild() {sheild.openSheild(gameBricks, layout_game, gameBackground);}
-
     public void moreBall() {powerBall.moreBall(layout_game);}
-
     public void upPaddle() {specialPaddle.upPaddle();}
-
     public void resetPaddle() {specialPaddle.downPaddle();}
 
-
-    public void catchBall() {
-        isCatch = !isCatch;
-    }
-
-    public void enableGun() {
-        shooter.setEnabled(true);
-    }
-
-    public void unEnableGun() {
-        shooter.setEnabled(false);
-    }
+    public void catchBall() { isCatch = !isCatch; }
+    public void enableGun() { shooter.setEnabled(true); }
+    public void unEnableGun() { shooter.setEnabled(false); }
 }

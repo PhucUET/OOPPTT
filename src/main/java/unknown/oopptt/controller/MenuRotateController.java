@@ -4,7 +4,6 @@ import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
-import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
@@ -48,9 +47,9 @@ public class MenuRotateController {
         // Nạp ảnh từ classpath
         imgBackGournd = firstAvailable("/graphic/battle.png", "/graphic/Space3.png");
         imgFallback  = load("/graphic/background10.jpg");
-        imgBattle    = firstAvailable("/graphic/battle.png", "/graphic/background10.png");
-        imgAdventure = firstAvailable("/graphic/adventure.png", "/graphic/background10.jpg");
-        imgHelp      = firstAvailable("/graphic/help.png", "/graphic/ball_orange.png");
+        imgBattle    = firstAvailable("/graphic/battle.png", "/graphic/BattleScreen.png");
+        imgAdventure = firstAvailable("/graphic/adventure.png", "/graphic/AdventureScreen.png");
+        imgHelp      = firstAvailable("/graphic/help.png", "/graphic/background10.jqp");
 
         render();
 

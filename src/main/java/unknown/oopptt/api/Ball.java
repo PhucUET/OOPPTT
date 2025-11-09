@@ -10,7 +10,7 @@ public  class Ball extends GameEntity {
     private static String path = new File("src/main/resources/graphic/ball_orange.png").toURI().toString();
     private double speedX;
     private double speedY;
-    private double speedXY = 300;
+    private double speedXY = 500;
     private boolean isSticky = true; // Đang dính vào thanh đỡ
     private double posinPaddle = 0;
     private Circle ball = new Circle();
