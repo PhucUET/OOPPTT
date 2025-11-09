@@ -1,4 +1,4 @@
-package unknown.oopptt.api;
+package unknown.oopptt.api.ball;
 
 import javafx.animation.FadeTransition;
 import javafx.scene.effect.DropShadow;
@@ -7,7 +7,8 @@ import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.util.Duration;
-import java.io.File;
+import unknown.oopptt.api.GameEntity;
+
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -21,7 +22,7 @@ public class Ball extends GameEntity {
     // ====== CONSTANTS ======
     private static final String BALL_FOLDER = "src/main/resources/graphic/Ball";
     private static final double BASE_SPEED = 360.0;
-    private static final int BALL_SIZE = 20;
+    private static final int BALL_SIZE = 12;
 
     // ====== MOVEMENT ======
     private double speedX;
@@ -143,7 +144,8 @@ public class Ball extends GameEntity {
     /**
      * Cập nhật vị trí bóng mỗi frame
      */
-    public void updatePos(double dt) {
+    @Override
+    public void update(double dt) {
         //if (sticky) return;
 
         double dx = speedX * dt * speedScale;
@@ -153,14 +155,8 @@ public class Ball extends GameEntity {
         pos_y += dy;
 
         // cập nhật ImageView (UI)
-        imageView.setTranslateX(pos_x - BALL_SIZE / 2.0);
-        imageView.setTranslateY(pos_y - BALL_SIZE / 2.0);
 
-        // cập nhật hitbox (logic)
-        hitCircle.setCenterX(pos_x);
-        hitCircle.setCenterY(pos_y);
 
-        // sinh hiệu ứng thiên thạch
         trailTimer += dt;
         if (trailTimer > 0.03) {
             spawnTrail();
@@ -170,7 +166,11 @@ public class Ball extends GameEntity {
         updateSparks(dt);
 
         updateAnimation(dt);
+
+        imageView.setTranslateX(pos_x - BALL_SIZE / 2.0);
+        imageView.setTranslateY(pos_y - BALL_SIZE / 2.0);
     }
+
 
     /**
      * Khi bóng đang dính vào paddle và paddle di chuyển
@@ -182,10 +182,6 @@ public class Ball extends GameEntity {
         updateAnimation(dt);
     }
 
-    @Override
-    public void update() {
-        // Không dùng trong Ball, để override khi cần sau này
-    }
 
     // ============================================================== //
     // Game interaction helpers
@@ -195,7 +191,7 @@ public class Ball extends GameEntity {
      * Dừng bóng trên paddle
      */
     public void stopBall(double offsetX) {
-        this.speedX = 1;
+        this.speedX = 0.3;
         this.speedY = 0;
         this.offsetOnPaddle = offsetX;
         this.sticky = true;
@@ -254,6 +250,10 @@ public class Ball extends GameEntity {
 
     public void addOffsetOnPaddle(double dt) {
         offsetOnPaddle += dt * speedX * speedScale;
+    }
+
+    public void setOffsetOnPaddle(double offsetOnPaddle) {
+        this.offsetOnPaddle = offsetOnPaddle;
     }
 
     public double getOffsetOnPaddle() {

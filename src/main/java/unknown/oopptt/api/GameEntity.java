@@ -6,6 +6,7 @@ import javafx.scene.image.ImageView;
 
 
 import java.awt.Rectangle;
+import java.awt.geom.Rectangle2D;
 import java.io.File;
 
 /**
@@ -17,7 +18,10 @@ public abstract class GameEntity {
 
     private static String path = new File("src/main/resources/graphic/ball_orange.png").toURI().toString();
     protected ImageView imageView;
-    double pos_x, pos_y,width,height;
+    protected double pos_x;
+    protected double pos_y;
+    protected double width;
+    protected double height;
     private static String superBall = new File("src/main/resources/graphic/Slime2_Attack_with_shadow.png").toURI().toString();
     private  SpriteAnimation animation;
     /**
@@ -54,8 +58,7 @@ public abstract class GameEntity {
         animation.update(dt);
     }
 
-
-    public abstract void update();
+    public abstract void update(double dt);
 
 
     public abstract void setLocation(double v, double dt);

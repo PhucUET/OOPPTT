@@ -1,34 +1,31 @@
 package unknown.oopptt.api;
 
-import javafx.animation.FadeTransition;
-import javafx.animation.PauseTransition;
 import javafx.geometry.Bounds;
 import javafx.scene.image.ImageView;
-import javafx.scene.layout.Pane;
-import javafx.util.Duration;
-import unknown.oopptt.controller.GameScreen_controller;
+import unknown.oopptt.api.ball.Ball;
+import unknown.oopptt.api.enemy.Enemy;
+import unknown.oopptt.controller.Game_Screen_Controller;
 
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class BaseGame {
 
-    private final GameScreen_controller controller;
+    private final Game_Screen_Controller controller;
     private int myPoint = 0;
 
-    public BaseGame(GameScreen_controller controller) {
+    public BaseGame(Game_Screen_Controller controller) {
         this.controller = controller;
     }
 
     // ======================================================
     // WALL COLLISION (Giới hạn tường)
     // ======================================================
-    public void wallCollision(Ball ball, ImageView background) {
+    public boolean wallCollision(Ball ball, ImageView background) {
         Bounds ballBounds = ball.getImageView().getBoundsInParent();
         Bounds wallBounds = background.getBoundsInParent();
 
-        // co lại biên kiểm tra 10px để tránh phản xạ sớm / xuyên
-        double padding = 10;
+        double padding = 5;
 
         double leftWall  = wallBounds.getMinX() + padding;
         double rightWall = wallBounds.getMaxX() - padding;
@@ -43,17 +40,19 @@ public class BaseGame {
         double vx = ball.getSpeedX();
         double vy = ball.getSpeedY();
 
-        // Phản xạ trái/phải
         if ((bxLeft <= leftWall && vx < 0) || (bxRight >= rightWall && vx > 0)) {
             ball.setSpeedX(-vx);
         }
 
-        // Phản xạ trên
         if (byTop <= topWall && vy < 0) {
             ball.setSpeedY(-vy);
         }
 
-        // Không phản xạ dưới (để mất bóng)
+        if (byBottom <= bottomWall ) {
+            return false;
+        }
+        return true;
+
     }
 
     // ======================================================
@@ -63,19 +62,16 @@ public class BaseGame {
         Bounds bb = ball.getImageView().getBoundsInParent();
         Bounds pb = paddle.getImageView().getBoundsInParent();
 
-        // Co nhỏ 10px để tránh phản xạ lặp
-        double shrink = 10;
+        double shrink = 20;
         if (bb.intersects(
                 pb.getMinX() + shrink, pb.getMinY() + shrink,
                 pb.getWidth() - 2 * shrink, pb.getHeight() - 2 * shrink)) {
 
-            // Nếu đang có hiệu ứng dính
             if (isCatch && ball.getSpeedY() != 0) {
                 ball.stopBall(ball.getPos_x() - paddle.getPos_x());
                 return;
             }
 
-            // Tính góc phản xạ theo vị trí va chạm
             double t = 2 * (bb.getCenterX() - pb.getCenterX()) / pb.getWidth();
             t = Math.max(-0.98, Math.min(0.98, t));
 
@@ -87,7 +83,6 @@ public class BaseGame {
             double dirX = -Math.cos(rad);
             double dirY = Math.sin(rad);
 
-            // Chuẩn hóa vector
             double len = Math.hypot(dirX, dirY);
             dirX /= len;
             dirY /= len;
@@ -102,15 +97,12 @@ public class BaseGame {
         ImageView bv = ball.getImageView();
         Bounds bb = bv.getBoundsInParent();
 
-        // Thu nhỏ một chút hitbox để tránh phản sai
         Bounds bReduced = new javafx.geometry.BoundingBox(
                 bb.getMinX() + 10, bb.getMinY() + 10,
                 bb.getWidth() - 20, bb.getHeight() - 20);
 
-        // Nếu không giao nhau thì bỏ qua
         if (!bReduced.intersects(r)) return false;
 
-        // Tính tâm và nửa kích thước (AABB)
         double ballCenterX = bb.getMinX() + bb.getWidth() / 2.0;
         double ballCenterY = bb.getMinY() + bb.getHeight() / 2.0;
         double brickCenterX = r.getMinX() + r.getWidth() / 2.0;
@@ -192,13 +184,20 @@ public class BaseGame {
         return false;
     }
 
+    public static int rand1to20() {
+        return ThreadLocalRandom.current().nextInt(-20, 21); // [1, 21)
+    }
+
     public void enemyCollision(Ball ballLogic, List<Enemy> enemys) {
 
         for (Enemy enemy :  enemys) {
             Bounds en = enemy.getImageView().getBoundsInParent();
 
             if (simpleCollision(ballLogic, en)) {
-                myPoint +=  enemy.oneHit();
+                myPoint +=  enemy.takeDamage(10);
+                if (enemy instanceof TransitEnemy) {
+                    ballLogic.setLocation(ballLogic.pos_x + rand1to20() ,  ballLogic.pos_y + rand1to20());
+                }
             }
         }
     }

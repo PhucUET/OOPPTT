@@ -5,7 +5,7 @@ import javafx.application.Platform;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.Pane;
-import unknown.oopptt.controller.GameScreen_controller;
+import unknown.oopptt.controller.Game_Screen_Controller;
 
 import java.io.File;
 import java.util.List;
@@ -25,10 +25,11 @@ public class Powerup  {
     private double pos_y;
     private double width = 40;
     private double height = 20;
-    private  GameScreen_controller controller;
+    private Game_Screen_Controller controller;
 
     public enum PowerupType {
-        UPBALL(10), UPPADDLE(8), SHEILD(-1), MOREBALL(-1), SLOW(10), CATCHBALL(10), GUN(8);;
+        UPBALL(10), UPPADDLE(8), SHEILD(-1), MOREBALL(-1), SLOW(10),
+        CATCHBALL(10), GUN(8), REDIR(10);
         private final int duration;
         PowerupType(int duration) {
             this.duration = duration;
@@ -73,6 +74,45 @@ public class Powerup  {
             case PowerupType.GUN:
                 imageView = new ImageView(new Image(upballview));
                 break;
+            case PowerupType.REDIR:
+                imageView = new ImageView(new Image(upballview));
+                break;
+        }
+        imageView.setFitWidth(width);
+        imageView.setFitHeight(height);
+        imageView.setTranslateX(pos_x -  imageView.getFitWidth() / 2);
+        imageView.setTranslateY(pos_y -  imageView.getFitHeight() / 2);
+    }
+
+    public Powerup(double pos_x, double pos_y, PowerupType type) {
+        this.type = type;
+        this.pos_x = pos_x;
+        this.pos_y = pos_y;
+        switch (type) {
+            case PowerupType.UPBALL:
+                imageView = new ImageView(new Image(upballview));
+                break;
+            case PowerupType.UPPADDLE:
+                imageView = new ImageView(new Image(upballview));
+                break;
+            case PowerupType.SHEILD:
+                imageView = new ImageView(new Image(upballview));
+                break;
+            case  PowerupType.MOREBALL:
+                imageView = new ImageView(new Image(upballview));
+                break;
+            case PowerupType.SLOW:
+                imageView = new ImageView(new Image(upballview));
+                break;
+            case PowerupType.CATCHBALL:
+                imageView = new ImageView(new Image(upballview));
+                break;
+            case PowerupType.GUN:
+                imageView = new ImageView(new Image(upballview));
+                break;
+            case PowerupType.REDIR:
+                imageView = new ImageView(new Image(upballview));
+                break;
         }
         imageView.setFitWidth(width);
         imageView.setFitHeight(height);
@@ -84,9 +124,9 @@ public class Powerup  {
         return imageView;
     }
 
-    public void movedown() {
-        this.pos_y += 2;
-        imageView.setTranslateY(pos_y);
+    public void movedown(double dt) {
+        this.pos_y += 300 * dt;
+        imageView.setTranslateY(pos_y - imageView.getFitHeight() / 2);
     }
 
     private void runTimeEffect(int duration, Runnable startEffect, Runnable endEffect) {
@@ -99,11 +139,10 @@ public class Powerup  {
         }).start();
     }
 
-    public void WhenCollison(GameScreen_controller controller) {
+    public void WhenCollison(Game_Screen_Controller controller) {
         this.controller = controller;
         switch (type) {
             case PowerupType.UPBALL:
-                System.out.println("ditmecuocdoi");
                         runTimeEffect(type.getDuration(), controller::upBall, controller::resetBall);
                 break;
             case PowerupType.UPPADDLE:
@@ -124,6 +163,8 @@ public class Powerup  {
             case PowerupType.GUN:
                 runTimeEffect(type.getDuration(),  controller::enableGun, controller::unEnableGun);
                 break;
+            case PowerupType.REDIR:
+                runTimeEffect(type.getDuration(), controller::setRedirPaddle, controller::offRedirPaddle);
 
         }
 

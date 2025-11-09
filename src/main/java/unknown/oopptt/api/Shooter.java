@@ -34,9 +34,12 @@ public class Shooter {
         double vy;
         double dx = 0;
         double dy = 1;
+        private String Epath = new File("src/main/resources/graphic/Plasma_ball_cycle").toString();
+        SpriteAnimation animation = new SpriteAnimation(Epath, 30);
         final ImageView imageView;
         boolean alive;
         Bullet(ImageView imageView){this.imageView = imageView;}
+        Bullet() {this.imageView = animation.getView();}
     }
 
     public Shooter(double bulletSpeed, double coldDown, double bulletW, double bulletH, Pane gameLayout, ImageView paddleView, int prewarmPoolSize) {
@@ -59,6 +62,7 @@ public class Shooter {
         }
     }
 
+
     public Shooter(double bulletSpeed, double coldDown, double bulletW, double bulletH, Pane gameLayout, ImageView paddleView, int prewarmPoolSize, ImageView enemyView) {
         BULLET_SPEED = bulletSpeed;
         COLD_DOWN = coldDown;
@@ -67,14 +71,14 @@ public class Shooter {
         game_Layout = gameLayout;
         this.paddleView = paddleView;
         this.enemyView = enemyView;
-        this.bulletImg = new Image(path);
+        bulletImg = new Image(path);
 
         for (int i = 0 ; i < prewarmPoolSize ; i++){
-            Bullet bullet = new Bullet(new ImageView(bulletImg));
+            Bullet bullet = new Bullet();
             bulletPool.push(bullet);
             bullet.imageView.setVisible(false);
-            bullet.imageView.setFitWidth(BULLET_W);
-            bullet.imageView.setFitHeight(BULLET_H);
+            bullet.imageView.setFitWidth(BULLET_W * 6);
+            bullet.imageView.setFitHeight(BULLET_H * 6);
             bullet.imageView.setPreserveRatio(false);
             game_Layout.getChildren().add(bullet.imageView);
         }
@@ -132,11 +136,12 @@ public class Shooter {
                     it.remove();
                     continue;
                 }
-                bullet.x += bullet.x * dtsecond * bullet.dx;
-                bullet.y += bullet.vy * dtsecond * bullet.dy ;
-                bullet.imageView.setTranslateY(bullet.y);
-                bullet.imageView.setTranslateX(bullet.x);
-                System.out.println(bullet.dx + " " + bullet.dy);
+                bullet.x += BULLET_SPEED * dtsecond * bullet.dx;
+                bullet.y += BULLET_SPEED * dtsecond * bullet.dy ;
+
+                bullet.animation.update(dtsecond);
+                bullet.imageView.setTranslateY(bullet.y - BULLET_H * 6 /2);
+                bullet.imageView.setTranslateX(bullet.x - BULLET_W * 6 /2);
 
                 if (bullet.y >= paddleView.getBoundsInParent().getMaxY()) {
                     recycle(it, bullet);
@@ -255,13 +260,13 @@ public class Shooter {
         Bullet newBullet = getBullet();
         newBullet.imageView.setVisible(true);
         newBullet.x = ex;
-        newBullet.y = ey;
+        newBullet.y = ey ;
         newBullet.vy = BULLET_SPEED;
         newBullet.dx = dirX;
         newBullet.dy = dirY;
         newBullet.alive = true;
-        newBullet.imageView.setTranslateX(newBullet.x);
-        newBullet.imageView.setTranslateY(newBullet.y);
+        newBullet.imageView.setTranslateX(newBullet.x - BULLET_W * 6 / 2 );
+        newBullet.imageView.setTranslateY(newBullet.y -  BULLET_H * 6 / 2 );
         active.add(newBullet);
 
         timeSinceLastShoot = 0;
@@ -291,7 +296,7 @@ public class Shooter {
         bulletPool.addLast(bullet);
     }
 
-    private void reset() {
+    public void reset() {
         enemyView.setVisible(false);
         Iterator<Bullet> it = active.iterator();
         while (it.hasNext()){

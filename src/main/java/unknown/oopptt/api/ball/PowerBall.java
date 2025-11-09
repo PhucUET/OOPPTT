@@ -1,9 +1,8 @@
-package unknown.oopptt.api;
+package unknown.oopptt.api.ball;
 
 import javafx.scene.layout.Pane;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 /**

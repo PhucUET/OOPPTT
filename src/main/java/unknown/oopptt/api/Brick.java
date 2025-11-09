@@ -20,7 +20,7 @@ public class Brick extends GameEntity {
     private int hitPoints = 1;
     protected String powerupType; // Loại PowerUp (ví dụ: "EXPAND", "MULTI_BALL"), null nếu không có
     private final static int widthBrick = 50;
-    private final static int heightBrick = 25;
+    private final static int heightBrick = 23 ;
     private int typeBrick = 0;
     private final ArrayList<Integer> pointList = new ArrayList<Integer>(Arrays.asList(50, 100, 150, 200));
     private double timeDrop = 0.3;
@@ -101,7 +101,7 @@ public class Brick extends GameEntity {
     //public abstract boolean hit();
 
     @Override
-    public void update() {
+    public void update(double dt) {
 
     }
 

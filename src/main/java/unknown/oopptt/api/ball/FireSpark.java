@@ -1,4 +1,4 @@
-package unknown.oopptt.api;
+package unknown.oopptt.api.ball;
 
 import javafx.scene.image.ImageView;
 import javafx.scene.paint.Color;

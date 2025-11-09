@@ -1,8 +1,5 @@
-package unknown.oopptt.api;
+package unknown.oopptt.api.enemy;
 
-import javafx.scene.image.ImageView;
-
-import javax.swing.*;
 import java.io.File;
 
 public class BasicEnemy extends Enemy {
