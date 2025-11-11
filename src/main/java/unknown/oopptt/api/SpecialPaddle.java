@@ -10,6 +10,6 @@ public class SpecialPaddle {
         paddle.changeSize(paddle.getWidth() * 2);
     }
     public void downPaddle() {
-        paddle.changeSize(paddle.getWidth() / 2);
+        paddle.changeSize(100);
     }
 }

@@ -130,6 +130,7 @@ public class GameScreen_controller {
 
             shooter = new Shooter(200, 2, 1, 3, layout_game, paddleLogic.getImageView(), 20);
             upMap(level.getMap());
+            endGameOverlay.setVisible(false);
         });
     }
 
@@ -245,8 +246,8 @@ public class GameScreen_controller {
             layout_game.getChildren().remove(ball.getImageView());
         }
         gameBall.clear();
-        for(Powerup PU : gamePowerup){
-            layout_game.getChildren().remove(PU.getImageView());
+        for(Powerup Pu : gamePowerup){
+            layout_game.getChildren().remove(Pu.getImageView());
         }
         gamePowerup.clear();
         Platform.runLater(() -> {
@@ -255,8 +256,8 @@ public class GameScreen_controller {
         });
 
         btnEscape.setOnAction(e -> System.exit(0));
-        btnRestart.setOnAction(e -> restartLevel());
-        btnNext.setOnAction(e -> loadNextLevel());
+        btnRestart.setOnAction(e ->{ restartLevel();endGameOverlay.setVisible(false);});
+        btnNext.setOnAction(e -> {loadNextLevel();endGameOverlay.setVisible(false);});
     }
     public void loadNextLevel() {
         endGameOverlay.setVisible(false);

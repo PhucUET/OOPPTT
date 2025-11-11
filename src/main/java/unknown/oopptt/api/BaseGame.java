@@ -131,7 +131,7 @@ public class BaseGame {
                 bricks.remove(i);
                 boolean rand = false;
 
-                if (shouldDrop(0.1)) {
+                if (shouldDrop(0.7)) {
                     Powerup p = new Powerup(rv.getBoundsInParent().getCenterX(), rv.getBoundsInParent().getCenterY());
                     root.getChildren().add(p.getImageView());
                    //System.out.println(this.randomIndex + "    " + p.getRandomIndex());

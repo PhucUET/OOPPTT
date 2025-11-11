@@ -31,10 +31,6 @@
       </Pane>
       <StackPane fx:id="endGameOverlay" style="-fx-background-color: rgba(0,0,0,0.7);" visible="false">
          <children>
-            <ImageView fitHeight="150.0" fitWidth="200.0" pickOnBounds="true" preserveRatio="true">
-               <image>
-                  <Image url="@../../graphic/Space3.png" />
-               </image></ImageView>
             <VBox alignment="CENTER" prefHeight="150.0" prefWidth="200.0">
                <children>
                   <Label fx:id="scoreLabel" prefHeight="47.0" prefWidth="310.0" style="-fx-font-size: 32px; -fx-text-fill: red; -fx-font-weight: bold;" text="Your Score: 0000" textAlignment="CENTER" />

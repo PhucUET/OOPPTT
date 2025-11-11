@@ -64,7 +64,7 @@ public final class Level {
                 break;
             case 2:
                 this.map = new File("src/main/resources/map/map2.txt");
-                this.background = new File("src/main/resources/graphic/background10.jpg")
+                this.background = new File("src/main/resources/graphic/Space3.png")
                         .toURI().toString();
                 break;
             case 3:
