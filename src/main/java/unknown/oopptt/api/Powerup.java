@@ -146,7 +146,7 @@ public class Powerup  {
                         runTimeEffect(type.getDuration(), controller::upBall, controller::resetBall);
                 break;
             case PowerupType.UPPADDLE:
-                runTimeEffect(type.getDuration(), controller::upPaddle, controller::resetPaddle);
+                runTimeEffect(type.getDuration(), controller::upPaddle, controller::offUpPaddle);
                 break;
             case PowerupType.SHEILD:
                 controller.openSheild();

@@ -16,10 +16,11 @@ public class PowerBall {
     // Giới hạn an toàn
     private static final double MIN_SPEED_SCALE = 150.0;
     private static final double MAX_SPEED_SCALE = 600.0;
-    private static final int MAX_BALLS = 12;
+    private static final int MAX_BALLS = 8;
     private static final int DEFAULT_SIZE = 15;
     private static final int BIG_SIZE = 25;
     private static final int SMALL_SIZE = 10;
+    private boolean slowActive;
 
     public PowerBall(List<Ball> balls) {
         this.balls = balls;
@@ -39,6 +40,10 @@ public class PowerBall {
 
 
     public void slowBall() {
+        if (slowActive) {
+            return;
+        }
+        slowActive = true;
         for (Ball ball : balls) {
             double newSpeed = Math.max(MIN_SPEED_SCALE, ball.getSpeedScale() * 0.8);
             ball.setSpeedScale(newSpeed);
@@ -46,6 +51,7 @@ public class PowerBall {
     }
 
     public void normalBall() {
+        slowActive = false;
         for (Ball ball : balls) {
             ball.setSpeedScale(DEFAULT_SPEED);
         }

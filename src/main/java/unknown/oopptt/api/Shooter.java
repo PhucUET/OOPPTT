@@ -268,7 +268,7 @@ public class Shooter {
         newBullet.imageView.setTranslateX(newBullet.x - BULLET_W * 6 / 2 );
         newBullet.imageView.setTranslateY(newBullet.y -  BULLET_H * 6 / 2 );
         active.add(newBullet);
-
+        System.out.println("bantinh");
         timeSinceLastShoot = 0;
 
     }

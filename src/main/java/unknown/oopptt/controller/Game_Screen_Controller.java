@@ -1,10 +1,12 @@
 package unknown.oopptt.controller;
 
 import javafx.animation.AnimationTimer;
+import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.geometry.Bounds;
 import javafx.geometry.Pos;
 import javafx.scene.Cursor;
+import javafx.scene.Group;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyEvent;
@@ -15,6 +17,7 @@ import unknown.oopptt.api.*;
 import unknown.oopptt.api.ball.Ball;
 import unknown.oopptt.api.ball.PowerBall;
 import unknown.oopptt.api.enemy.BasicEnemy;
+import unknown.oopptt.api.enemy.BossEnemy;
 import unknown.oopptt.api.enemy.Enemy;
 import unknown.oopptt.api.enemy.ShooterEnemy;
 
@@ -46,13 +49,15 @@ public class Game_Screen_Controller {
     @FXML private StackPane stack_root;
     @FXML private MediaView mediaView;
     @FXML private ImageView gameBackground;
-    @FXML private Paddle paddleLogic;
+    private Paddle paddleLogic;
+    @FXML private Group bgr;
 
     private final List<Ball> gameBall = new ArrayList<>();
     private final List<Enemy> gameEnemies =  new ArrayList<>();
     private final List<Powerup> gamePowerup = new ArrayList<>();
     private PowerBall powerBall;
     private SpecialPaddle specialPaddle;
+    private ParallaxBackground bg =  new ParallaxBackground();
 
     @FXML Pane layout_game;
 
@@ -67,9 +72,9 @@ public class Game_Screen_Controller {
         stack_root.setAlignment(Pos.CENTER);
         preloadAssets();
         setBackground(BG_IMAGE_PATH,MAP_FILE);
+
         ListenEventHandle();
         startGameloop();
-
     }
 
     private void preloadAssets() {
@@ -82,9 +87,12 @@ public class Game_Screen_Controller {
         ImageCache.loadFolder("src/main/resources/graphic/dropbrick2");
         ImageCache.loadFolder("src/main/resources/graphic/dropbrick3");
         ImageCache.loadFolder("src/main/resources/graphic/Plasma_ball_cycle");
+        ImageCache.loadFolder("src/main/resources/graphic/Boss");
     }
 
     private void setBackground(String backgroundPath, File MAP_FILE) {
+        stack_root.getChildren().add(0, bg.getRoot());
+        stack_root.setAlignment(Pos.CENTER);
         gameBackground.setImage(new Image(backgroundPath));
 
         paddleLogic = new Paddle(gameBackground.getBoundsInParent().getCenterX(),
@@ -104,6 +112,12 @@ public class Game_Screen_Controller {
         shooter = new Shooter(200, 2, 5, 10, layout_game, paddleLogic.getImageView(), 20);
 
         upMap(MAP_FILE);
+
+        Platform.runLater(() -> {
+            BossEnemy bossEnemy = new BossEnemy(250, 300, 50,50,50,paddleLogic,this,layout_game);
+            gameEnemies.add(bossEnemy);
+            layout_game.getChildren().add(bossEnemy.getImageView());
+        });
 
     }
 
@@ -153,6 +167,7 @@ public class Game_Screen_Controller {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+
     }
 
     private int safeParse(String s) {
@@ -226,6 +241,7 @@ public class Game_Screen_Controller {
                     gameBricksUp(STEP);
                     setGamePowerup(STEP);
                     enemyGame(STEP);
+                    bg.update(STEP);
                     accumulator -= STEP;
                 }
                 if (shooter.getEnabled()) {
@@ -278,6 +294,12 @@ public class Game_Screen_Controller {
                 }
                 BasicEnemy  basicEnemy = (BasicEnemy) enemy;
                 basicEnemy.update(dt);
+            }
+
+            if (enemy instanceof BossEnemy) {
+                BossEnemy bossEnemy = (BossEnemy) enemy;
+
+                bossEnemy.update(dt);
             }
 
         }
@@ -358,14 +380,23 @@ public class Game_Screen_Controller {
         }
     }
 
-    public void resetPaddle()        {
-        specialPaddle.downPaddle();
+    public void offUpPaddle()        {
+        specialPaddle.offupPaddle();
         for (Ball balLogic : gameBall) {
             balLogic.setOffsetOnPaddle(balLogic.getOffsetOnPaddle()/2);
         }
     }
     public void slowPaddle()        {
         specialPaddle.slowPaddle();
+    }
+    public void offslowPaddle()        {
+        specialPaddle.offslowPaddle();
+    }
+    public void downPaddle() {
+        specialPaddle.downPaddle();
+    }
+    public void offdownPaddle()    {
+        specialPaddle.offdownPaddle();
     }
     public void fastPaddle()        {
         specialPaddle.fastPaddle();
