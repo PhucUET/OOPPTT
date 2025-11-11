@@ -35,10 +35,10 @@ public class LoginScreenController {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/unknown/oopptt/MenuRotate.fxml"));
             Parent rotateRoot = loader.load();
 
-            // Lấy stage hiện tại
+            //lay stage hien tai
             Stage stage = (Stage) txtUsername.getScene().getWindow();
 
-            // Tạo scene mới và gán trực tiếp
+            //tao scene moi va gan truc tiep
             Scene scene = new Scene(rotateRoot);
             stage.setFullScreen(true);
             stage.setScene(scene);
@@ -48,13 +48,11 @@ public class LoginScreenController {
 
         } catch (Exception e) {
             e.printStackTrace();
-            lblMessage.setText("Lỗi tải màn hình MenuRotate!");
+            lblMessage.setText("Error when open MenuRotate!");
         }
     }
 
-    /**
-     * Xử lý khi người dùng nhấn nút "Đăng nhập"
-     */
+    //khi nhan nut dang nhap
     @FXML
     private void handleLogin() {
         String username = txtUsername.getText().trim();
@@ -64,45 +62,42 @@ public class LoginScreenController {
 
         if (username.isEmpty() || password.isEmpty()) {
             SoundManager.playSoundEffect("error.mp3");
-            lblMessage.setText("Vui lòng nhập đầy đủ thông tin!");
+            lblMessage.setText("Please enter full username and password!");
             return;
         }
 
-        // Gọi hàm login() từ Data để kiểm tra với Google Sheets
+        //goi ham login() tu data de kiem tra voi ggsheets
         String result = data.login(username, password);
 
         switch (result) {
             case "LOGIN_OK" -> {
-                lblMessage.setText("Đăng nhập thành công!");
-                //SoundManager.stopBackgroundMusic();
+                lblMessage.setText("Login successful!");
                 SoundManager.playSoundEffect("clickLoginRegister.mp3");
                 goToMenuRotate();
             }
             case "INVALID" -> {
                 SoundManager.playSoundEffect("error.mp3");
-                lblMessage.setText("Sai tên hoặc mật khẩu!");
+                lblMessage.setText("Wrong username or password!");
             }
             default -> {
                 SoundManager.playSoundEffect("error.mp3");
-                lblMessage.setText("Lỗi kết nối tới server!");
+                lblMessage.setText("Error when login!");
             }
         }
     }
 
-    /**
-     * Xử lý khi người dùng nhấn vào link "Đăng ký tài khoản mới"
-     */
+    //khi nhan nut dang ky tai khoan moi
     @FXML
     private void openRegister() {
         try {
-            // Tải FXML mới
+            //tai fxml moi
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/unknown/oopptt/RegisterScreen.fxml"));
             Parent rootNew = loader.load();
 
-            // Lấy stage hiện tại
+            //lay stage hien tai
             Stage stage = (Stage) txtUsername.getScene().getWindow();
 
-            // Tạo scene mới và gán thẳng
+            //tao scene moi va gan thang
             Scene newScene = new Scene(rootNew);
             stage.setFullScreen(false);
             stage.setScene(newScene);
@@ -113,7 +108,7 @@ public class LoginScreenController {
         } catch (Exception e) {
             e.printStackTrace();
             SoundManager.playSoundEffect("error.mp3");
-            lblMessage.setText("Lỗi khi mở màn hình đăng ký!");
+            lblMessage.setText("Error when open Register!");
         }
     }
 

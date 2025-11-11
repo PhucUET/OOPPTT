@@ -41,13 +41,13 @@ public class RegisterScreenController {
 
         if (username.isEmpty() || password.isEmpty() || confirm.isEmpty()) {
             SoundManager.playSoundEffect("error.mp3");
-            lblMessage.setText("Vui lòng nhập đầy đủ thông tin!");
+            lblMessage.setText("Please enter full information!");
             return;
         }
 
         if (!password.equals(confirm)) {
             SoundManager.playSoundEffect("error.mp3");
-            lblMessage.setText("Mật khẩu không khớp!");
+            lblMessage.setText("Passwords do not match!");
             return;
         }
 
@@ -56,31 +56,32 @@ public class RegisterScreenController {
         switch (result) {
             case "REGISTER_OK" -> {
                 SoundManager.playSoundEffect("clickLoginRegister.mp3");
-                lblMessage.setText("Đăng ký thành công!");
+                lblMessage.setText("Register successfully!");
             }
             case "EXISTS" -> {
                 SoundManager.playSoundEffect("error.mp3");
-                lblMessage.setText("Tài khoản đã tồn tại!");
+                lblMessage.setText("Account already exists!");
             }
             default -> {
                 SoundManager.playSoundEffect("error.mp3");
-                lblMessage.setText("Lỗi kết nối hoặc không thể đăng ký!");
+                lblMessage.setText("Connection error or unable to register!");
             }
         }
     }
 
+    //khi nhan nut quay tro lai dang nhap
     @FXML
     private void openLogin() {
         try {
             SoundManager.playSoundEffect("click.mp3");
-            // Tải file LoginScreen.fxml
+            //tai file LoginScreen.fxml
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/unknown/oopptt/LoginScreen.fxml"));
             Parent loginRoot = loader.load();
 
-            // Lấy stage hiện tại từ nút hoặc textfield bất kỳ
+            //lay stage hien tai tu nut hoac textfield bat ki
             Stage stage = (Stage) txtUsername.getScene().getWindow();
 
-            // Tạo scene mới và gán thẳng
+            //tao scene moi va gan thang
             Scene scene = new Scene(loginRoot);
             stage.setFullScreen(false);
             stage.setScene(scene);
@@ -89,7 +90,7 @@ public class RegisterScreenController {
         } catch (Exception e) {
             e.printStackTrace();
             SoundManager.playSoundEffect("error.mp3");
-            lblMessage.setText("Lỗi khi mở màn hình đăng nhập!");
+            lblMessage.setText("Error when opening login screen!");
         }
     }
 
