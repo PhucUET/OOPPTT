@@ -64,7 +64,7 @@ public class MenuRotateController {
                 else if (e.getCode() == KeyCode.RIGHT) onRotateRight();
                 else if (e.getCode() == KeyCode.ESCAPE) onEscape();
                 else if (e.getCode() == KeyCode.M) onToggleMute();
-                else if (e.getCode() == KeyCode.ENTER || e.getCode() == KeyCode.SPACE) onSelectCenter();
+                else if (e.getCode() == KeyCode.ENTER ) onSelectCenter();
             });
         });
     }
