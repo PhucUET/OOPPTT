@@ -1,33 +1,31 @@
 package unknown.oopptt.api;
 
-import javafx.animation.FadeTransition;
-import javafx.animation.PauseTransition;
 import javafx.geometry.Bounds;
 import javafx.scene.image.ImageView;
-import javafx.scene.layout.Pane;
-import javafx.util.Duration;
-import unknown.oopptt.controller.GameScreen_controller;
+import unknown.oopptt.api.ball.Ball;
+import unknown.oopptt.api.enemy.Enemy;
+import unknown.oopptt.controller.Game_Screen_Controller;
 
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class BaseGame {
 
-    private final GameScreen_controller controller;
+    private final Game_Screen_Controller controller;
+    private int myPoint = 0;
 
-    public BaseGame(GameScreen_controller controller) {
+    public BaseGame(Game_Screen_Controller controller) {
         this.controller = controller;
     }
 
     // ======================================================
     // WALL COLLISION (Giới hạn tường)
     // ======================================================
-    public void wallCollision(Ball ball, ImageView background) {
+    public boolean wallCollision(Ball ball, ImageView background) {
         Bounds ballBounds = ball.getImageView().getBoundsInParent();
         Bounds wallBounds = background.getBoundsInParent();
 
-        // co lại biên kiểm tra 10px để tránh phản xạ sớm / xuyên
-        double padding = 10;
+        double padding = 5;
 
         double leftWall  = wallBounds.getMinX() + padding;
         double rightWall = wallBounds.getMaxX() - padding;
@@ -42,17 +40,19 @@ public class BaseGame {
         double vx = ball.getSpeedX();
         double vy = ball.getSpeedY();
 
-        // Phản xạ trái/phải
         if ((bxLeft <= leftWall && vx < 0) || (bxRight >= rightWall && vx > 0)) {
             ball.setSpeedX(-vx);
         }
 
-        // Phản xạ trên
         if (byTop <= topWall && vy < 0) {
             ball.setSpeedY(-vy);
         }
 
-        // Không phản xạ dưới (để mất bóng)
+        if (byBottom <= bottomWall ) {
+            return false;
+        }
+        return true;
+
     }
 
     // ======================================================
@@ -62,19 +62,16 @@ public class BaseGame {
         Bounds bb = ball.getImageView().getBoundsInParent();
         Bounds pb = paddle.getImageView().getBoundsInParent();
 
-        // Co nhỏ 10px để tránh phản xạ lặp
-        double shrink = 10;
+        double shrink = 20;
         if (bb.intersects(
                 pb.getMinX() + shrink, pb.getMinY() + shrink,
                 pb.getWidth() - 2 * shrink, pb.getHeight() - 2 * shrink)) {
 
-            // Nếu đang có hiệu ứng dính
             if (isCatch && ball.getSpeedY() != 0) {
                 ball.stopBall(ball.getPos_x() - paddle.getPos_x());
                 return;
             }
 
-            // Tính góc phản xạ theo vị trí va chạm
             double t = 2 * (bb.getCenterX() - pb.getCenterX()) / pb.getWidth();
             t = Math.max(-0.98, Math.min(0.98, t));
 
@@ -86,7 +83,6 @@ public class BaseGame {
             double dirX = -Math.cos(rad);
             double dirY = Math.sin(rad);
 
-            // Chuẩn hóa vector
             double len = Math.hypot(dirX, dirY);
             dirX /= len;
             dirY /= len;
@@ -96,12 +92,59 @@ public class BaseGame {
         }
     }
 
+
+    private boolean simpleCollision(Ball ball, Bounds r) {
+        ImageView bv = ball.getImageView();
+        Bounds bb = bv.getBoundsInParent();
+
+        Bounds bReduced = new javafx.geometry.BoundingBox(
+                bb.getMinX() + 10, bb.getMinY() + 10,
+                bb.getWidth() - 20, bb.getHeight() - 20);
+
+        if (!bReduced.intersects(r)) return false;
+
+        double ballCenterX = bb.getMinX() + bb.getWidth() / 2.0;
+        double ballCenterY = bb.getMinY() + bb.getHeight() / 2.0;
+        double brickCenterX = r.getMinX() + r.getWidth() / 2.0;
+        double brickCenterY = r.getMinY() + r.getHeight() / 2.0;
+
+        double dx = ballCenterX - brickCenterX;
+        double dy = ballCenterY - brickCenterY;
+
+        double combinedHalfWidth = (bb.getWidth() + r.getWidth()) / 2.0;
+        double combinedHalfHeight = (bb.getHeight() + r.getHeight()) / 2.0;
+
+        double overlapX = combinedHalfWidth - Math.abs(dx);
+        double overlapY = combinedHalfHeight - Math.abs(dy);
+
+        // Nếu thực sự có overlap (tránh false positive)
+        if (overlapX > 0 && overlapY > 0) {
+            // Nếu chồng theo X ít hơn → phản xạ theo X
+            if (overlapX < overlapY) {
+                double push = (dx > 0) ? overlapX : -overlapX;
+                bv.setTranslateX(bv.getTranslateX() + push);
+                ball.setSpeedX(-ball.getSpeedX());
+            }
+            // Ngược lại phản xạ theo Y
+            else {
+                double push = (dy > 0) ? overlapY : -overlapY;
+                bv.setTranslateY(bv.getTranslateY() + push);
+                ball.setSpeedY(-ball.getSpeedY());
+            }
+            return true;
+        }
+
+        return false;
+    }
+
+
     // ======================================================
     // BRICK COLLISION
     // ======================================================
+
+
     public void brickCollision(Ball ball, List<Brick> bricks) {
-        ImageView bv = ball.getImageView();
-        Bounds bb = bv.getBoundsInParent();
+
 
         for (int i = bricks.size() - 1; i >= 0; i--) {
             Brick brick = bricks.get(i);
@@ -110,41 +153,18 @@ public class BaseGame {
 
             // co lại vùng kiểm tra 10px để tránh phản xạ sai
             Bounds r = rv.getBoundsInParent();
-            Bounds bReduced = new javafx.geometry.BoundingBox(
-                    bb.getMinX() + 10, bb.getMinY() + 10,
-                    bb.getWidth() - 20, bb.getHeight() - 20);
 
-            if (!bReduced.intersects(r)) continue;
-
-            // Tính chồng lấn
-            double overlapL = bb.getMaxX() - r.getMinX();
-            double overlapR = r.getMaxX() - bb.getMinX();
-            double overlapT = bb.getMaxY() - r.getMinY();
-            double overlapB = r.getMaxY() - bb.getMinY();
-
-            double overlapX = Math.min(overlapL, overlapR);
-            double overlapY = Math.min(overlapT, overlapB);
-
-            // Phản xạ theo hướng ít chồng lấn hơn (tránh xuyên)
-            if (overlapX < overlapY) {
-                double push = (overlapL < overlapR) ? -overlapL : overlapR;
-                bv.setTranslateX(bv.getTranslateX() + push);
-                ball.setSpeedX(-ball.getSpeedX());
-            } else {
-                double push = (overlapT < overlapB) ? -overlapT : overlapB;
-                bv.setTranslateY(bv.getTranslateY() + push);
-                ball.setSpeedY(-ball.getSpeedY());
+            if (simpleCollision(ball, r)) {
+                // Cập nhật trạng thái gạch
+                if (!brick.hit()) {
+                    myPoint += brick.getHitPoints();
+                    brick.setWait(true);
+                    break;
+                }
             }
 
-            // Cập nhật trạng thái gạch
-            if (!brick.hit()) {
-
-                brick.setWait(true);
-
-            }
 
             // Chỉ xử lý 1 gạch mỗi frame
-            break;
         }
     }
 
@@ -162,6 +182,24 @@ public class BaseGame {
             return true;
         }
         return false;
+    }
+
+    public static int rand1to20() {
+        return ThreadLocalRandom.current().nextInt(-20, 21); // [1, 21)
+    }
+
+    public void enemyCollision(Ball ballLogic, List<Enemy> enemys) {
+
+        for (Enemy enemy :  enemys) {
+            Bounds en = enemy.getImageView().getBoundsInParent();
+
+            if (simpleCollision(ballLogic, en)) {
+                myPoint +=  enemy.takeDamage(10);
+                if (enemy instanceof TransitEnemy) {
+                    ballLogic.setLocation(ballLogic.pos_x + rand1to20() ,  ballLogic.pos_y + rand1to20());
+                }
+            }
+        }
     }
 
     // ======================================================
