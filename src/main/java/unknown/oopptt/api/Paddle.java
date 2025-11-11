@@ -46,9 +46,10 @@ public class Paddle extends GameEntity {
             this.pos_x = clamp(this.pos_x, backgroundGame.getBoundsInParent().getMinX() + this.width/2,
                     backgroundGame.getBoundsInParent().getMaxX() - this.width/2);
         }
-        imageView.setTranslateX(this.pos_x - this.width/2);
-        imageView.setTranslateY(this.pos_y - this.height/2);
-
+        this.imageView.setTranslateX(this.pos_x - this.width/2);
+        this.imageView.setTranslateY(this.pos_y - this.height/2);
+//        System.out.println(backgroundGame.localToParent(backgroundGame.getBoundsInParent()));
+//        System.out.println(this.imageView.localToParent(backgroundGame.getBoundsInParent()));
         this.updateAnimation(dt);
     }
 

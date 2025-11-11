@@ -1,10 +1,13 @@
 package unknown.oopptt.controller;
 
 import javafx.animation.AnimationTimer;
+import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.geometry.Bounds;
 import javafx.geometry.Pos;
 import javafx.scene.Cursor;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyEvent;
@@ -36,6 +39,7 @@ public class Game_Screen_Controller {
     private static final String BG_IMAGE_PATH = new File("src/main/resources/graphic/background10.jpg").toURI().toString();
     private static final File MAP_FILE = new File("src/main/resources/map/map1.txt");
 
+    private Level level = Level.getInstance();
     private final List<Brick> gameBricks = new LinkedList<>();
     private final Sheild sheild = new Sheild();
     private Shooter shooter;
@@ -47,6 +51,9 @@ public class Game_Screen_Controller {
     @FXML private MediaView mediaView;
     @FXML private ImageView gameBackground;
     @FXML private Paddle paddleLogic;
+    @FXML private StackPane endGameOverlay;
+    @FXML private Label scoreLabel;
+    @FXML private Button btnEscape, btnRestart, btnNext;
 
     private final List<Ball> gameBall = new ArrayList<>();
     private final List<Enemy> gameEnemies =  new ArrayList<>();
@@ -65,6 +72,7 @@ public class Game_Screen_Controller {
     @FXML
     public void initialize() {
         stack_root.setAlignment(Pos.CENTER);
+        level.start();
         preloadAssets();
         setBackground(BG_IMAGE_PATH,MAP_FILE);
         ListenEventHandle();
@@ -104,6 +112,7 @@ public class Game_Screen_Controller {
         shooter = new Shooter(200, 2, 5, 10, layout_game, paddleLogic.getImageView(), 20);
 
         upMap(MAP_FILE);
+        endGameOverlay.setVisible(false);
 
     }
 
@@ -196,6 +205,38 @@ public class Game_Screen_Controller {
         });
     }
 
+    private void showEndGameScreen() {
+        layout_game.getChildren().remove(paddleLogic.getImageView());
+
+        for(Ball ball : gameBall){
+            layout_game.getChildren().remove(ball.getImageView());
+        }
+        gameBall.clear();
+
+        for(Powerup Pu : gamePowerup){
+            layout_game.getChildren().remove(Pu.getImageView());
+        }
+        gamePowerup.clear();
+        Platform.runLater(() -> {
+            scoreLabel.setText("Your Score: " + 0);
+            endGameOverlay.setVisible(true);
+        });
+
+        btnEscape.setOnAction(e -> System.exit(0));
+        btnRestart.setOnAction(e ->{ restartLevel();endGameOverlay.setVisible(false);});
+        btnNext.setOnAction(e -> {loadNextLevel();endGameOverlay.setVisible(false);});
+    }
+    public void loadNextLevel() {
+        endGameOverlay.setVisible(false);
+        level.nextLevel();
+        setBackground(BG_IMAGE_PATH,level.getMap());
+
+    }
+    public void restartLevel() {
+        endGameOverlay.setVisible(false);
+        setBackground(BG_IMAGE_PATH,level.getMap());
+    }
+
     // ================= gamel==================
     private static final double TARGET_FPS = 60;
     private static final  double STEP = 1.0/TARGET_FPS;
@@ -230,6 +271,11 @@ public class Game_Screen_Controller {
                 }
                 if (shooter.getEnabled()) {
                     shooter.tryFire();
+                }
+                System.out.println(gameBricks.size());
+                if(gameBricks.isEmpty()){
+                    showEndGameScreen();
+                    //gameBricks.clear();
                 }
             }
         };
@@ -309,11 +355,11 @@ public class Game_Screen_Controller {
                 ballLogic.addOffsetOnPaddle(dt);
                 continue;
             }
-            if (baseGame.outBall(ballLogic.getImageView().getBoundsInParent(), gameBackground)) {
-                gameBall.remove(i);
-                layout_game.getChildren().remove(ballLogic.getImageView());
-                continue;
-            }
+//            if (baseGame.outBall(ballLogic.getImageView().getBoundsInParent(), gameBackground)) {
+//                gameBall.remove(i);
+//                layout_game.getChildren().remove(ballLogic.getImageView());
+//                continue;
+//            }
 
             baseGame.brickCollision(ballLogic, gameBricks);
             baseGame.paddleballCollision(ballLogic, paddleLogic, isCatch);
@@ -349,7 +395,7 @@ public class Game_Screen_Controller {
     public void resetBall()          { powerBall.downBall(); }
     public void slowBall()           { powerBall.slowBall(); }
     public void resetSlowBall()      { powerBall.normalBall(); }
-    public void openSheild()         { sheild.openSheild(gameBricks, layout_game, gameBackground); }
+    //public void openSheild()         { sheild.openSheild(gameBricks, layout_game, gameBackground); }
     public void moreBall()           { powerBall.moreBall(layout_game); }
 
     public void upPaddle() {

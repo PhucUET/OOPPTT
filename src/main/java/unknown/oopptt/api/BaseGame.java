@@ -4,18 +4,22 @@ import javafx.geometry.Bounds;
 import javafx.scene.image.ImageView;
 import unknown.oopptt.api.ball.Ball;
 import unknown.oopptt.api.enemy.Enemy;
+import unknown.oopptt.controller.BattleScreenController;
 import unknown.oopptt.controller.Game_Screen_Controller;
 
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class BaseGame {
-
-    private final Game_Screen_Controller controller;
+    private Game_Screen_Controller controller;
+    private BattleScreenController BTcontroller;
     private int myPoint = 0;
 
     public BaseGame(Game_Screen_Controller controller) {
         this.controller = controller;
+    }
+    public BaseGame(BattleScreenController controller) {
+        this.BTcontroller = controller;
     }
 
     // ======================================================
@@ -44,15 +48,15 @@ public class BaseGame {
             ball.setSpeedX(-vx);
         }
 
-        if (byTop <= topWall && vy < 0) {
+        if ((byTop <= topWall && vy < 0) || (byBottom >= bottomWall && vy > 0)) {
             ball.setSpeedY(-vy);
         }
-
-        if (byBottom <= bottomWall ) {
-            return false;
-        }
+//
+//        if (byBottom <= bottomWall ) {
+//            return false;
+//        }
+//        return true;
         return true;
-
     }
 
     // ======================================================

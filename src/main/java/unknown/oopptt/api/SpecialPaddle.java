@@ -1,5 +1,7 @@
 package unknown.oopptt.api;
 
+import javafx.scene.layout.Background;
+
 public class SpecialPaddle {
     private final  Paddle paddle;
     public SpecialPaddle(Paddle paddle) {
@@ -7,10 +9,15 @@ public class SpecialPaddle {
     }
 
     public void upPaddle() {
-        paddle.changeSize(paddle.getWidth() * 2);
+        if(paddle.getWidth() < 500) {
+            paddle.changeSize(paddle.getWidth() * 2);
+        }
+        else {
+            paddle.changeSize(500);
+        }
     }
     public void downPaddle() {
-        paddle.changeSize(paddle.getWidth() / 2);
+        paddle.changeSize(150);
     }
     public void slowPaddle() {
         paddle.setMoveSpeed(paddle.getMoveSpeed() / 2);
