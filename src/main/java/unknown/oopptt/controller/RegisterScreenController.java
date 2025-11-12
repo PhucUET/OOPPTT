@@ -114,12 +114,9 @@ public class RegisterScreenController {
         try {
             SoundManager.playSoundEffect("click.mp3");
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/unknown/oopptt/LoginScreen.fxml"));
-            Parent loginRoot = loader.load();
+                        Parent loginRoot = loader.load();
             Stage stage = (Stage) txtUsername.getScene().getWindow();
-            Scene scene = new Scene(loginRoot);
-            stage.setFullScreen(false);
-            stage.setScene(scene);
-            stage.show();
+            stage.getScene().setRoot(loginRoot);
         } catch (Exception e) {
             e.printStackTrace();
             SoundManager.playSoundEffect("error.mp3");

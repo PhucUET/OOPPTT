@@ -121,11 +121,12 @@ public class LoginScreenController {
     private void openRegister() {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/unknown/oopptt/RegisterScreen.fxml"));
-            Parent rootNew = loader.load();
+                        Parent rootNew = loader.load();
             Stage stage = (Stage) txtUsername.getScene().getWindow();
-            Scene newScene = new Scene(rootNew);
-            stage.setFullScreen(false);
-            stage.setScene(newScene);
+            stage.setTitle("Register");
+
+            stage.getScene().setRoot(rootNew);
+
             SoundManager.playSoundEffect("click.mp3");
             stage.show();
         } catch (Exception e) {
