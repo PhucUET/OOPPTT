@@ -17,10 +17,10 @@ public class RegisterScreenController {
     @FXML private PasswordField txtPassword;
     @FXML private PasswordField txtConfirmPassword;
     @FXML private Label lblMessage;
-    @FXML
-    private ImageView background;
-    @FXML
-    private AnchorPane root;
+    @FXML private ImageView background;
+    @FXML private AnchorPane root;
+
+    private final Data data = new Data();
 
     @FXML
     public void initialize() {
@@ -29,69 +29,101 @@ public class RegisterScreenController {
         background.fitHeightProperty().bind(root.heightProperty());
     }
 
-    private final Data data = new Data();
-
     @FXML
     private void handleRegister() {
-        String username = txtUsername.getText().trim();
-        String password = txtPassword.getText().trim();
-        String confirm = txtConfirmPassword.getText().trim();
+        final String username = txtUsername.getText().trim();
+        final String password = txtPassword.getText().trim();
+        final String confirm  = txtConfirmPassword.getText().trim();
 
         SoundManager.playSoundEffect("click.mp3");
 
+        //validate nhẹ trên ui thread (không cần overlay nếu sai đầu vào)
         if (username.isEmpty() || password.isEmpty() || confirm.isEmpty()) {
             SoundManager.playSoundEffect("error.mp3");
             lblMessage.setText("Please enter full information!");
             return;
         }
-
         if (!password.equals(confirm)) {
             SoundManager.playSoundEffect("error.mp3");
             lblMessage.setText("Passwords do not match!");
             return;
         }
 
-        String result = data.register(username, password);
+        //hiện overlay ngay lập tức
+        final Parent overlay;
+        final LoadingController loadingCtrl;
+        try {
+            FXMLLoader fx = new FXMLLoader(getClass().getResource("/unknown/oopptt/Loading.fxml"));
+            overlay = fx.load();
+            loadingCtrl = fx.getController();
 
-        switch (result) {
-            case "REGISTER_OK" -> {
-                SoundManager.playSoundEffect("clickLoginRegister.mp3");
-                lblMessage.setText("Register successfully!");
-            }
-            case "EXISTS" -> {
-                SoundManager.playSoundEffect("error.mp3");
-                lblMessage.setText("Account already exists!");
-            }
-            default -> {
-                SoundManager.playSoundEffect("error.mp3");
-                lblMessage.setText("Connection error or unable to register!");
-            }
+            overlay.setPickOnBounds(true); //chặn click xuyên
+            AnchorPane.setTopAnchor(overlay, 0.0);
+            AnchorPane.setRightAnchor(overlay, 0.0);
+            AnchorPane.setBottomAnchor(overlay, 0.0);
+            AnchorPane.setLeftAnchor(overlay, 0.0);
+            root.getChildren().add(overlay);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            lblMessage.setText("Cannot show loading overlay!");
+            return;
         }
+
+        //gọi register ở bgr (không chặn ui)
+        javafx.concurrent.Task<String> registerTask = new javafx.concurrent.Task<>() {
+            @Override protected String call() {
+                return data.register(username, password);
+            }
+        };
+
+        registerTask.setOnSucceeded(ev -> {
+            //gỡ overlay + dừng animation
+            root.getChildren().remove(overlay);
+            loadingCtrl.stop();
+
+            String result = registerTask.getValue();
+            switch (result) {
+                case "REGISTER_OK" -> {
+                    SoundManager.playSoundEffect("clickLoginRegister.mp3");
+                    lblMessage.setText("Register successfully!");
+                }
+                case "EXISTS" -> {
+                    SoundManager.playSoundEffect("error.mp3");
+                    lblMessage.setText("Account already exists!");
+                }
+                default -> {
+                    SoundManager.playSoundEffect("error.mp3");
+                    lblMessage.setText("Connection error or unable to register!");
+                }
+            }
+        });
+
+        registerTask.setOnFailed(ev -> {
+            root.getChildren().remove(overlay);
+            loadingCtrl.stop();
+            SoundManager.playSoundEffect("error.mp3");
+            lblMessage.setText("Register failed (exception)!");
+        });
+
+        new Thread(registerTask, "register-task").start();
     }
 
-    //khi nhan nut quay tro lai dang nhap
+    // khi nhấn nút quay lại đăng nhập
     @FXML
     private void openLogin() {
         try {
             SoundManager.playSoundEffect("click.mp3");
-            //tai file LoginScreen.fxml
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/unknown/oopptt/LoginScreen.fxml"));
             Parent loginRoot = loader.load();
-
-            //lay stage hien tai tu nut hoac textfield bat ki
             Stage stage = (Stage) txtUsername.getScene().getWindow();
-
-            //tao scene moi va gan thang
             Scene scene = new Scene(loginRoot);
             stage.setFullScreen(false);
             stage.setScene(scene);
             stage.show();
-
         } catch (Exception e) {
             e.printStackTrace();
             SoundManager.playSoundEffect("error.mp3");
             lblMessage.setText("Error when opening login screen!");
         }
     }
-
 }

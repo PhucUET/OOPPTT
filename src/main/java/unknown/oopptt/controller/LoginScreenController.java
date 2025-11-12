@@ -1,5 +1,6 @@
 package unknown.oopptt.controller;
 
+import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -12,53 +13,18 @@ import unknown.oopptt.api.Data;
 import unknown.oopptt.api.SoundManager;
 
 public class LoginScreenController {
-
-    @FXML
-    private TextField txtUsername;
-
-    @FXML
-    private PasswordField txtPassword;
-
-    @FXML
-    private Label lblMessage;
-
-    @FXML
-    private ImageView background;
-
-    @FXML
-    private AnchorPane root;
+    @FXML private TextField txtUsername;
+    @FXML private PasswordField txtPassword;
+    @FXML private Label lblMessage;
+    @FXML private ImageView background;
+    @FXML private AnchorPane root;
 
     private final Data data = new Data();
 
-    private void goToMenuRotate() {
-        try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/unknown/oopptt/MenuRotate.fxml"));
-            Parent rotateRoot = loader.load();
-
-            //lay stage hien tai
-            Stage stage = (Stage) txtUsername.getScene().getWindow();
-
-            //tao scene moi va gan truc tiep
-            Scene scene = new Scene(rotateRoot);
-            stage.setFullScreen(true);
-            stage.setScene(scene);
-            stage.show();
-
-            SoundManager.playBackgroundMusic("menuBgrMusic.mp3");
-
-        } catch (Exception e) {
-            e.printStackTrace();
-            lblMessage.setText("Error when open MenuRotate!");
-        }
-    }
-
-    //khi nhan nut dang nhap
     @FXML
     private void handleLogin() {
-        String username = txtUsername.getText().trim();
-        String password = txtPassword.getText().trim();
-
-        SoundManager.playSoundEffect("click.mp3");
+        final String username = txtUsername.getText().trim();
+        final String password = txtPassword.getText().trim();
 
         if (username.isEmpty() || password.isEmpty()) {
             SoundManager.playSoundEffect("error.mp3");
@@ -66,45 +32,102 @@ public class LoginScreenController {
             return;
         }
 
-        //goi ham login() tu data de kiem tra voi ggsheets
-        String result = data.login(username, password);
+        SoundManager.playSoundEffect("click.mp3");
 
-        switch (result) {
-            case "LOGIN_OK" -> {
-                lblMessage.setText("Login successful!");
-                SoundManager.playSoundEffect("clickLoginRegister.mp3");
-                goToMenuRotate();
+        final Parent overlay;
+        final LoadingController loadingCtrl;
+        try {
+            FXMLLoader fx = new FXMLLoader(getClass().getResource("/unknown/oopptt/Loading.fxml"));
+            overlay = fx.load();
+            loadingCtrl = fx.getController();
+
+            overlay.setPickOnBounds(true); // chặn click xuyên
+            AnchorPane.setTopAnchor(overlay, 0.0);
+            AnchorPane.setRightAnchor(overlay, 0.0);
+            AnchorPane.setBottomAnchor(overlay, 0.0);
+            AnchorPane.setLeftAnchor(overlay, 0.0);
+            root.getChildren().add(overlay);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            lblMessage.setText("Cannot show loading overlay!");
+            return;
+        }
+
+        javafx.concurrent.Task<String> loginTask = new javafx.concurrent.Task<>() {
+            @Override protected String call() {
+                //gọi Google Sheets
+                return data.login(username, password);
             }
-            case "INVALID" -> {
+        };
+
+        loginTask.setOnSucceeded(ev -> {
+            String result = loginTask.getValue();
+            if ("LOGIN_OK".equals(result)) {
+                SoundManager.playSoundEffect("clickLoginRegister.mp3");
+
+                //preload màn kế tiếp ở background rồi mới setScene (để chuyển mượt)
+                javafx.concurrent.Task<Parent> preloadNext = new javafx.concurrent.Task<>() {
+                    @Override protected Parent call() throws Exception {
+                        FXMLLoader nextFx = new FXMLLoader(getClass().getResource("/unknown/oopptt/MenuRotate.fxml"));
+                        return nextFx.load();
+                    }
+                };
+                preloadNext.setOnSucceeded(done -> {
+                    //gỡ overlay + chuyển màn
+                    root.getChildren().remove(overlay);
+                    loadingCtrl.stop();
+                    try {
+                        Stage stage = (Stage) root.getScene().getWindow();
+                        stage.setScene(new Scene(preloadNext.getValue()));
+                        stage.setFullScreen(true);
+                        SoundManager.playBackgroundMusic("menuBgrMusic.mp3");
+                    } catch (Exception ex) {
+                        ex.printStackTrace();
+                        lblMessage.setText("Error switching to MenuRotate!");
+                    }
+                });
+                preloadNext.setOnFailed(err -> {
+                    root.getChildren().remove(overlay);
+                    loadingCtrl.stop();
+                    lblMessage.setText("Failed to load next screen!");
+                });
+                new Thread(preloadNext, "preload-next").start();
+
+            } else if ("INVALID".equals(result)) {
+                //sai tài khoản → gỡ overlay, báo lỗi
+                root.getChildren().remove(overlay);
+                loadingCtrl.stop();
                 SoundManager.playSoundEffect("error.mp3");
                 lblMessage.setText("Wrong username or password!");
-            }
-            default -> {
+            } else {
+                root.getChildren().remove(overlay);
+                loadingCtrl.stop();
                 SoundManager.playSoundEffect("error.mp3");
                 lblMessage.setText("Error when login!");
             }
-        }
+        });
+
+        loginTask.setOnFailed(ev -> {
+            root.getChildren().remove(overlay);
+            loadingCtrl.stop();
+            SoundManager.playSoundEffect("error.mp3");
+            lblMessage.setText("Login failed (exception)!");
+        });
+
+        new Thread(loginTask, "login-task").start();
     }
 
-    //khi nhan nut dang ky tai khoan moi
     @FXML
     private void openRegister() {
         try {
-            //tai fxml moi
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/unknown/oopptt/RegisterScreen.fxml"));
             Parent rootNew = loader.load();
-
-            //lay stage hien tai
             Stage stage = (Stage) txtUsername.getScene().getWindow();
-
-            //tao scene moi va gan thang
             Scene newScene = new Scene(rootNew);
             stage.setFullScreen(false);
             stage.setScene(newScene);
-
             SoundManager.playSoundEffect("click.mp3");
             stage.show();
-
         } catch (Exception e) {
             e.printStackTrace();
             SoundManager.playSoundEffect("error.mp3");
@@ -112,14 +135,10 @@ public class LoginScreenController {
         }
     }
 
-
     @FXML
     public void initialize() {
         background.setPreserveRatio(false);
         background.fitWidthProperty().bind(root.widthProperty());
         background.fitHeightProperty().bind(root.heightProperty());
-        System.out.println(root.sceneToLocal(root.getBoundsInParent()));
-        System.out.println(root.getBoundsInParent().getWidth() + " " +  root.getBoundsInParent().getHeight());
-        System.out.println(background.getBoundsInParent().getMinX() + " " +  background.getBoundsInParent().getMinY());
     }
 }
