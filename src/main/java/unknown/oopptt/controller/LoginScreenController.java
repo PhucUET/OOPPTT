@@ -28,7 +28,7 @@ public class LoginScreenController {
     @FXML
     private AnchorPane root;
 
-    private final Data data = new Data();
+    private  Data data = new Data();
 
     private void goToMenuRotate() {
         try {

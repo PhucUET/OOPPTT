@@ -63,6 +63,8 @@ public class Game_Screen_Controller {
     private PowerBall powerBall;
     private SpecialPaddle specialPaddle;
     private ParallaxBackground bg =  new ParallaxBackground();
+    private Sheild shield;
+    private NowPlay Player;
 
     @FXML Pane layout_game;
 
@@ -95,6 +97,17 @@ public class Game_Screen_Controller {
         ImageCache.loadFolder("src/main/resources/graphic/dropbrick3");
         ImageCache.loadFolder("src/main/resources/graphic/Plasma_ball_cycle");
         ImageCache.loadFolder("src/main/resources/graphic/Boss");
+        ImageCache.loadFolder("src/main/resources/graphic/Shooter");
+        ImageCache.loadFolder("src/main/resources/graphic/paddle");
+        ImageCache.loadFolder("src/main/resources/graphic/PU/Anti-speed");
+        ImageCache.loadFolder("src/main/resources/graphic/PU/attackx2");
+        ImageCache.loadFolder("src/main/resources/graphic/PU/Defence");
+        ImageCache.loadFolder("src/main/resources/graphic/PU/attackx3");
+        ImageCache.loadFolder("src/main/resources/graphic/PU/HPx2");
+        ImageCache.loadFolder("src/main/resources/graphic/PU/Immortality");
+        ImageCache.loadFolder("src/main/resources/graphic/PU/magnet");
+        ImageCache.loadFolder("src/main/resources/graphic/PU/Shield");
+
     }
 
     private void setBackground(String backgroundPath, File MAP_FILE) {
@@ -291,7 +304,9 @@ public class Game_Screen_Controller {
                     setGamePowerup(STEP);
                     enemyGame(STEP);
                     bg.update(STEP);
+                    shield.update(STEP);
                     accumulator -= STEP;
+                    specialPaddle.applyAllEffects();
                 }
                 if (shooter.getEnabled()) {
                     shooter.tryFire();
@@ -427,32 +442,31 @@ public class Game_Screen_Controller {
 
     public void upPaddle() {
         if (paddleLogic.getWidth() * 2 <= gameBackground.getBoundsInParent().getWidth() / 2.0)  {
-            specialPaddle.upPaddle();
+            specialPaddle.setBig();
         }
     }
 
     public void offUpPaddle()        {
-        specialPaddle.offupPaddle();
+        specialPaddle.setNormalSize();
         for (Ball balLogic : gameBall) {
             balLogic.setOffsetOnPaddle(balLogic.getOffsetOnPaddle()/2);
         }
     }
     public void slowPaddle()        {
-        specialPaddle.slowPaddle();
+        specialPaddle.setSlow();
     }
     public void offslowPaddle()        {
-        specialPaddle.offslowPaddle();
+        specialPaddle.setNormalSpeed();
     }
     public void downPaddle() {
-        specialPaddle.downPaddle();
+        specialPaddle.setSmall();
     }
     public void offdownPaddle()    {
-        specialPaddle.offdownPaddle();
+        specialPaddle.setNormalSize();
     }
     public void fastPaddle()        {
-        specialPaddle.fastPaddle();
+        specialPaddle.setFast();
     }
-
     public void createMinions() {
 
     }
@@ -463,10 +477,10 @@ public class Game_Screen_Controller {
         isSpam = false;
     }
     public void setRedirPaddle() {
-        specialPaddle.setRedir();
+        specialPaddle.setRedir(true);
     }
     public void offRedirPaddle() {
-        specialPaddle.offRedir();
+        specialPaddle.setRedir(false);
     }
     public void createFakePU() {
         Powerup newPU = new Powerup(gameBackground.getBoundsInParent().getCenterX()/2,0, Powerup.PowerupType.REDIR);
@@ -474,6 +488,9 @@ public class Game_Screen_Controller {
     public void catchBall()          { isCatch = !isCatch; }
     public void enableGun()          { shooter.setEnabled(true); }
     public void unEnableGun()        { shooter.setEnabled(false); }
+    public void setShieldOn()        {
+        shield.setOpenShield(true);
+    }
 
 }
 
