@@ -10,7 +10,7 @@ import java.io.File;
 
 public class Paddle extends GameEntity {
     private static String path = new File("src/main/resources/graphic/paddle").toString();
-    private int moveSpeed = 500;
+    private double moveSpeed = 500;
     private boolean isCatchEnabled = false; // PowerUp CATCH/Sticky Ball
     private Rectangle Paddle;
     private ImageView backgroundGame;
@@ -46,10 +46,9 @@ public class Paddle extends GameEntity {
             this.pos_x = clamp(this.pos_x, backgroundGame.getBoundsInParent().getMinX() + this.width/2,
                     backgroundGame.getBoundsInParent().getMaxX() - this.width/2);
         }
-        this.imageView.setTranslateX(this.pos_x - this.width/2);
-        this.imageView.setTranslateY(this.pos_y - this.height/2);
-//        System.out.println(backgroundGame.localToParent(backgroundGame.getBoundsInParent()));
-//        System.out.println(this.imageView.localToParent(backgroundGame.getBoundsInParent()));
+        imageView.setTranslateX(this.pos_x - this.width/2);
+        imageView.setTranslateY(this.pos_y - this.height/2);
+
         this.updateAnimation(dt);
     }
 
@@ -94,11 +93,11 @@ public class Paddle extends GameEntity {
         this.leftHeld = leftHeld;
     }
 
-    public int getMoveSpeed() {
+    public double getMoveSpeed() {
         return moveSpeed;
     }
 
-    public void setMoveSpeed(int moveSpeed) {
+    public void setMoveSpeed(double moveSpeed) {
         this.moveSpeed = moveSpeed;
     }
 

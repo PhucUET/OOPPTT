@@ -6,6 +6,7 @@ import javafx.fxml.FXML;
 import javafx.geometry.Bounds;
 import javafx.geometry.Pos;
 import javafx.scene.Cursor;
+import javafx.scene.Group;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
@@ -18,6 +19,7 @@ import unknown.oopptt.api.*;
 import unknown.oopptt.api.ball.Ball;
 import unknown.oopptt.api.ball.PowerBall;
 import unknown.oopptt.api.enemy.BasicEnemy;
+import unknown.oopptt.api.enemy.BossEnemy;
 import unknown.oopptt.api.enemy.Enemy;
 import unknown.oopptt.api.enemy.ShooterEnemy;
 
@@ -39,10 +41,9 @@ public class Game_Screen_Controller {
     private static final String BG_IMAGE_PATH = new File("src/main/resources/graphic/background10.jpg").toURI().toString();
     private static final File MAP_FILE = new File("src/main/resources/map/map1.txt");
 
-    private Level level = Level.getInstance();
     private final List<Brick> gameBricks = new LinkedList<>();
-    private final Sheild sheild = new Sheild();
     private Shooter shooter;
+    private Level level = Level.getInstance();
     private final BaseGame baseGame = new BaseGame(this);
 
     private int countlife = 3;
@@ -50,16 +51,20 @@ public class Game_Screen_Controller {
     @FXML private StackPane stack_root;
     @FXML private MediaView mediaView;
     @FXML private ImageView gameBackground;
-    @FXML private Paddle paddleLogic;
-    @FXML private StackPane endGameOverlay;
-    @FXML private Label scoreLabel;
-    @FXML private Button btnEscape, btnRestart, btnNext;
+    @FXML Label scoreLabel;
+    @FXML Button btnRestart,btnNext,btnEscape;
+    @FXML StackPane endGameOverlay;
+    private Paddle paddleLogic;
+    @FXML private Group bgr;
 
     private final List<Ball> gameBall = new ArrayList<>();
     private final List<Enemy> gameEnemies =  new ArrayList<>();
     private final List<Powerup> gamePowerup = new ArrayList<>();
     private PowerBall powerBall;
     private SpecialPaddle specialPaddle;
+    private ParallaxBackground bg =  new ParallaxBackground();
+    private Sheild shield;
+    //private NowPlay Player;
 
     @FXML Pane layout_game;
 
@@ -74,10 +79,11 @@ public class Game_Screen_Controller {
         stack_root.setAlignment(Pos.CENTER);
         level.start();
         preloadAssets();
+        stack_root.getChildren().add(0, bg.getRoot());
+        stack_root.setAlignment(Pos.CENTER);
         setBackground(BG_IMAGE_PATH,MAP_FILE);
         ListenEventHandle();
         startGameloop();
-
     }
 
     private void preloadAssets() {
@@ -90,30 +96,42 @@ public class Game_Screen_Controller {
         ImageCache.loadFolder("src/main/resources/graphic/dropbrick2");
         ImageCache.loadFolder("src/main/resources/graphic/dropbrick3");
         ImageCache.loadFolder("src/main/resources/graphic/Plasma_ball_cycle");
+        ImageCache.loadFolder("src/main/resources/graphic/Boss");
+        ImageCache.loadFolder("src/main/resources/graphic/Shooter");
+        ImageCache.loadFolder("src/main/resources/graphic/paddle");
+        ImageCache.loadFolder("src/main/resources/graphic/PU/Anti-speed");
+        ImageCache.loadFolder("src/main/resources/graphic/PU/attackx2");
+        ImageCache.loadFolder("src/main/resources/graphic/PU/Defence");
+        ImageCache.loadFolder("src/main/resources/graphic/PU/attackx3");
+        ImageCache.loadFolder("src/main/resources/graphic/PU/HPx2");
+        ImageCache.loadFolder("src/main/resources/graphic/PU/Immortality");
+        ImageCache.loadFolder("src/main/resources/graphic/PU/magnet");
+        ImageCache.loadFolder("src/main/resources/graphic/PU/Shield");
+
     }
 
     private void setBackground(String backgroundPath, File MAP_FILE) {
-        gameBackground.setImage(new Image(backgroundPath));
+        //gameBackground.setImage(new Image(backgroundPath));
 
-        paddleLogic = new Paddle(gameBackground.getBoundsInParent().getCenterX(),
-                gameBackground.getBoundsInParent().getMaxY() - 40, gameBackground);
+        if(endGameOverlay.isVisible() == false) {
+            paddleLogic = new Paddle(gameBackground.getBoundsInParent().getCenterX(),
+                    gameBackground.getBoundsInParent().getMaxY() - 40, gameBackground);
 
-        layout_game.getChildren().add(paddleLogic.getImageView());
-        specialPaddle = new SpecialPaddle(paddleLogic);
+            layout_game.getChildren().add(paddleLogic.getImageView());
+            specialPaddle = new SpecialPaddle(paddleLogic);
 
-        Ball first_ball = new Ball(paddleLogic.getPos_x(),
-                paddleLogic.getPos_y() - 5, 0.3, 0, layout_game);
+            Ball first_ball = new Ball(paddleLogic.getPos_x(),
+                    paddleLogic.getPos_y() - 5, 0.3, 0, layout_game);
 
-        gameBall.add(first_ball);
+            gameBall.add(first_ball);
 
-        layout_game.getChildren().add(first_ball.getImageView());
-        powerBall = new PowerBall(gameBall);
+            layout_game.getChildren().add(first_ball.getImageView());
+            powerBall = new PowerBall(gameBall);
 
-        shooter = new Shooter(200, 2, 5, 10, layout_game, paddleLogic.getImageView(), 20);
+            shooter = new Shooter(200, 2, 5, 10, layout_game, paddleLogic.getImageView(), 20);
 
-        upMap(MAP_FILE);
-        endGameOverlay.setVisible(false);
-
+            upMap(MAP_FILE);
+        }
     }
 
     private void upMap(File MAP_FILE) {
@@ -137,31 +155,32 @@ public class Game_Screen_Controller {
                         gameBricks.add(new_Brick);
                         layout_game.getChildren().add(new_Brick.getImageView());
                     }
-                    if (type >= 10) {
-                        type = type - 10;
-                        int newX = startX + col * BRICK_CELL_W;
-                        int newY = startY + row[0] * BRICK_CELL_H;
-                        Enemy new_Enemy = null;
-                        switch (type) {
-                            case 1: break;
-                            case 2: break;
-                            case 0: new_Enemy = new ShooterEnemy(newX, newY, 30, 30, layout_game, paddleLogic.getImageView()); break;
-                            default:
-                                throw new IllegalStateException("Unexpected value: " + type);
-                        }
-
-                        if (new_Enemy != null) {
-                            System.out.println("ngusiii");
-                            gameEnemies.add(new_Enemy);
-                            layout_game.getChildren().add(new_Enemy.getImageView());
-                        }
-                    }
+//                    if (type >= 10) {
+//                        type = type - 10;
+//                        int newX = startX + col * BRICK_CELL_W;
+//                        int newY = startY + row[0] * BRICK_CELL_H;
+//                        Enemy new_Enemy = null;
+//                        switch (type) {
+//                            case 1: break;
+//                            case 2: break;
+//                            case 0: new_Enemy = new ShooterEnemy(newX, newY, 30, 30, layout_game, paddleLogic.getImageView()); break;
+//                            default:
+//                                throw new IllegalStateException("Unexpected value: " + type);
+//                        }
+//
+//                        if (new_Enemy != null) {
+//                            System.out.println("ngusiii");
+//                            gameEnemies.add(new_Enemy);
+//                            layout_game.getChildren().add(new_Enemy.getImageView());
+//                        }
+//                    }
                 }
                 row[0]++;
             });
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+
     }
 
     private int safeParse(String s) {
@@ -205,7 +224,7 @@ public class Game_Screen_Controller {
         });
     }
 
-    private void showEndGameScreen() {
+    private void clearEntity() {
         layout_game.getChildren().remove(paddleLogic.getImageView());
 
         for(Ball ball : gameBall){
@@ -213,28 +232,38 @@ public class Game_Screen_Controller {
         }
         gameBall.clear();
 
+        for(Enemy enemy: gameEnemies){
+            layout_game.getChildren().remove(enemy.getImageView());
+        }
+        gameEnemies.clear();
         for(Powerup Pu : gamePowerup){
             layout_game.getChildren().remove(Pu.getImageView());
         }
         gamePowerup.clear();
+    }
+
+    private void showEndGameScreen() {
+        clearEntity();
         Platform.runLater(() -> {
             scoreLabel.setText("Your Score: " + 0);
             endGameOverlay.setVisible(true);
         });
-
         btnEscape.setOnAction(e -> System.exit(0));
         btnRestart.setOnAction(e ->{ restartLevel();endGameOverlay.setVisible(false);});
         btnNext.setOnAction(e -> {loadNextLevel();endGameOverlay.setVisible(false);});
     }
     public void loadNextLevel() {
         endGameOverlay.setVisible(false);
+        System.out.println(endGameOverlay.isVisible());
         level.nextLevel();
-        setBackground(BG_IMAGE_PATH,level.getMap());
+        System.out.println(endGameOverlay.isVisible());
+        setBackground(BG_IMAGE_PATH, level.getMap());
+        System.out.println(endGameOverlay.isVisible());
 
     }
     public void restartLevel() {
         endGameOverlay.setVisible(false);
-        setBackground(BG_IMAGE_PATH,level.getMap());
+        setBackground(BG_IMAGE_PATH, level.getMap());
     }
 
     // ================= gamel==================
@@ -266,16 +295,17 @@ public class Game_Screen_Controller {
                     paddleLogic.update(STEP);
                     gameBricksUp(STEP);
                     setGamePowerup(STEP);
-                    enemyGame(STEP);
+                    //enemyGame(STEP);
+                    bg.update(STEP);
+                    //shield.update(STEP);
                     accumulator -= STEP;
+                    specialPaddle.applyAllEffects();
                 }
                 if (shooter.getEnabled()) {
                     shooter.tryFire();
                 }
-                System.out.println(gameBricks.size());
-                if(gameBricks.isEmpty()){
+                if(gameBricks.isEmpty()) {
                     showEndGameScreen();
-                    //gameBricks.clear();
                 }
             }
         };
@@ -291,7 +321,7 @@ public class Game_Screen_Controller {
                 if (brick.dropBrick(dt)) {
                     layout_game.getChildren().remove(brick.getImageView());
                     gameBricks.remove(i);
-                    if (shouldDrop(0.5)) {
+                    if (shouldDrop(0.7)) {
                         Powerup p = new Powerup(
                                 brick.getImageView().getBoundsInParent().getCenterX(), brick.getImageView().getBoundsInParent().getCenterY());
                         layout_game.getChildren().add(p.getImageView());
@@ -324,6 +354,12 @@ public class Game_Screen_Controller {
                 }
                 BasicEnemy  basicEnemy = (BasicEnemy) enemy;
                 basicEnemy.update(dt);
+            }
+
+            if (enemy instanceof BossEnemy) {
+                BossEnemy bossEnemy = (BossEnemy) enemy;
+
+                bossEnemy.update(dt);
             }
 
         }
@@ -395,28 +431,35 @@ public class Game_Screen_Controller {
     public void resetBall()          { powerBall.downBall(); }
     public void slowBall()           { powerBall.slowBall(); }
     public void resetSlowBall()      { powerBall.normalBall(); }
-    //public void openSheild()         { sheild.openSheild(gameBricks, layout_game, gameBackground); }
     public void moreBall()           { powerBall.moreBall(layout_game); }
 
     public void upPaddle() {
         if (paddleLogic.getWidth() * 2 <= gameBackground.getBoundsInParent().getWidth() / 2.0)  {
-            specialPaddle.upPaddle();
+            specialPaddle.setBig();
         }
     }
 
-    public void resetPaddle()        {
-        specialPaddle.downPaddle();
+    public void offUpPaddle()        {
+        specialPaddle.setNormalSize();
         for (Ball balLogic : gameBall) {
             balLogic.setOffsetOnPaddle(balLogic.getOffsetOnPaddle()/2);
         }
     }
     public void slowPaddle()        {
-        specialPaddle.slowPaddle();
+        specialPaddle.setSlow();
+    }
+    public void offslowPaddle()        {
+        specialPaddle.setNormalSpeed();
+    }
+    public void downPaddle() {
+        specialPaddle.setSmall();
+    }
+    public void offdownPaddle()    {
+        specialPaddle.setNormalSize();
     }
     public void fastPaddle()        {
-        specialPaddle.fastPaddle();
+        specialPaddle.setFast();
     }
-
     public void createMinions() {
 
     }
@@ -427,10 +470,10 @@ public class Game_Screen_Controller {
         isSpam = false;
     }
     public void setRedirPaddle() {
-        specialPaddle.setRedir();
+        specialPaddle.setRedir(true);
     }
     public void offRedirPaddle() {
-        specialPaddle.offRedir();
+        specialPaddle.setRedir(false);
     }
     public void createFakePU() {
         Powerup newPU = new Powerup(gameBackground.getBoundsInParent().getCenterX()/2,0, Powerup.PowerupType.REDIR);
@@ -438,7 +481,9 @@ public class Game_Screen_Controller {
     public void catchBall()          { isCatch = !isCatch; }
     public void enableGun()          { shooter.setEnabled(true); }
     public void unEnableGun()        { shooter.setEnabled(false); }
+    public void setShieldOn()        {
+        shield.setOpenShield(true);
+    }
 
 }
-
 

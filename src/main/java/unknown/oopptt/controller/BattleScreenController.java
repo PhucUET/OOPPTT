@@ -1,6 +1,7 @@
 package unknown.oopptt.controller;
 
 import javafx.animation.AnimationTimer;
+import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.geometry.Bounds;
 import javafx.geometry.Pos;
@@ -38,6 +39,10 @@ public class BattleScreenController {
     private int BRICK_CELL_W = 50;
     private int countlife = 3;
     private int BRICK_CELL_H = 23;
+    private int ballStick;
+    private boolean stillStick = true;
+    private int signal = 0;
+    private int fakesignal = 0;
     private static final String BG_IMAGE_PATH = new File("src/main/resources/graphic/background10.jpg").toURI().toString();
     private static final File MAP_FILE = new File("src/main/resources/map/map1.txt");
 
@@ -58,6 +63,7 @@ public class BattleScreenController {
     private boolean isCatch1 = false;
     private Shooter shooter1;
     private boolean isSpam1 = false;
+    private Sheild sheild1;
     private Paddle paddleLogic1;
     private PowerBall powerBall1;
     private SpecialPaddle specialPaddle1;
@@ -78,6 +84,7 @@ public class BattleScreenController {
     private boolean isCatch2 = false;
     private boolean isSpam2 = false;
     private Shooter shooter2;
+    private Sheild sheild2;
     private Paddle paddleLogic2;
     private PowerBall powerBall2;
     private SpecialPaddle specialPaddle2;
@@ -87,6 +94,23 @@ public class BattleScreenController {
     private String playerName = "Trung";
     private String serverIP;
     private final int serverPort = 5000;
+
+
+    private void connectToServer() {
+        client = new GameClient(client.findServerIP(), serverPort, playerName, msg -> {
+            Platform.runLater(() -> {
+                System.out.println("Server: " + msg);
+                switch (msg.charAt(0)) {
+                    case 'B' -> setBallStick(Integer.parseInt(msg.substring(1)));
+                    case 'S' -> setStillStick(Boolean.parseBoolean(msg.substring(1)));
+                    case '1' -> {paddleLogic2.setLeftHeld(true);}
+                    case '2' -> {paddleLogic2.setRightHeld(true);}
+                    case '3' -> {paddleLogic2.setLeftHeld(false);}
+                    case '4' -> {paddleLogic2.setRightHeld(false);}
+                }
+            });
+        });
+    }
 
     @FXML void initialize() {
         preloadAssets();
@@ -191,19 +215,30 @@ public class BattleScreenController {
     }
     private void onKeyPressed(KeyEvent e) {
         switch (e.getCode()) {
-            case A, LEFT  -> paddleLogic1.setLeftHeld(true);
-            case D, RIGHT -> paddleLogic1.setRightHeld(true);
-            case SHIFT    -> paddleLogic1.setMoveSpeed(600);
+            case A, LEFT  -> {
+                    paddleLogic1.setLeftHeld(true);
+                    //client.send("1");
+            }
+            case D, RIGHT -> {
+                    paddleLogic1.setRightHeld(true);
+                    //client.send("2");
+            }
             //case SPACE    -> setBallmove();
         }
     }
     private void onKeyReleased(KeyEvent e) {
         switch (e.getCode()) {
-            case A, LEFT  -> paddleLogic1.setLeftHeld(false);
-            case D, RIGHT -> paddleLogic1.setRightHeld(false);
-            case SHIFT    -> paddleLogic1.setMoveSpeed(500);
+            case A, LEFT  -> {
+                paddleLogic1.setLeftHeld(false);
+               // client.send("3");
+            }
+            case D, RIGHT -> {
+                paddleLogic1.setRightHeld(false);
+               // client.send("4");
+            }
             case SPACE    -> {
                 setBallmove(gameBall1);
+                //client.send("S"+Boolean.toString(false));
             }
         }
     }
@@ -243,7 +278,7 @@ public class BattleScreenController {
                 accumulator += dt;
 
                 if (accumulator > STEP) {
-                    gameBall(STEP);
+                    gameBall1(STEP);
                     paddleLogic1.update(STEP);
                     paddleLogic2.update(STEP);
                     gameBricksUp1(STEP);
@@ -294,17 +329,7 @@ public class BattleScreenController {
     }
 
 
-    private void gameBall(double dt) {
-        if (gameBall1.isEmpty()) {
-            if (countlife > 0) {
-                Ball newBall = new Ball(paddleLogic1.getPos_x(),
-                        paddleLogic1.getPos_y() - 5, 0.3, 0, player_1);
-                gameBall1.add(newBall);
-                player1.getChildren().add(newBall.getImageView());
-                countlife--;
-            }
-        }
-
+    private void gameBall1(double dt) {
         for (int i = gameBall1.size() - 1; i >= 0; i--) {
             Ball ballLogic = gameBall1.get(i);
             if (ballLogic.isSticky()) {
@@ -318,6 +343,7 @@ public class BattleScreenController {
 
                 ballLogic.setLocation(newX, dt);
                 ballLogic.addOffsetOnPaddle(dt);
+                //client.send("B"+Integer.toString((int) newX));
                 continue;
             }
 //            if (baseGame.outBall(ballLogic.getImageView().getBoundsInParent(), gameBackground)) {
@@ -335,49 +361,37 @@ public class BattleScreenController {
         }
 
     }
+    private void gameBall2(double dt) {
 
+        for (int i = gameBall2.size() - 1; i >= 0; i--) {
+            Ball ballLogic = gameBall2.get(i);
+            if (isStillStick()) {
+                ballLogic.setLocation(getBallStick(), dt);
+                ballLogic.addOffsetOnPaddle(dt);
+                continue;
+            }
+//            if (baseGame.outBall(ballLogic.getImageView().getBoundsInParent(), gameBackground)) {
+//                gameBall.remove(i);
+//                layout_game.getChildren().remove(ballLogic.getImageView());
+//                continue;
+//            }
 
+            baseGame2.brickCollision(ballLogic, gameBricks2);
+            baseGame2.paddleballCollision(ballLogic, paddleLogic2, isCatch2);
+            baseGame2.enemyCollision(ballLogic,gameEnemies2);
+            baseGame2.wallCollision(ballLogic, background_player2);
 
-
-
-
-    public void upBall1()             { powerBall1.upBall(); }
-    public void resetBall1()          { powerBall1.downBall(); }
-    public void slowBall1()           { powerBall1.slowBall(); }
-    public void resetSlowBall1()      { powerBall1.normalBall(); }
-    //public void openSheild1()         { sheild.openSheild(gameBricks, layout_game, gameBackground); }
-    public void moreBall1()           { powerBall1.moreBall(player1); }
-
-    public void upPaddle1() {
-        if (paddleLogic1.getWidth() * 2 <= background_player1.getBoundsInParent().getWidth() / 2.0)  {
-            specialPaddle1.upPaddle();
+            ballLogic.update(dt);
         }
+
     }
 
-    public void resetPaddle1()        {
-        specialPaddle1.downPaddle();
-        for (Ball balLogic : gameBall1) {
-            balLogic.setOffsetOnPaddle(balLogic.getOffsetOnPaddle()/2);
-        }
-    }
-    public void slowPaddle1()        {
-        specialPaddle1.slowPaddle();
-    }
-    public void fastPaddle1()        {
-        specialPaddle1.fastPaddle();
-    }
-    public void setRedirPaddle1() {
-        specialPaddle1.setRedir();
-    }
-    public void offRedirPaddle1() {
-        specialPaddle1.offRedir();
-    }
-    public void createFakePU1() {
-        Powerup newPU = new Powerup(background_player1.getBoundsInParent().getCenterX()/2,0, Powerup.PowerupType.REDIR);
-    }
-    public void catchBall1()          { isCatch1 = !isCatch1; }
-    public void enableGun1()          { shooter1.setEnabled(true); }
-    public void unEnableGun1()        { shooter1.setEnabled(false); }
+
+    public int getBallStick() { return ballStick; }
+    public void setBallStick(int ballStick) { this.ballStick = ballStick; }
+    public boolean isStillStick() { return stillStick; }
+    public void setStillStick(boolean stillStick) { this.stillStick = stillStick; }
+
 
 
 
@@ -386,38 +400,118 @@ public class BattleScreenController {
     public void resetBall2()          { powerBall2.downBall(); }
     public void slowBall2()           { powerBall2.slowBall(); }
     public void resetSlowBall2()      { powerBall2.normalBall(); }
-    //public void openSheild2()         { sheild.openSheild(gameBricks, layout_game, gameBackground); }
     public void moreBall2()           { powerBall2.moreBall(player2); }
 
-    public void upPaddle() {
+    public void upPaddle2() {
         if (paddleLogic2.getWidth() * 2 <= background_player2.getBoundsInParent().getWidth() / 2.0)  {
-            specialPaddle2.upPaddle();
+            specialPaddle2.setBig();
         }
     }
 
-    public void resetPaddle2()        {
-        specialPaddle2.downPaddle();
-        for (Ball balLogic : gameBall2) {
+    public void offUpPaddle2()        {
+        specialPaddle2.setNormalSize();
+        for (Ball balLogic : gameBall1) {
             balLogic.setOffsetOnPaddle(balLogic.getOffsetOnPaddle()/2);
         }
     }
     public void slowPaddle2()        {
-        specialPaddle2.slowPaddle();
+        specialPaddle2.setSlow();
+    }
+    public void offslowPaddle2()        {
+        specialPaddle2.setNormalSpeed();
+    }
+    public void downPaddle2() {
+        specialPaddle2.setSmall();
+    }
+    public void offdownPaddle2()    {
+        specialPaddle2.setNormalSize();
     }
     public void fastPaddle2()        {
-        specialPaddle2.fastPaddle();
+        specialPaddle2.setFast();
+    }
+    public void createMinions2() {
+
+    }
+    public void setCreateMinions2() {
+        isSpam2 = true;
+    }
+    public  void setOffCreateMinions2() {
+        isSpam1 = false;
     }
     public void setRedirPaddle2() {
-        specialPaddle2.setRedir();
+        specialPaddle2.setRedir(true);
     }
     public void offRedirPaddle2() {
-        specialPaddle2.offRedir();
+        specialPaddle2.setRedir(false);
     }
     public void createFakePU2() {
         Powerup newPU = new Powerup(background_player2.getBoundsInParent().getCenterX()/2,0, Powerup.PowerupType.REDIR);
     }
-    public void catchBall2()          { isCatch2 = !isCatch2; }
-    public void enableGun2()          { shooter2.setEnabled(true); }
-    public void unEnableGun2()        { shooter2.setEnabled(false); }
+    public void catchBall()          { isCatch2 = !isCatch2; }
+    public void enableGun()          { shooter2.setEnabled(true); }
+    public void unEnableGun()        { shooter2.setEnabled(false); }
+    public void setShieldOn()        {
+        sheild2.setOpenShield(true);
+    }
+
+
+
+    public void upBall1()             { powerBall1.upBall(); }
+    public void resetBall1()          { powerBall1.downBall(); }
+    public void slowBall1()           { powerBall1.slowBall(); }
+    public void resetSlowBall1()      { powerBall1.normalBall(); }
+    public void moreBall1()           { powerBall1.moreBall(player1); }
+
+    public void upPaddle1() {
+        if (paddleLogic1.getWidth() * 2 <= background_player1.getBoundsInParent().getWidth() / 2.0)  {
+            specialPaddle1.setBig();
+        }
+    }
+
+    public void offUpPaddle1()        {
+        specialPaddle1.setNormalSize();
+        for (Ball balLogic : gameBall1) {
+            balLogic.setOffsetOnPaddle(balLogic.getOffsetOnPaddle()/2);
+        }
+    }
+    public void slowPaddle1()        {
+        specialPaddle1.setSlow();
+    }
+    public void offslowPaddle1()        {
+        specialPaddle1.setNormalSpeed();
+    }
+    public void downPaddle1() {
+        specialPaddle1.setSmall();
+    }
+    public void offdownPaddle1()    {
+        specialPaddle1.setNormalSize();
+    }
+    public void fastPaddle1()        {
+        specialPaddle1.setFast();
+    }
+    public void createMinions1() {
+
+    }
+    public void setCreateMinions1() {
+        isSpam1 = true;
+    }
+    public  void setOffCreateMinions1() {
+        isSpam1 = false;
+    }
+    public void setRedirPaddle1() {
+        specialPaddle1.setRedir(true);
+    }
+    public void offRedirPaddle1() {
+        specialPaddle1.setRedir(false);
+    }
+    public void createFakePU1() {
+        Powerup newPU = new Powerup(background_player1.getBoundsInParent().getCenterX()/2,0, Powerup.PowerupType.REDIR);
+    }
+    public void catchBall1()          { isCatch1 = !isCatch1; }
+    public void enableGun1()          { shooter1.setEnabled(true); }
+    public void unEnableGun1()        { shooter1.setEnabled(false); }
+    public void setShieldOn1()        {
+        sheild1.setOpenShield(true);
+    }
 
 }

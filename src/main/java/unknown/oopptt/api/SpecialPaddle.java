@@ -1,34 +1,93 @@
+
 package unknown.oopptt.api;
 
-import javafx.scene.layout.Background;
+enum SpeedState {
+    NORMAL,
+    FAST,
+    SLOW
+}
+
+enum SizeState {
+    NORMAL,
+    BIG,
+    SMALL
+}
 
 public class SpecialPaddle {
-    private final  Paddle paddle;
+    private final Paddle paddle;
+
+    private final double baseMoveSpeed;
+    private final double baseWidth;
+
+    // 3. Quản lý trạng thái hiện tại
+    private SpeedState currentSpeedState = SpeedState.NORMAL;
+    private SizeState currentSizeState = SizeState.NORMAL;
+    private boolean redirActive = false;
+
     public SpecialPaddle(Paddle paddle) {
         this.paddle = paddle;
+        this.baseMoveSpeed = paddle.getMoveSpeed();
+        this.baseWidth = paddle.getWidth();
     }
 
-    public void upPaddle() {
-        if(paddle.getWidth() < 500) {
-            paddle.changeSize(paddle.getWidth() * 2);
+    /**
+     * "Bộ não" của lớp.
+     * Hàm này được gọi mỗi khi có thay đổi trạng thái.
+     * Nó tính toán lại MỌI THỨ từ giá trị GỐC.
+     */
+    public void applyAllEffects() {
+
+        double newSpeed = baseMoveSpeed;
+        if (currentSpeedState == SpeedState.FAST) {
+            newSpeed *= 2.0;
+        } else if (currentSpeedState == SpeedState.SLOW) {
+            newSpeed /= 2.0;
         }
-        else {
-            paddle.changeSize(500);
+        paddle.setMoveSpeed(newSpeed);
+        double newWidth = baseWidth;
+        if (currentSizeState == SizeState.BIG) {
+            newWidth *= 2.0;
+        } else if (currentSizeState == SizeState.SMALL) {
+            newWidth /= 2.0;
         }
+        paddle.changeSize(newWidth);
+
+        paddle.setRedir(redirActive ? -1 : 1);
     }
-    public void downPaddle() {
-        paddle.changeSize(150);
+
+
+    public void setFast() {
+        currentSpeedState = SpeedState.FAST;
+        applyAllEffects(); // Tính toán lại
     }
-    public void slowPaddle() {
-        paddle.setMoveSpeed(paddle.getMoveSpeed() / 2);
+
+    public void setSlow() {
+        currentSpeedState = SpeedState.SLOW;
+        applyAllEffects();
     }
-    public void fastPaddle() {
-        paddle.setMoveSpeed(paddle.getMoveSpeed() * 2);
+
+    public void setNormalSpeed() {
+        currentSpeedState = SpeedState.NORMAL;
+        applyAllEffects();
     }
-    public void setRedir() {
-        paddle.setRedir(-1);
+
+    public void setBig() {
+        currentSizeState = SizeState.BIG;
+        applyAllEffects();
     }
-    public void offRedir() {
-        paddle.setRedir(1);
+
+    public void setSmall() {
+        currentSizeState = SizeState.SMALL;
+        applyAllEffects();
+    }
+
+    public void setNormalSize() {
+        currentSizeState = SizeState.NORMAL;
+        applyAllEffects();
+    }
+
+    public void setRedir(boolean active) {
+        redirActive = active;
+        applyAllEffects();
     }
 }
