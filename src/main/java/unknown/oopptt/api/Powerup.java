@@ -173,7 +173,7 @@ public class Powerup  {
                 controller.setShieldOn();
                 break;
             case PowerupType.ADDHP:
-                controller.addHp();
+                //controller.addHp();
                 break;
         }
 

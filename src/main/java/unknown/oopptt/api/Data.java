@@ -87,6 +87,7 @@ public class Data extends Manage {
             return "ERROR";
         }
     }
+    private String namePlayer = null;
 
     //dang nhap
     public String login(String username, String password) {
@@ -103,7 +104,10 @@ public class Data extends Manage {
             String response = reader.readLine();
             reader.close();
 
-            if (response.contains("LOGIN_OK")) return "LOGIN_OK";
+            if (response.contains("LOGIN_OK"))  {
+                namePlayer = username;
+                return "LOGIN_OK";
+            }
             if (response.contains("INVALID")) return "INVALID";
             return "ERROR";
 
@@ -113,7 +117,9 @@ public class Data extends Manage {
         }
     }
 
-
+    public String getNamePlayer() {
+        return namePlayer;
+    }
 
     /**
      * Tạm thời lưu top điểm trong bộ nhớ RAM (không cần SQL) để hiển thị bảng xếp hạng nhanh trong cùng phiên chơi

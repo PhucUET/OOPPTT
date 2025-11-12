@@ -8,12 +8,12 @@ import java.io.File;
 import java.util.List;
 
 public class Sheild {
-    private String path = new File("src/main/resources/graphic/shield/shield.png").toString();
+    private String path = new File("src/main/resources/graphic/shield/shield.png").toURI().toString();
     private boolean isActive = false;
     private Pane layout_game;
     private ImageView imageView;
     private double durantion = 10.0;
-    public Sheild(Pane layout_game, Integer stt) {
+    public Sheild(Pane layout_game) {
         this.layout_game = layout_game;
         imageView = new ImageView(new Image(path));
         imageView.setFitHeight(5);
@@ -21,6 +21,7 @@ public class Sheild {
         imageView.setTranslateX(0);
         imageView.setTranslateY(layout_game.getHeight());
         imageView.setVisible(true);
+        layout_game.getChildren().add(imageView);
     }
 
      public void setOpenShield(boolean isOpen) {

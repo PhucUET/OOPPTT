@@ -64,7 +64,8 @@ public class Game_Screen_Controller {
     private SpecialPaddle specialPaddle;
     private ParallaxBackground bg =  new ParallaxBackground();
     private Sheild shield;
-    private NowPlay Player;
+    private NowPlay player;
+    private Data data = new Data();
 
     @FXML Pane layout_game;
 
@@ -84,6 +85,10 @@ public class Game_Screen_Controller {
         setBackground(BG_IMAGE_PATH,MAP_FILE);
         ListenEventHandle();
         startGameloop();
+    }
+
+    public void setData(Data data) {
+        this.data = data;
     }
 
     private void preloadAssets() {
@@ -130,6 +135,7 @@ public class Game_Screen_Controller {
 
             shooter = new Shooter(200, 2, 5, 10, layout_game, paddleLogic.getImageView(), 20);
 
+            shield = new Sheild(layout_game);
             upMap(MAP_FILE);
 
 
@@ -490,6 +496,9 @@ public class Game_Screen_Controller {
     public void unEnableGun()        { shooter.setEnabled(false); }
     public void setShieldOn()        {
         shield.setOpenShield(true);
+    }
+    public void upHp() {
+        player.addLive(data.getNamePlayer());
     }
 
 }

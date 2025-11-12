@@ -56,6 +56,9 @@ public class NowPlay extends Manage {
             this.score = 0;
             this.lives = 3;
         }
+        public void addLive() {
+            this.lives += 1;
+        }
     }
 
     //enum là kiểu dữ liệu liệt kê, để liệt kê các mode game
@@ -66,6 +69,8 @@ public class NowPlay extends Manage {
     private final Map<String, Player> players = new LinkedHashMap<>();
     private Mode mode = Mode.SOLO; //gán mode chơi mặc định ban đầu là solo
 
+
+
     //đặt lại mode chơi
     public void setMode(Mode mode) {
         this.mode = mode;
@@ -73,6 +78,7 @@ public class NowPlay extends Manage {
     public Mode getMode() {
         return mode;
     }
+
 
     //thêm người chơi mới nếu chưa tồn tại
     public void addPlayer(String name) {
@@ -85,12 +91,18 @@ public class NowPlay extends Manage {
         if (p != null) p.addScore(points); //nếu tồn tại ng chơi p thì cộng điểm
     }
 
+
     //đưa ra bảng xếp hạng
     public List<Player> getRanking() {
         List<Player> list = new ArrayList<>(players.values()); //tạo ds ng chơi
         //sắp xếp danh sách theo điểm giảm dần
         list.sort((a, b) -> Integer.compare(b.getScore(), a.getScore()));
         return list;
+    }
+
+    public void addLive(String name) {
+        Player p = players.get(name);
+        p.addLive();
     }
 
     //kết thúc trận đấu
