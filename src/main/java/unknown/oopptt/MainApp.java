@@ -16,10 +16,10 @@ public class MainApp extends Application {
     @Override
     public void start(Stage primaryStage) throws Exception {
 
-        FXMLLoader loader = new FXMLLoader(getClass().getResource("/unknown/oopptt/GameScreen.fxml"));
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("/unknown/oopptt/LoginScreen.fxml"));
         Parent root = loader.load();
         primaryStage.setTitle("met moi qua");
-        primaryStage.setFullScreen(false);
+        primaryStage.setFullScreen(true);
         Scene scene = new Scene(root);
         primaryStage.setScene(scene);
 

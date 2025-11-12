@@ -20,7 +20,7 @@ public class Sheild {
         imageView.setFitWidth(layout_game.getWidth());
         imageView.setTranslateX(0);
         imageView.setTranslateY(layout_game.getHeight());
-        imageView.setVisible(true);
+        imageView.setVisible(false);
         layout_game.getChildren().add(imageView);
     }
 
@@ -28,6 +28,7 @@ public class Sheild {
         if (isOpen) {
             return;
         }
+        imageView.setVisible(true);
         this.isActive = isOpen;
         durantion = 10;
     }

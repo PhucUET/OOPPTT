@@ -117,7 +117,7 @@ public class Powerup  {
                 imageView = new ImageView(new Image(upballview));
                 break;
             case PowerupType.SHIELD:
-                imageView = new ImageView(new Image(upballview));
+                imageView = new ImageView(new Image(shield));
                 break;
         }
         imageView.setFitWidth(width);
@@ -173,7 +173,7 @@ public class Powerup  {
                 controller.setShieldOn();
                 break;
             case PowerupType.ADDHP:
-                //controller.addHp();
+                controller.upHp();
                 break;
         }
 
