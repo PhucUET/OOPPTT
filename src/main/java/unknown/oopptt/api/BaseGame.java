@@ -48,9 +48,14 @@ public class BaseGame {
             ball.setSpeedY(-vy);
         }
 
-        if (byBottom <= bottomWall ) {
-            return false;
+//        if (byBottom <= bottomWall ) {
+//            return false;
+//        }
+//
+        if ((byTop <= topWall && vy < 0) || (byBottom >= bottomWall && vy > 0)) {
+            ball.setSpeedY(-vy);
         }
+//
         return true;
 
     }

@@ -17,7 +17,9 @@ public class Powerup  {
 
 
     private String upballview = new File("src/main/resources/graphic/ball.png" ).toURI().toString();
-
+    private String catchBall = new  File("src/main/resources/graphic/PU/magnet").toString();
+    private String shield  =  new File("src/main/resources/graphic/PU/Defence").toString();
+    private String addHp = new  File("src/main/resources/graphic/PU/HPx2").toString();
     private ImageView imageView;
     private TranslateTransition translateTransition = new TranslateTransition();
     private PowerupType type;
@@ -28,8 +30,8 @@ public class Powerup  {
     private Game_Screen_Controller controller;
 
     public enum PowerupType {
-        UPBALL(10), UPPADDLE(8), SHEILD(-1), MOREBALL(-1), SLOW(10),
-        CATCHBALL(10), GUN(8), REDIR(10);
+        UPBALL(10), UPPADDLE(8), MOREBALL(-1), SLOW(10),
+        CATCHBALL(10), GUN(8), REDIR(10), ADDHP(-1), SHIELD(-1);
         private final int duration;
         PowerupType(int duration) {
             this.duration = duration;
@@ -53,13 +55,12 @@ public class Powerup  {
         this.pos_x = pos_x;
         this.pos_y = pos_y;
         switch (type) {
+            case PowerupType.ADDHP:
+                imageView = new ImageView(new Image(addHp));
             case PowerupType.UPBALL:
                 imageView = new ImageView(new Image(upballview));
                 break;
             case PowerupType.UPPADDLE:
-                imageView = new ImageView(new Image(upballview));
-                break;
-            case PowerupType.SHEILD:
                 imageView = new ImageView(new Image(upballview));
                 break;
             case  PowerupType.MOREBALL:
@@ -69,13 +70,16 @@ public class Powerup  {
                 imageView = new ImageView(new Image(upballview));
                 break;
             case PowerupType.CATCHBALL:
-                imageView = new ImageView(new Image(upballview));
+                imageView = new ImageView(new Image(catchBall));
                 break;
             case PowerupType.GUN:
                 imageView = new ImageView(new Image(upballview));
                 break;
             case PowerupType.REDIR:
                 imageView = new ImageView(new Image(upballview));
+                break;
+            case PowerupType.SHIELD:
+                imageView = new ImageView(new Image(shield));
                 break;
         }
         imageView.setFitWidth(width);
@@ -89,13 +93,12 @@ public class Powerup  {
         this.pos_x = pos_x;
         this.pos_y = pos_y;
         switch (type) {
+            case PowerupType.ADDHP:
+                imageView = new ImageView(new Image(addHp));
             case PowerupType.UPBALL:
                 imageView = new ImageView(new Image(upballview));
                 break;
             case PowerupType.UPPADDLE:
-                imageView = new ImageView(new Image(upballview));
-                break;
-            case PowerupType.SHEILD:
                 imageView = new ImageView(new Image(upballview));
                 break;
             case  PowerupType.MOREBALL:
@@ -105,12 +108,15 @@ public class Powerup  {
                 imageView = new ImageView(new Image(upballview));
                 break;
             case PowerupType.CATCHBALL:
-                imageView = new ImageView(new Image(upballview));
+                imageView = new ImageView(new Image(catchBall));
                 break;
             case PowerupType.GUN:
                 imageView = new ImageView(new Image(upballview));
                 break;
             case PowerupType.REDIR:
+                imageView = new ImageView(new Image(upballview));
+                break;
+            case PowerupType.SHIELD:
                 imageView = new ImageView(new Image(upballview));
                 break;
         }
@@ -148,9 +154,6 @@ public class Powerup  {
             case PowerupType.UPPADDLE:
                 runTimeEffect(type.getDuration(), controller::upPaddle, controller::offUpPaddle);
                 break;
-            case PowerupType.SHEILD:
-                controller.openSheild();
-                break;
             case  PowerupType.MOREBALL:
                 controller.moreBall();
                 break;
@@ -165,7 +168,13 @@ public class Powerup  {
                 break;
             case PowerupType.REDIR:
                 runTimeEffect(type.getDuration(), controller::setRedirPaddle, controller::offRedirPaddle);
-
+                break;
+            case PowerupType.SHIELD:
+                controller.setShieldOn();
+                break;
+            case PowerupType.ADDHP:
+                controller.addHp();
+                break;
         }
 
     }

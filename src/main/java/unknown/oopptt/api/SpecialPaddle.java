@@ -1,81 +1,92 @@
 package unknown.oopptt.api;
 
+enum SpeedState {
+    NORMAL,
+    FAST,
+    SLOW
+}
+
+enum SizeState {
+    NORMAL,
+    BIG,
+    SMALL
+}
+
 public class SpecialPaddle {
-    private final  Paddle paddle;
-    private boolean upActive = false;
-    private boolean downActive = false;
-    private boolean fastActive = false;
-    private boolean slowActive = false;
-    private boolean dirActive = false;
+    private final Paddle paddle;
+
+    private final double baseMoveSpeed;
+    private final double baseWidth;
+
+    // 3. Quản lý trạng thái hiện tại
+    private SpeedState currentSpeedState = SpeedState.NORMAL;
+    private SizeState currentSizeState = SizeState.NORMAL;
+    private boolean redirActive = false;
+
     public SpecialPaddle(Paddle paddle) {
         this.paddle = paddle;
+        this.baseMoveSpeed = paddle.getMoveSpeed();
+        this.baseWidth = paddle.getWidth();
     }
 
-    public void upPaddle() {
-        if (!upActive) {
-            upActive = true;
-            paddle.changeSize(paddle.getWidth() * 2);
-        }
-    }
-    public void offupPaddle() {
-        if (upActive) {
-            upActive = false;
-            paddle.changeSize(paddle.getWidth() * 2);
-        }
-    }
-    public void downPaddle() {
-        if (!downActive) {
-            downActive = true;
-            System.out.println("downPaddle" + "ngusi");
-            paddle.changeSize(paddle.getWidth() / 2);
-        }
-    }
-    public void offdownPaddle() {
-        if (downActive) {
-            downActive = false;
-            System.out.println("offdownPaddle" + "ngusi");
-            paddle.changeSize(paddle.getWidth() * 2);
-        }
-    }
-    public void slowPaddle() {
+    /**
+     * "Bộ não" của lớp.
+     * Hàm này được gọi mỗi khi có thay đổi trạng thái.
+     * Nó tính toán lại MỌI THỨ từ giá trị GỐC.
+     */
+    public void applyAllEffects() {
 
-        if (!slowActive) {
-            slowActive = true;
-            paddle.setMoveSpeed(paddle.getMoveSpeed() / 2);
+        double newSpeed = baseMoveSpeed;
+        if (currentSpeedState == SpeedState.FAST) {
+            newSpeed *= 2.0;
+        } else if (currentSpeedState == SpeedState.SLOW) {
+            newSpeed /= 2.0;
         }
+        paddle.setMoveSpeed(newSpeed);
+        double newWidth = baseWidth;
+        if (currentSizeState == SizeState.BIG) {
+            newWidth *= 2.0;
+        } else if (currentSizeState == SizeState.SMALL) {
+            newWidth /= 2.0;
+        }
+        paddle.changeSize(newWidth);
 
+        paddle.setRedir(redirActive ? -1 : 1);
     }
 
-    public void offslowPaddle() {
-        if (slowActive) {
-            slowActive = false;
-            paddle.setMoveSpeed(paddle.getMoveSpeed() * 2);
-        }
+
+    public void setFast() {
+        currentSpeedState = SpeedState.FAST;
+        applyAllEffects(); // Tính toán lại
     }
 
-    public void fastPaddle() {
-        if (!fastActive) {
-            fastActive = true;
-            paddle.setMoveSpeed(paddle.getMoveSpeed() * 2);
-            return;
-        }
-        if (slowActive) {
-            slowActive = false;
-            paddle.setMoveSpeed(paddle.getMoveSpeed() * 2);;
-        }
+    public void setSlow() {
+        currentSpeedState = SpeedState.SLOW;
+        applyAllEffects();
+    }
 
+    public void setNormalSpeed() {
+        currentSpeedState = SpeedState.NORMAL;
+        applyAllEffects();
     }
-    public void setRedir() {
-        if (dirActive) {
-            return;
-        }
-        dirActive = true;
-        paddle.setRedir(-1);
+
+    public void setBig() {
+        currentSizeState = SizeState.BIG;
+        applyAllEffects();
     }
-    public void offRedir() {
-        if (dirActive) {
-            dirActive = false;
-        }
-        paddle.setRedir(1);
+
+    public void setSmall() {
+        currentSizeState = SizeState.SMALL;
+        applyAllEffects();
+    }
+
+    public void setNormalSize() {
+        currentSizeState = SizeState.NORMAL;
+        applyAllEffects();
+    }
+
+    public void setRedir(boolean active) {
+        redirActive = active;
+        applyAllEffects();
     }
 }
