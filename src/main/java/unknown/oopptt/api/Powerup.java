@@ -28,7 +28,7 @@ public class Powerup  {
     private Game_Screen_Controller controller;
 
     public enum PowerupType {
-        UPBALL(10), UPPADDLE(8), SHEILD(-1), MOREBALL(-1), SLOW(10),
+        UPBALL(10), UPPADDLE(8), MOREBALL(-1), SLOW(10),
         CATCHBALL(10), GUN(8), REDIR(10);
         private final int duration;
         PowerupType(int duration) {
@@ -57,9 +57,6 @@ public class Powerup  {
                 imageView = new ImageView(new Image(upballview));
                 break;
             case PowerupType.UPPADDLE:
-                imageView = new ImageView(new Image(upballview));
-                break;
-            case PowerupType.SHEILD:
                 imageView = new ImageView(new Image(upballview));
                 break;
             case  PowerupType.MOREBALL:
@@ -93,9 +90,6 @@ public class Powerup  {
                 imageView = new ImageView(new Image(upballview));
                 break;
             case PowerupType.UPPADDLE:
-                imageView = new ImageView(new Image(upballview));
-                break;
-            case PowerupType.SHEILD:
                 imageView = new ImageView(new Image(upballview));
                 break;
             case  PowerupType.MOREBALL:
@@ -147,9 +141,6 @@ public class Powerup  {
                 break;
             case PowerupType.UPPADDLE:
                 runTimeEffect(type.getDuration(), controller::upPaddle, controller::offUpPaddle);
-                break;
-            case PowerupType.SHEILD:
-                controller.openSheild();
                 break;
             case  PowerupType.MOREBALL:
                 controller.moreBall();

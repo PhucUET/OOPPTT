@@ -7,6 +7,8 @@ import javafx.geometry.Bounds;
 import javafx.geometry.Pos;
 import javafx.scene.Cursor;
 import javafx.scene.Group;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyEvent;
@@ -40,8 +42,8 @@ public class Game_Screen_Controller {
     private static final File MAP_FILE = new File("src/main/resources/map/map1.txt");
 
     private final List<Brick> gameBricks = new LinkedList<>();
-    private final Sheild sheild = new Sheild();
     private Shooter shooter;
+    private Level level = Level.getInstance();
     private final BaseGame baseGame = new BaseGame(this);
 
     private int countlife = 3;
@@ -49,6 +51,9 @@ public class Game_Screen_Controller {
     @FXML private StackPane stack_root;
     @FXML private MediaView mediaView;
     @FXML private ImageView gameBackground;
+    @FXML Label scoreLabel;
+    @FXML Button btnRestart,btnNext,btnEscape;
+    @FXML StackPane endGameOverlay;
     private Paddle paddleLogic;
     @FXML private Group bgr;
 
@@ -70,9 +75,11 @@ public class Game_Screen_Controller {
     @FXML
     public void initialize() {
         stack_root.setAlignment(Pos.CENTER);
+        level.start();
         preloadAssets();
+        stack_root.getChildren().add(0, bg.getRoot());
+        stack_root.setAlignment(Pos.CENTER);
         setBackground(BG_IMAGE_PATH,MAP_FILE);
-
         ListenEventHandle();
         startGameloop();
     }
@@ -91,34 +98,34 @@ public class Game_Screen_Controller {
     }
 
     private void setBackground(String backgroundPath, File MAP_FILE) {
-        stack_root.getChildren().add(0, bg.getRoot());
-        stack_root.setAlignment(Pos.CENTER);
-        gameBackground.setImage(new Image(backgroundPath));
+        //gameBackground.setImage(new Image(backgroundPath));
 
-        paddleLogic = new Paddle(gameBackground.getBoundsInParent().getCenterX(),
-                gameBackground.getBoundsInParent().getMaxY() - 40, gameBackground);
+        if(endGameOverlay.isVisible() == false) {
+            paddleLogic = new Paddle(gameBackground.getBoundsInParent().getCenterX(),
+                    gameBackground.getBoundsInParent().getMaxY() - 40, gameBackground);
 
-        layout_game.getChildren().add(paddleLogic.getImageView());
-        specialPaddle = new SpecialPaddle(paddleLogic);
+            layout_game.getChildren().add(paddleLogic.getImageView());
+            specialPaddle = new SpecialPaddle(paddleLogic);
 
-        Ball first_ball = new Ball(paddleLogic.getPos_x(),
-                paddleLogic.getPos_y() - 5, 0.3, 0, layout_game);
+            Ball first_ball = new Ball(paddleLogic.getPos_x(),
+                    paddleLogic.getPos_y() - 5, 0.3, 0, layout_game);
 
-        gameBall.add(first_ball);
+            gameBall.add(first_ball);
 
-        layout_game.getChildren().add(first_ball.getImageView());
-        powerBall = new PowerBall(gameBall);
+            layout_game.getChildren().add(first_ball.getImageView());
+            powerBall = new PowerBall(gameBall);
 
-        shooter = new Shooter(200, 2, 5, 10, layout_game, paddleLogic.getImageView(), 20);
+            shooter = new Shooter(200, 2, 5, 10, layout_game, paddleLogic.getImageView(), 20);
 
-        upMap(MAP_FILE);
+            upMap(MAP_FILE);
 
-        Platform.runLater(() -> {
-            BossEnemy bossEnemy = new BossEnemy(250, 300, 50,50,50,paddleLogic,this,layout_game);
-            gameEnemies.add(bossEnemy);
-            layout_game.getChildren().add(bossEnemy.getImageView());
-        });
 
+            Platform.runLater(() -> {
+                BossEnemy bossEnemy = new BossEnemy(250, 300, 50, 50, 50, paddleLogic, this, layout_game);
+                gameEnemies.add(bossEnemy);
+                layout_game.getChildren().add(bossEnemy.getImageView());
+            });
+        }
     }
 
     private void upMap(File MAP_FILE) {
@@ -211,6 +218,48 @@ public class Game_Screen_Controller {
         });
     }
 
+    private void clearEntity() {
+        layout_game.getChildren().remove(paddleLogic.getImageView());
+
+        for(Ball ball : gameBall){
+            layout_game.getChildren().remove(ball.getImageView());
+        }
+        gameBall.clear();
+
+        for(Enemy enemy: gameEnemies){
+            layout_game.getChildren().remove(enemy.getImageView());
+        }
+        gameEnemies.clear();
+        for(Powerup Pu : gamePowerup){
+            layout_game.getChildren().remove(Pu.getImageView());
+        }
+        gamePowerup.clear();
+    }
+
+    private void showEndGameScreen() {
+        clearEntity();
+        Platform.runLater(() -> {
+            scoreLabel.setText("Your Score: " + 0);
+            endGameOverlay.setVisible(true);
+        });
+        btnEscape.setOnAction(e -> System.exit(0));
+        btnRestart.setOnAction(e ->{ restartLevel();endGameOverlay.setVisible(false);});
+        btnNext.setOnAction(e -> {loadNextLevel();endGameOverlay.setVisible(false);});
+    }
+    public void loadNextLevel() {
+        endGameOverlay.setVisible(false);
+        System.out.println(endGameOverlay.isVisible());
+        level.nextLevel();
+        System.out.println(endGameOverlay.isVisible());
+        setBackground(BG_IMAGE_PATH, level.getMap());
+        System.out.println(endGameOverlay.isVisible());     
+
+    }
+    public void restartLevel() {
+            endGameOverlay.setVisible(false);
+            setBackground(BG_IMAGE_PATH, level.getMap());
+    }
+
     // ================= gamel==================
     private static final double TARGET_FPS = 60;
     private static final  double STEP = 1.0/TARGET_FPS;
@@ -247,6 +296,9 @@ public class Game_Screen_Controller {
                 if (shooter.getEnabled()) {
                     shooter.tryFire();
                 }
+                if(gameBricks.isEmpty()) {
+                    showEndGameScreen();
+                }
             }
         };
         timer.start();
@@ -261,7 +313,7 @@ public class Game_Screen_Controller {
                 if (brick.dropBrick(dt)) {
                     layout_game.getChildren().remove(brick.getImageView());
                     gameBricks.remove(i);
-                    if (shouldDrop(0.5)) {
+                    if (shouldDrop(0.7)) {
                         Powerup p = new Powerup(
                                 brick.getImageView().getBoundsInParent().getCenterX(), brick.getImageView().getBoundsInParent().getCenterY());
                         layout_game.getChildren().add(p.getImageView());
@@ -331,11 +383,11 @@ public class Game_Screen_Controller {
                 ballLogic.addOffsetOnPaddle(dt);
                 continue;
             }
-            if (baseGame.outBall(ballLogic.getImageView().getBoundsInParent(), gameBackground)) {
-                gameBall.remove(i);
-                layout_game.getChildren().remove(ballLogic.getImageView());
-                continue;
-            }
+//            if (baseGame.outBall(ballLogic.getImageView().getBoundsInParent(), gameBackground)) {
+//                gameBall.remove(i);
+//                layout_game.getChildren().remove(ballLogic.getImageView());
+//                continue;
+//            }
 
             baseGame.brickCollision(ballLogic, gameBricks);
             baseGame.paddleballCollision(ballLogic, paddleLogic, isCatch);
@@ -371,7 +423,6 @@ public class Game_Screen_Controller {
     public void resetBall()          { powerBall.downBall(); }
     public void slowBall()           { powerBall.slowBall(); }
     public void resetSlowBall()      { powerBall.normalBall(); }
-    public void openSheild()         { sheild.openSheild(gameBricks, layout_game, gameBackground); }
     public void moreBall()           { powerBall.moreBall(layout_game); }
 
     public void upPaddle() {
