@@ -3,9 +3,12 @@ package unknown.oopptt.controller;
 import javafx.animation.AnimationTimer;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.geometry.Bounds;
 import javafx.geometry.Pos;
 import javafx.scene.Cursor;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.SplitPane;
@@ -15,6 +18,8 @@ import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
+import javafx.stage.Stage;
+import javafx.stage.Window;
 import unknown.oopptt.api.*;
 import unknown.oopptt.api.ball.Ball;
 import unknown.oopptt.api.ball.PowerBall;
@@ -88,7 +93,6 @@ public class BattleScreenController {
     @FXML Pane Data1;
     @FXML ImageView bgDataPlayer1;
     @FXML private Label scorePlayer1;
-    @FXML Button Esc;
     @FXML StackPane stackP1;
     @FXML ImageView bgP1;
     @FXML Pane player1;
@@ -341,6 +345,7 @@ public class BattleScreenController {
                 paddleLogic1.setRightHeld(true);
                 client.send("2");
             }
+            case R -> openHome();
             // case SPACE -> setBallmove();
         }
     }
@@ -548,6 +553,39 @@ public class BattleScreenController {
             baseGame2.wallCollision(ballLogic, background_player2);
 
             ballLogic.update(dt);
+        }
+    }
+
+    @FXML
+    private void openHome() {
+        try {
+            // Load màn hình MenuRotate
+            Parent menuRoot = FXMLLoader.load(getClass().getResource("/unknown/oopptt/MenuRotate.fxml"));
+
+            // Nếu đang nằm trong một Scene: chỉ cần thay root để "xóa" màn hiện tại
+            if (stack_root != null && stack_root.getScene() != null) {
+                stack_root.getScene().setRoot(menuRoot);
+            } else {
+                // Dự phòng: chưa có Scene -> mở Stage mới
+                Stage stage = new Stage();
+                stage.setScene(new Scene(menuRoot));
+                stage.setTitle("Menu");
+                stage.show();
+
+                // Đóng cửa sổ hiện tại nếu đang chạy độc lập
+                closeWindowIfStandalone();
+            }
+        } catch (IOException e) {
+            e.printStackTrace(); // hoặc log ra logger của bạn
+        }
+    }
+
+    private void closeWindowIfStandalone() {
+        if (stack_root != null && stack_root.getScene() != null) {
+            Window w = stack_root.getScene().getWindow();
+            if (w != null) {
+                w.hide();
+            }
         }
     }
 

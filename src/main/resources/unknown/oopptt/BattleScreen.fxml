@@ -20,7 +20,6 @@
                             <children>
                                 <ImageView fx:id="bgDataPlayer1" fitHeight="40.0" fitWidth="500.0" pickOnBounds="true" preserveRatio="true" />
                                 <Label fx:id="scorePlayer1" layoutX="8.0" layoutY="6.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="40.0" prefWidth="500.0" text="SCORE:" />
-                                <Button fx:id="Esc" layoutX="500.0" layoutY="8.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="48.0" text="ESC" />
                             </children>
                         </Pane>
                         <StackPane fx:id="stackP1">
@@ -51,7 +50,7 @@
                                 <ImageView fx:id="bgP2" fitHeight="640.0" fitWidth="500.0" pickOnBounds="true" preserveRatio="true" />
                                 <Pane fx:id="player2" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="640.0" prefWidth="500.0">
                                     <children>
-                                        <ImageView fx:id="background_player2" fitHeight="640.0" fitWidth="500.0" pickOnBounds="true" preserveRatio="false" />
+                                        <ImageView fx:id="background_player2" fitHeight="640.0" fitWidth="500.0" pickOnBounds="true" />
                                     </children>
                                 </Pane>
                             </children>

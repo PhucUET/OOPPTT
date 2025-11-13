@@ -88,7 +88,6 @@ public class MenuRotateController {
             });
         });
     }
-
     private static final double TARGET_FPS = 60;
     private static final  double STEP = 1.0/TARGET_FPS;
     AnimationTimer timer;
