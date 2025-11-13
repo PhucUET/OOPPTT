@@ -107,8 +107,8 @@ public class BaseGame {
         Bounds bb = bv.getBoundsInParent();
 
         Bounds bReduced = new javafx.geometry.BoundingBox(
-                bb.getMinX() + 10, bb.getMinY() + 10,
-                bb.getWidth() - 20, bb.getHeight() - 20);
+                bb.getMinX() + 15, bb.getMinY() + 15,
+                bb.getWidth() - 30, bb.getHeight() - 30);
 
         if (!bReduced.intersects(r)) return false;
 
