@@ -53,7 +53,7 @@
             <children>
                 <VBox alignment="CENTER" prefHeight="150.0" prefWidth="200.0">
                     <children>
-                        <Label fx:id="scoreLabel1" prefHeight="47.0" prefWidth="211.0" style="-fx-font-size: 32px; -fx-text-fill: red; -fx-font-weight: bold;" text="Your Score: 0000" textAlignment="RIGHT" />
+                        <Label fx:id="scoreLabel1" prefHeight="47.0" prefWidth="284.0" style="-fx-font-size: 32px; -fx-text-fill: red; -fx-font-weight: bold;" text="Your Score: 0000" textAlignment="RIGHT" />
                         <HBox alignment="CENTER" prefHeight="127.0" prefWidth="500.0">
                             <children>
                                 <Button fx:id="btnEscape1" blendMode="SOFT_LIGHT" style="-fx-font-size: 18px; -fx-pref-width:100px;" text="Escape" />

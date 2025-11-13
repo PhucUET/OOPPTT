@@ -31,7 +31,7 @@ public class MenuRotateController {
     @FXML private ImageView background;
 
     @FXML private Button btnLeft, btnRight, btnMute, btnEsc;
-
+    @FXML private Button btnHS;
     @FXML private ImageView imgLeft, imgCenter, imgRight;
     private String path = new File("src/main/resources/graphic/B1-Pale").toString();
     private ParallaxBackground bg = new ParallaxBackground(2000, 1200, path);
@@ -124,6 +124,10 @@ public class MenuRotateController {
 
     /* ================== Actions ================== */
 
+    @FXML
+    public void HighScore(ActionEvent event) {
+
+    }
     @FXML
     public void onRotateLeft() {
         SoundManager.playSoundEffect("click.mp3");

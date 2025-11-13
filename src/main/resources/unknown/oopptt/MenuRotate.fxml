@@ -30,6 +30,11 @@
                         <!-- ESC + Mute -->
                         <HBox alignment="TOP_RIGHT" spacing="8" StackPane.alignment="TOP_RIGHT">
                             <children>
+                        <Button fx:id="btnHS" blendMode="COLOR_DODGE" mnemonicParsing="false" onAction="#HighScore" prefHeight="39.0" prefWidth="125.0" text="HighScore">
+                           <font>
+                              <Font size="18.0" />
+                           </font>
+                        </Button>
                                 <Button fx:id="btnMute" blendMode="COLOR_DODGE" onAction="#onToggleMute" prefHeight="39.0" prefWidth="45.0" text="🔊">
                            <font>
                               <Font size="18.0" />
