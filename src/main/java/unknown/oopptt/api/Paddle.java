@@ -21,11 +21,20 @@ public class Paddle extends GameEntity {
     private Boolean leftHeld = false;
     private Boolean rightHeld = false;
     private int redir = 1;
+    private Boolean isDead = false;
 
     public Paddle(double x, double y, ImageView backgroundGame) {
         super(x, y, DEFAULT_WIDTH, DEFAULT_HEIGHT, path);
         Paddle = new Rectangle(x - DEFAULT_WIDTH, y - DEFAULT_HEIGHT, DEFAULT_WIDTH, DEFAULT_HEIGHT);
         this.backgroundGame = backgroundGame;
+    }
+
+    public Boolean getDead() {
+        return isDead;
+    }
+
+    public void setDead(Boolean dead) {
+        isDead = dead;
     }
 
     private static double clamp(double v, double lo, double hi) {

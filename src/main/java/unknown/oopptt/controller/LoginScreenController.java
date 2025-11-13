@@ -1,5 +1,6 @@
 package unknown.oopptt.controller;
 
+import javafx.animation.AnimationTimer;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -8,8 +9,11 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
+import javafx.util.Pair;
 import unknown.oopptt.api.Data;
+import unknown.oopptt.api.ParallaxBackground;
 import unknown.oopptt.api.SoundManager;
 
 public class LoginScreenController {
@@ -18,6 +22,9 @@ public class LoginScreenController {
     @FXML private Label lblMessage;
     @FXML private ImageView background;
     @FXML private AnchorPane root;
+    @FXML private StackPane layout;
+
+    private ParallaxBackground bg = new ParallaxBackground(1440, 780);
 
     private  Data data = new Data();
 
@@ -66,20 +73,33 @@ public class LoginScreenController {
                 SoundManager.playSoundEffect("clickLoginRegister.mp3");
 
                 //preload màn kế tiếp ở background rồi mới setScene (để chuyển mượt)
-                javafx.concurrent.Task<Parent> preloadNext = new javafx.concurrent.Task<>() {
-                    @Override protected Parent call() throws Exception {
-                        FXMLLoader nextFx = new FXMLLoader(getClass().getResource("/unknown/oopptt/MenuRotate.fxml"));
-                        return nextFx.load();
-                    }
-                };
+                javafx.concurrent.Task<Pair<Parent, MenuRotateController>> preloadNext =
+                        new javafx.concurrent.Task<>() {
+                            @Override
+                            protected Pair<Parent, MenuRotateController> call() throws Exception {
+                                FXMLLoader nextFx = new FXMLLoader(
+                                        getClass().getResource("/unknown/oopptt/MenuRotate.fxml")
+                                );
+
+                                Parent root = nextFx.load();                             // 1) load trước
+                                MenuRotateController controller = nextFx.getController(); // 2) rồi mới lấy controller
+
+                                return new Pair<>(root, controller);                      // 3) trả về cả root + controller
+                            }
+                        };
+
                 preloadNext.setOnSucceeded(done -> {
                     //gỡ overlay + chuyển màn
                     root.getChildren().remove(overlay);
                     loadingCtrl.stop();
                     try {
                         Stage stage = (Stage) root.getScene().getWindow();
-                        stage.setScene(new Scene(preloadNext.getValue()));
+                        Parent newScene = (Parent) (preloadNext.getValue().getKey());
+                        MenuRotateController controller = (MenuRotateController) preloadNext.getValue().getValue();
+                        stage.getScene().setRoot(newScene);
+                        controller.setData(data);
                         stage.setFullScreen(true);
+                        //timer.stop();
                         SoundManager.playBackgroundMusic("menuBgrMusic.mp3");
                     } catch (Exception ex) {
                         ex.printStackTrace();
@@ -138,8 +158,46 @@ public class LoginScreenController {
 
     @FXML
     public void initialize() {
-        background.setPreserveRatio(false);
-        background.fitWidthProperty().bind(root.widthProperty());
-        background.fitHeightProperty().bind(root.heightProperty());
+
+        Platform.runLater(() -> {
+            bg = new ParallaxBackground(root.getWidth(), root.getHeight());
+            root.getChildren().add(0, bg.getRoot());
+            startGameloop();
+        });
+
+    }
+
+    private static final double TARGET_FPS = 60;
+    private static final  double STEP = 1.0/TARGET_FPS;
+    AnimationTimer timer;
+    private void startGameloop() {
+         timer = new AnimationTimer() {
+            private long lastTime = 0L;
+            private double accumulator = 0.0;
+
+            @Override
+            public void handle(long now) {
+                if (lastTime == 0L) {
+                    lastTime = now;
+                    return;
+                }
+
+                double dt = (now - lastTime) / 1e9;
+                if (dt > 0.25) {
+                    dt = 0.25;
+                }
+
+                lastTime = now;
+                accumulator += dt;
+
+                if (accumulator > STEP) {
+                    bg.update(STEP);
+                    accumulator -= STEP;
+
+                }
+
+            }
+        };
+        timer.start();
     }
 }

@@ -23,9 +23,6 @@ public class NowPlay extends Manage {
             return name;
         }
 
-        public int getScore() {
-            return score;
-        }
 
         public int getHighScore() {
             return highScore;
@@ -59,6 +56,13 @@ public class NowPlay extends Manage {
         public void addLive() {
             this.lives += 1;
         }
+
+        public void subLive() {
+            this.lives -= 1;
+        }
+        public int getScore() {
+            return this.score;
+        }
     }
 
     //enum là kiểu dữ liệu liệt kê, để liệt kê các mode game
@@ -79,10 +83,15 @@ public class NowPlay extends Manage {
         return mode;
     }
 
+    public int getPoints(String player) {
+        Player p = players.get(player);
+        return p.getScore();
+    }
 
     //thêm người chơi mới nếu chưa tồn tại
     public void addPlayer(String name) {
         players.putIfAbsent(name, new Player(name));
+        System.out.println("Added player " + name);
     }
 
     //cập nhật điểm số
@@ -103,6 +112,14 @@ public class NowPlay extends Manage {
     public void addLive(String name) {
         Player p = players.get(name);
         p.addLive();
+    }
+    public void subLive(String name) {
+        Player p = players.get(name);
+        p.subLive();
+    }
+
+    public Integer getAlive(String name) {
+        return players.get(name).getLives();
     }
 
     //kết thúc trận đấu

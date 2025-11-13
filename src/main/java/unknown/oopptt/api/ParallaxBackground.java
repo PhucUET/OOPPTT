@@ -42,13 +42,13 @@ public class ParallaxBackground extends Pane {
         return (Math.random() * (max - min)) + min;
     }
 
-    public ParallaxBackground() {
+    public ParallaxBackground(double width, double height) {
         root = new Pane();
-        root.setPrefSize(500, 640);
-        root.setMaxSize(500,640);
-        root.setMinSize(500,640);
+        root.setPrefSize(width, height);
+        root.setMaxSize(width,height);
+        root.setMinSize(width,height);
         root.setPickOnBounds(true);
-        Rectangle rect = new Rectangle(500, 640);
+        Rectangle rect = new Rectangle(width, height);
         root.setClip(rect);
         loadFrames(path);
         for (Image image : frames) {
@@ -75,6 +75,8 @@ public class ParallaxBackground extends Pane {
             layers.add(imageView2);
         }
     }
+
+
 
 
     public Pane getRoot() {

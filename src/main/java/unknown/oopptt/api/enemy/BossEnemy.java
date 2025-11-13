@@ -44,7 +44,7 @@ public class BossEnemy extends Enemy {
         centerY = y;
         System.out.println(centerX + " " + centerY);
         shooter = new Shooter(300, 3, 40, 40,
-                layout_game, paddleLogic.getImageView(), 30, this.imageView);
+                layout_game, paddleLogic.getImageView(), 30, this.imageView, paddleLogic);
 
         shooter.setEnabled(true);
     }

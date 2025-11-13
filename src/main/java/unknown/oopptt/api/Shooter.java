@@ -1,5 +1,6 @@
 package unknown.oopptt.api;
 
+import javafx.geometry.Bounds;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.Pane;
@@ -19,6 +20,7 @@ public class Shooter {
     private final Image bulletImg;
 
     private final ImageView paddleView;
+    private  Paddle paddle;
     private  ImageView enemyView;
     private boolean enabled = false;
     private double timeSinceLastShoot;
@@ -27,6 +29,7 @@ public class Shooter {
 
     private final Deque<Bullet> bulletPool = new ArrayDeque<>();
     private final List<Bullet> active = new ArrayList<>();
+
 
 
     private final class Bullet{
@@ -63,7 +66,7 @@ public class Shooter {
     }
 
 
-    public Shooter(double bulletSpeed, double coldDown, double bulletW, double bulletH, Pane gameLayout, ImageView paddleView, int prewarmPoolSize, ImageView enemyView) {
+    public Shooter(double bulletSpeed, double coldDown, double bulletW, double bulletH, Pane gameLayout, ImageView paddleView, int prewarmPoolSize, ImageView enemyView, Paddle paddle) {
         BULLET_SPEED = bulletSpeed;
         COLD_DOWN = coldDown;
         BULLET_W = bulletW;
@@ -72,13 +75,14 @@ public class Shooter {
         this.paddleView = paddleView;
         this.enemyView = enemyView;
         bulletImg = new Image(path);
+        this.paddle = paddle;
 
         for (int i = 0 ; i < prewarmPoolSize ; i++){
             Bullet bullet = new Bullet();
             bulletPool.push(bullet);
             bullet.imageView.setVisible(false);
-            bullet.imageView.setFitWidth(BULLET_W * 6);
-            bullet.imageView.setFitHeight(BULLET_H * 6);
+            bullet.imageView.setFitWidth(BULLET_W * 3);
+            bullet.imageView.setFitHeight(BULLET_H * 3);
             bullet.imageView.setPreserveRatio(false);
             game_Layout.getChildren().add(bullet.imageView);
         }
@@ -140,16 +144,25 @@ public class Shooter {
                 bullet.y += BULLET_SPEED * dtsecond * bullet.dy ;
 
                 bullet.animation.update(dtsecond);
-                bullet.imageView.setTranslateY(bullet.y - BULLET_H * 6 /2);
-                bullet.imageView.setTranslateX(bullet.x - BULLET_W * 6 /2);
+                bullet.imageView.setTranslateY(bullet.y - BULLET_H * 3 /2);
+                bullet.imageView.setTranslateX(bullet.x - BULLET_W * 3 /2);
 
                 if (bullet.y >= paddleView.getBoundsInParent().getMaxY()) {
                     recycle(it, bullet);
                     continue;
                 }
+                Bounds en = bullet.imageView.getBoundsInParent();
+                Bounds bReduced = new javafx.geometry.BoundingBox(
+                        en.getMinX() + 20, en.getMinY() + 20,
+                        en.getWidth() - 40, en.getHeight() - 40);
 
-                if (bullet.imageView.intersects(paddleView.getBoundsInParent())) {
-                    gameOn =  false;
+                Bounds eu = paddleView.getBoundsInParent();
+                Bounds eReduced = new javafx.geometry.BoundingBox(
+                        eu.getMinX() + 20, eu.getMinY() + 20,
+                        eu.getWidth() - 40, eu.getHeight() - 40);
+                if (eReduced.intersects(bReduced)) {
+                    paddle.setDead(true);
+                    System.out.println("hehheeheh");
                     recycle(it, bullet);
                     return;
                 }
@@ -265,8 +278,8 @@ public class Shooter {
         newBullet.dx = dirX;
         newBullet.dy = dirY;
         newBullet.alive = true;
-        newBullet.imageView.setTranslateX(newBullet.x - BULLET_W * 6 / 2 );
-        newBullet.imageView.setTranslateY(newBullet.y -  BULLET_H * 6 / 2 );
+        newBullet.imageView.setTranslateX(newBullet.x - BULLET_W * 3 / 2 );
+        newBullet.imageView.setTranslateY(newBullet.y -  BULLET_H * 3 / 2 );
         active.add(newBullet);
         System.out.println("bantinh");
         timeSinceLastShoot = 0;

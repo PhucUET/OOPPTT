@@ -1,5 +1,6 @@
 package unknown.oopptt.controller;
 
+import javafx.animation.AnimationTimer;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -19,6 +20,8 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+import unknown.oopptt.api.Data;
+import unknown.oopptt.api.ParallaxBackground;
 import unknown.oopptt.api.SoundManager;
 
 public class MenuRotateController {
@@ -29,6 +32,7 @@ public class MenuRotateController {
     @FXML private Button btnLeft, btnRight, btnMute, btnEsc;
 
     @FXML private ImageView imgLeft, imgCenter, imgRight;
+    private ParallaxBackground bg = new ParallaxBackground(1500, 1000);
 
     private enum Mode { BATTLE, ADVENTURE, HELP }
     // Thứ tự hiển thị: [LEFT, CENTER, RIGHT]
@@ -37,16 +41,30 @@ public class MenuRotateController {
     // Ảnh demo (sẽ fallback sang background10.jpg nếu thiếu)
     private Image imgBattle, imgAdventure, imgHelp, imgFallback,  imgBackGournd;
 
+    private Data data = new Data();
+
+    public void setData(Data data) {
+        this.data = data;
+    }
+
     @FXML
     private void initialize() {
         // Nền full màn
         //stack_root.setAlignment(Pos.CENTER);
-        if (background != null && root != null) {
-            background.fitWidthProperty().bind(root.widthProperty());
-            background.fitHeightProperty().bind(root.heightProperty());
-            background.setPreserveRatio(false);
-        }
 
+//        if (root != null) {
+//            Platform.runLater(() -> {
+//                bg = new ParallaxBackground(root.getBoundsInLocal().getWidth(), root.getBoundsInLocal().getHeight());
+//                System.out.println(root.getBoundsInLocal().getWidth() + " " + root.getBoundsInLocal().getHeight());
+//                root.getChildren().add(0,bg.getRoot());
+//                startGameloop();
+//            });
+//        }
+        root.getChildren().add(0, bg.getRoot());
+        bg.getRoot().prefWidthProperty().bind(root.widthProperty());
+        bg.getRoot().prefHeightProperty().bind(root.heightProperty());
+
+        startGameloop();
         // Nạp ảnh từ classpath
         imgBackGournd = firstAvailable("/graphic/battle.png", "/graphic/Space3.png");
         imgFallback  = load("/graphic/background10.jpg");
@@ -67,6 +85,40 @@ public class MenuRotateController {
                 else if (e.getCode() == KeyCode.ENTER ) onSelectCenter();
             });
         });
+    }
+
+    private static final double TARGET_FPS = 60;
+    private static final  double STEP = 1.0/TARGET_FPS;
+    AnimationTimer timer;
+    private void startGameloop() {
+        timer = new AnimationTimer() {
+            private long lastTime = 0L;
+            private double accumulator = 0.0;
+
+            @Override
+            public void handle(long now) {
+                if (lastTime == 0L) {
+                    lastTime = now;
+                    return;
+                }
+
+                double dt = (now - lastTime) / 1e9;
+                if (dt > 0.25) {
+                    dt = 0.25;
+                }
+
+                lastTime = now;
+                accumulator += dt;
+
+                if (accumulator > STEP) {
+                    bg.update(STEP);
+                    accumulator -= STEP;
+
+                }
+
+            }
+        };
+        timer.start();
     }
 
     /* ================== Actions ================== */
@@ -150,7 +202,6 @@ public class MenuRotateController {
 
     private void render() {
         // order: [LEFT, CENTER, RIGHT]
-        background.setImage(imgBackGournd);
         setImage(imgLeft,  order.get(0));
         setImage(imgCenter,order.get(1));
         setImage(imgRight, order.get(2));
@@ -179,11 +230,12 @@ public class MenuRotateController {
     }
     private void switchTo(String fxml, ActionEvent e) {
         try {
-
-            Parent root = FXMLLoader.load(getClass().getResource(fxml));
+            FXMLLoader nextFx = new FXMLLoader(getClass().getResource(fxml));
+            Parent root = nextFx.load();
             Stage stage = (Stage) ((Node) e.getSource()).getScene().getWindow();
-            Scene scene = stage.getScene();
-            scene.setRoot(root);
+            Game_Screen_Controller controller = nextFx.getController();
+             stage.getScene().setRoot(root);
+            controller.setData(data);
         } catch (Exception ex) {
             ex.printStackTrace();
         }

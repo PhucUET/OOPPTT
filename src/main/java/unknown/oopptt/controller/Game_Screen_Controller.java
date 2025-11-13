@@ -12,6 +12,7 @@ import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyEvent;
+import javafx.scene.layout.Background;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.media.MediaView;
@@ -43,17 +44,16 @@ public class Game_Screen_Controller {
 
     private final List<Brick> gameBricks = new LinkedList<>();
     private Shooter shooter;
-    private Level level = Level.getInstance();
-    private final BaseGame baseGame = new BaseGame(this);
+//    private Level level = Level.getInstance();
+    private  BaseGame baseGame;
 
-    private int countlife = 3;
 
     @FXML private StackPane stack_root;
     @FXML private MediaView mediaView;
     @FXML private ImageView gameBackground;
     @FXML Label scoreLabel;
     @FXML Button btnRestart,btnNext,btnEscape;
-    @FXML StackPane endGameOverlay;
+//    @FXML StackPane endGameOverlay;
     private Paddle paddleLogic;
     @FXML private Group bgr;
 
@@ -62,23 +62,22 @@ public class Game_Screen_Controller {
     private final List<Powerup> gamePowerup = new ArrayList<>();
     private PowerBall powerBall;
     private SpecialPaddle specialPaddle;
-    private ParallaxBackground bg =  new ParallaxBackground();
+    private ParallaxBackground bg = new ParallaxBackground(500,640) ;
     private Sheild shield;
-    private NowPlay player;
+    private NowPlay player = new NowPlay();
     private Data data = new Data();
 
     @FXML Pane layout_game;
 
     private boolean isCatch = false;
 
-    private double udt = 0.0;
 
     private boolean isSpam = false;
 
     @FXML
     public void initialize() {
         stack_root.setAlignment(Pos.CENTER);
-        level.start();
+        //level.start();
         preloadAssets();
         stack_root.getChildren().add(0, bg.getRoot());
         stack_root.setAlignment(Pos.CENTER);
@@ -89,6 +88,8 @@ public class Game_Screen_Controller {
 
     public void setData(Data data) {
         this.data = data;
+        player.addPlayer(data.getNamePlayer());
+        baseGame = new BaseGame(this);
     }
 
     private void preloadAssets() {
@@ -118,7 +119,7 @@ public class Game_Screen_Controller {
     private void setBackground(String backgroundPath, File MAP_FILE) {
         //gameBackground.setImage(new Image(backgroundPath));
 
-        if(endGameOverlay.isVisible() == false) {
+//        if(endGameOverlay.isVisible() == false) {
             paddleLogic = new Paddle(gameBackground.getBoundsInParent().getCenterX(),
                     gameBackground.getBoundsInParent().getMaxY() - 40, gameBackground);
 
@@ -140,11 +141,12 @@ public class Game_Screen_Controller {
 
 
             Platform.runLater(() -> {
-                BossEnemy bossEnemy = new BossEnemy(250, 300, 50, 50, 50, paddleLogic, this, layout_game);
+                BossEnemy bossEnemy = new BossEnemy(250, 300, 100, 100, 50, paddleLogic, this, layout_game);
                 gameEnemies.add(bossEnemy);
                 layout_game.getChildren().add(bossEnemy.getImageView());
             });
-        }
+
+      //  }
     }
 
     private void upMap(File MAP_FILE) {
@@ -176,13 +178,12 @@ public class Game_Screen_Controller {
                         switch (type) {
                             case 1: break;
                             case 2: break;
-                            case 0: new_Enemy = new ShooterEnemy(newX, newY, 30, 30, layout_game, paddleLogic.getImageView()); break;
+                            case 0: new_Enemy = new ShooterEnemy(newX, newY, 30, 30, layout_game, paddleLogic.getImageView(), paddleLogic); break;
                             default:
                                 throw new IllegalStateException("Unexpected value: " + type);
                         }
 
                         if (new_Enemy != null) {
-                            System.out.println("ngusiii");
                             gameEnemies.add(new_Enemy);
                             layout_game.getChildren().add(new_Enemy.getImageView());
                         }
@@ -237,47 +238,6 @@ public class Game_Screen_Controller {
         });
     }
 
-    private void clearEntity() {
-        layout_game.getChildren().remove(paddleLogic.getImageView());
-
-        for(Ball ball : gameBall){
-            layout_game.getChildren().remove(ball.getImageView());
-        }
-        gameBall.clear();
-
-        for(Enemy enemy: gameEnemies){
-            layout_game.getChildren().remove(enemy.getImageView());
-        }
-        gameEnemies.clear();
-        for(Powerup Pu : gamePowerup){
-            layout_game.getChildren().remove(Pu.getImageView());
-        }
-        gamePowerup.clear();
-    }
-
-    private void showEndGameScreen() {
-        clearEntity();
-        Platform.runLater(() -> {
-            scoreLabel.setText("Your Score: " + 0);
-            endGameOverlay.setVisible(true);
-        });
-        btnEscape.setOnAction(e -> System.exit(0));
-        btnRestart.setOnAction(e ->{ restartLevel();endGameOverlay.setVisible(false);});
-        btnNext.setOnAction(e -> {loadNextLevel();endGameOverlay.setVisible(false);});
-    }
-    public void loadNextLevel() {
-        endGameOverlay.setVisible(false);
-        System.out.println(endGameOverlay.isVisible());
-        level.nextLevel();
-        System.out.println(endGameOverlay.isVisible());
-        setBackground(BG_IMAGE_PATH, level.getMap());
-        System.out.println(endGameOverlay.isVisible());     
-
-    }
-    public void restartLevel() {
-            endGameOverlay.setVisible(false);
-            setBackground(BG_IMAGE_PATH, level.getMap());
-    }
 
     // ================= gamel==================
     private static final double TARGET_FPS = 60;
@@ -304,6 +264,16 @@ public class Game_Screen_Controller {
                 accumulator += dt;
 
                 if (accumulator > STEP) {
+
+                    if (paddleLogic.getDead() == true) {
+                        paddleLogic.setDead(false);
+                        for (int i = gameBall.size() - 1; i >= 0; i--) {
+                            Ball ball = gameBall.get(i);
+                            layout_game.getChildren().remove(ball.getImageView());
+                            gameBall.remove(i);
+                        }
+                    }
+                    //System.out.println(player.getPoints(data.getNamePlayer()));
                     gameBall(STEP);
                     paddleLogic.update(STEP);
                     gameBricksUp(STEP);
@@ -316,9 +286,6 @@ public class Game_Screen_Controller {
                 }
                 if (shooter.getEnabled()) {
                     shooter.tryFire();
-                }
-                if(gameBricks.isEmpty()) {
-                    showEndGameScreen();
                 }
             }
         };
@@ -379,13 +346,14 @@ public class Game_Screen_Controller {
     }
 
     private void gameBall(double dt) {
+
         if (gameBall.isEmpty()) {
-            if (countlife > 0) {
+            if (player.getAlive(data.getNamePlayer()) > 0) {
                 Ball newBall = new Ball(paddleLogic.getPos_x(),
                         paddleLogic.getPos_y() - 5, 0.3, 0, layout_game);
                 gameBall.add(newBall);
                 layout_game.getChildren().add(newBall.getImageView());
-                countlife--;
+                player.subLive(data.getNamePlayer());
             }
         }
 
@@ -404,11 +372,11 @@ public class Game_Screen_Controller {
                 ballLogic.addOffsetOnPaddle(dt);
                 continue;
             }
-//            if (baseGame.outBall(ballLogic.getImageView().getBoundsInParent(), gameBackground)) {
-//                gameBall.remove(i);
-//                layout_game.getChildren().remove(ballLogic.getImageView());
-//                continue;
-//            }
+            if (baseGame.outBall(ballLogic.getImageView().getBoundsInParent(), gameBackground)) {
+                gameBall.remove(i);
+                layout_game.getChildren().remove(ballLogic.getImageView());
+                continue;
+            }
 
             baseGame.brickCollision(ballLogic, gameBricks);
             baseGame.paddleballCollision(ballLogic, paddleLogic, isCatch);
@@ -438,6 +406,18 @@ public class Game_Screen_Controller {
     }
     private boolean shouldDrop(double probability) {
         return ThreadLocalRandom.current().nextDouble() < probability;
+    }
+
+    public NowPlay getPlayer() {
+        return player;
+    }
+
+    public void setPlayer(NowPlay player) {
+        this.player = player;
+    }
+
+    public Data getData() {
+        return data;
     }
 
     public void upBall()             { powerBall.upBall(); }

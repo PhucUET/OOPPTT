@@ -4,6 +4,7 @@ import javafx.geometry.Bounds;
 import javafx.scene.image.ImageView;
 import unknown.oopptt.api.ball.Ball;
 import unknown.oopptt.api.enemy.Enemy;
+import unknown.oopptt.api.enemy.TransitEnemy;
 import unknown.oopptt.controller.Game_Screen_Controller;
 
 import java.util.List;
@@ -12,10 +13,14 @@ import java.util.concurrent.ThreadLocalRandom;
 public class BaseGame {
 
     private final Game_Screen_Controller controller;
-    private int myPoint = 0;
+    private final Data data;
+    private final NowPlay player;
+
 
     public BaseGame(Game_Screen_Controller controller) {
         this.controller = controller;
+        this.data = controller.getData();
+        this.player = controller.getPlayer();
     }
 
     // ======================================================
@@ -48,14 +53,6 @@ public class BaseGame {
             ball.setSpeedY(-vy);
         }
 
-//        if (byBottom <= bottomWall ) {
-//            return false;
-//        }
-//
-        if ((byTop <= topWall && vy < 0) || (byBottom >= bottomWall && vy > 0)) {
-            ball.setSpeedY(-vy);
-        }
-//
         return true;
 
     }
@@ -162,7 +159,7 @@ public class BaseGame {
             if (simpleCollision(ball, r)) {
                 // Cập nhật trạng thái gạch
                 if (!brick.hit()) {
-                    myPoint += brick.getHitPoints();
+                    player.updateScore(data.getNamePlayer(),brick.getPoint() );
                     brick.setWait(true);
                     break;
                 }
@@ -194,12 +191,15 @@ public class BaseGame {
     }
 
     public void enemyCollision(Ball ballLogic, List<Enemy> enemys) {
-
         for (Enemy enemy :  enemys) {
             Bounds en = enemy.getImageView().getBoundsInParent();
+            Bounds bReduced = new javafx.geometry.BoundingBox(
+                    en.getMinX() + 20, en.getMinY() + 20,
+                    en.getWidth() - 40, en.getHeight() - 40);
 
-            if (simpleCollision(ballLogic, en)) {
-                myPoint +=  enemy.takeDamage(10);
+
+            if (simpleCollision(ballLogic, bReduced)) {
+                player.updateScore(data.getNamePlayer(), enemy.takeDamage(10));
                 if (enemy instanceof TransitEnemy) {
                     ballLogic.setLocation(ballLogic.pos_x + rand1to20() ,  ballLogic.pos_y + rand1to20());
                 }
@@ -214,8 +214,12 @@ public class BaseGame {
 
     public boolean outBall(Bounds ball, ImageView background) {
         //System.out.println(ball.getImageView().getBoundsInParent().getMaxY() + " " + background.getBoundsInParent().getMaxY());;
-        return ball.getMaxY()
-                >= background.getBoundsInParent().getMaxY();
+        if (ball.getMaxY()
+                >= background.getBoundsInParent().getMaxY()) {
+            return true;
+        }
+        return false;
+
     }
 
     public boolean outPowerup(Powerup p, ImageView background) {

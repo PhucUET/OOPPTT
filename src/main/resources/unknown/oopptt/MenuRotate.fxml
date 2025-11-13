@@ -12,14 +12,15 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<StackPane fx:id="root" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="unknown.oopptt.controller.MenuRotateController">
+<StackPane fx:id="root" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="unknown.oopptt.controller.MenuRotateController">
 
     <children>
         <!-- Nền (tuỳ chọn) -->
-        <ImageView fx:id="background" fitHeight="400.0" fitWidth="600.0" pickOnBounds="true" preserveRatio="false">
-         <image>
-            <Image url="@../../graphic/Space3.png" />
-         </image></ImageView>
+<!--        <ImageView fx:id="background" fitHeight="400.0" fitWidth="600.0" pickOnBounds="true" preserveRatio="false">-->
+<!--             <image>-->
+<!--                <Image url="@../../graphic/Space3.png" />-->
+<!--             </image>-->
+<!--        </ImageView>-->
 
         <BorderPane>
             <!-- TOP: Logo + Tiêu đề + ESC/Mute -->

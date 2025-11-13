@@ -1,5 +1,7 @@
 package unknown.oopptt.controller;
 
+import javafx.animation.AnimationTimer;
+import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -9,6 +11,7 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
 import unknown.oopptt.api.Data;
+import unknown.oopptt.api.ParallaxBackground;
 import unknown.oopptt.api.SoundManager;
 
 public class RegisterScreenController {
@@ -19,14 +22,53 @@ public class RegisterScreenController {
     @FXML private Label lblMessage;
     @FXML private ImageView background;
     @FXML private AnchorPane root;
+    private ParallaxBackground bg = new ParallaxBackground(1440, 780);
 
     private final Data data = new Data();
 
     @FXML
     public void initialize() {
-        background.setPreserveRatio(false);
-        background.fitWidthProperty().bind(root.widthProperty());
-        background.fitHeightProperty().bind(root.heightProperty());
+
+        Platform.runLater(() -> {
+            bg = new ParallaxBackground(root.getWidth(), root.getHeight());
+            root.getChildren().add(0, bg.getRoot());
+            startGameloop();
+        });
+
+    }
+
+    private static final double TARGET_FPS = 60;
+    private static final  double STEP = 1.0/TARGET_FPS;
+    AnimationTimer timer;
+    private void startGameloop() {
+        timer = new AnimationTimer() {
+            private long lastTime = 0L;
+            private double accumulator = 0.0;
+
+            @Override
+            public void handle(long now) {
+                if (lastTime == 0L) {
+                    lastTime = now;
+                    return;
+                }
+
+                double dt = (now - lastTime) / 1e9;
+                if (dt > 0.25) {
+                    dt = 0.25;
+                }
+
+                lastTime = now;
+                accumulator += dt;
+
+                if (accumulator > STEP) {
+                    bg.update(STEP);
+                    accumulator -= STEP;
+
+                }
+
+            }
+        };
+        timer.start();
     }
 
     @FXML
@@ -56,7 +98,6 @@ public class RegisterScreenController {
             FXMLLoader fx = new FXMLLoader(getClass().getResource("/unknown/oopptt/Loading.fxml"));
             overlay = fx.load();
             loadingCtrl = fx.getController();
-
             overlay.setPickOnBounds(true); //chặn click xuyên
             AnchorPane.setTopAnchor(overlay, 0.0);
             AnchorPane.setRightAnchor(overlay, 0.0);
@@ -80,7 +121,7 @@ public class RegisterScreenController {
             //gỡ overlay + dừng animation
             root.getChildren().remove(overlay);
             loadingCtrl.stop();
-
+            timer.stop();
             String result = registerTask.getValue();
             switch (result) {
                 case "REGISTER_OK" -> {

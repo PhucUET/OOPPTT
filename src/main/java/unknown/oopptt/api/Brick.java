@@ -66,6 +66,10 @@ public class Brick extends GameEntity {
         this.wait = wait;
     }
 
+    public int getPoint() {
+        return Point;
+    }
+
     public Brick(double x, double y, int t) {
         super(x + widthBrick/2, y + heightBrick/2, widthBrick, heightBrick, Get_type(t));
         hitPoints = t;

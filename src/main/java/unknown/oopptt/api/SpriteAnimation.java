@@ -27,6 +27,7 @@ public class SpriteAnimation {
         }
     }
 
+
     public void changeFrames(String folderPath) {
         loadFrames(folderPath);
         if (!frames.isEmpty()) {
