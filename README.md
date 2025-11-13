@@ -30,40 +30,6 @@ Group 3 - OOPPTT - Class INT2204 4
 
 ---
 
-## UML Diagram
-
-### Class Diagram
-![Class Diagram](docs/uml/class-diagram.png)
-
-_Có thể sử dụng IntelliJ để generate ra Class Diagrams: https://www.youtube.com/watch?v=yCkTqNxZkbY_
-
-*Complete UML diagrams are available in the `docs/uml/` folder*
-
----
-
-## Design Patterns Implementation
-
-_Có dùng hay không và dùng ở đâu_
-
-### 1. Singleton Pattern
-**Used in:** `GameManager`, `AudioManager`, `ResourceLoader`
-
-**Purpose:** Ensure only one instance exists throughout the application.
-
----
-
-## Multithreading Implementation
-_Có dùng hay không và dùng như thế nào_
-
-The game uses multiple threads to ensure smooth performance:
-
-1. **Game Loop Thread**: Updates game logic at 60 FPS
-2. **Rendering Thread**: Handles graphics rendering (EDT for JavaFX Application Thread)
-3. **Audio Thread Pool**: Plays sound effects asynchronously
-4. **I/O Thread**: Handles save/load operations without blocking UI
-
----
-
 ## Installation
 
 1. Clone dự án repository.
@@ -77,8 +43,8 @@ The game uses multiple threads to ensure smooth performance:
 |-----|--------|
 | `←` or `A` | Di chuyển paddle sang trái |
 | `→` or `D` | Di chuyển paddle sang phải |
-| `SPACE` | Bắt đầu di chuyển bóng |
-| `P` or `ESC` | Tạm dừng trò chơi |
+| `SPACE` | Bắt đầu di chuyển bóng, tiếp tục trò chơi |
+| `P` | Tạm dừng trò chơi |
 | `R` | Bắt đầu lại trò chơi |
 | `Q` | Thoát ra menu |
 
@@ -109,21 +75,9 @@ The game uses multiple threads to ensure smooth performance:
 ### Screenshots
 
 **Main Menu**  
-![Main Menu](docs/screenshots/menu.png)
+<img width="1920" height="1080" alt="578434653_1161821988887820_4293047670442813856_n" src="https://github.com/user-attachments/assets/f0b4ba2b-4144-4419-ad06-3524e4cc09ef" />
 
-**Gameplay**  
-![Gameplay](docs/screenshots/gameplay.png)
 
-**Power-ups in Action**  
-![Power-ups](docs/screenshots/powerups.png)
-
-**Leaderboard**  
-![Leaderboard](docs/screenshots/leaderboard.png)
-
-### Video Demo
-[![Video Demo](docs/screenshots/video-thumbnail.png)](docs/demo/gameplay.mp4)
-
-*Full gameplay video is available in `docs/demo/gameplay.mp4`*
 
 ---
 
