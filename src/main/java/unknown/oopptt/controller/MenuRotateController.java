@@ -34,7 +34,7 @@ public class MenuRotateController {
 
     @FXML private ImageView imgLeft, imgCenter, imgRight;
     private String path = new File("src/main/resources/graphic/B1-Pale").toString();
-    private ParallaxBackground bg = new ParallaxBackground(1500, 1000, path);
+    private ParallaxBackground bg = new ParallaxBackground(1900, 1200, path);
 
     private enum Mode { BATTLE, ADVENTURE, HELP }
     // Thứ tự hiển thị: [LEFT, CENTER, RIGHT]

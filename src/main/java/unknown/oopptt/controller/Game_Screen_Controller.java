@@ -2,11 +2,12 @@ package unknown.oopptt.controller;
 
 import javafx.animation.AnimationTimer;
 import javafx.application.Platform;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.geometry.Bounds;
 import javafx.geometry.Pos;
-import javafx.scene.Cursor;
-import javafx.scene.Group;
+import javafx.scene.*;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
@@ -16,6 +17,8 @@ import javafx.scene.layout.Background;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.media.MediaView;
+import javafx.stage.Stage;
+import javafx.stage.Window;
 import unknown.oopptt.api.*;
 import unknown.oopptt.api.ball.Ball;
 import unknown.oopptt.api.ball.PowerBall;
@@ -44,7 +47,7 @@ public class Game_Screen_Controller {
 
     private final List<Brick> gameBricks = new LinkedList<>();
     private Shooter shooter;
-//    private Level level = Level.getInstance();
+    private Level level = Level.getInstance();
     private  BaseGame baseGame;
 
 
@@ -52,8 +55,11 @@ public class Game_Screen_Controller {
     @FXML private MediaView mediaView;
     @FXML private ImageView gameBackground;
     @FXML Label scoreLabel;
+    @FXML Label scoreLabel1;
     @FXML Button btnRestart,btnNext,btnEscape;
-//    @FXML StackPane endGameOverlay;
+    @FXML Button btnRestart1,btnEscape1;
+    @FXML private StackPane endGameOverlay;
+    @FXML StackPane gameOver;
     private Paddle paddleLogic;
     @FXML private Group bgr;
     private String ngusi = new File("src/main/resources/graphic/B3-Pale").toString();
@@ -77,7 +83,7 @@ public class Game_Screen_Controller {
     @FXML
     public void initialize() {
         stack_root.setAlignment(Pos.CENTER);
-        //level.start();
+        level.start();
         preloadAssets();
         stack_root.getChildren().add(0, bg.getRoot());
         stack_root.setAlignment(Pos.CENTER);
@@ -237,6 +243,89 @@ public class Game_Screen_Controller {
             }
         });
     }
+    private void showEndGame() {
+        layout_game.getChildren().remove(paddleLogic.getImageView());
+        for(Ball ball : gameBall){
+            layout_game.getChildren().remove(ball.getImageView());
+        }
+        gameBall.clear();
+        for(Powerup Pu : gamePowerup){
+            layout_game.getChildren().remove(Pu.getImageView());
+        }
+        gamePowerup.clear();
+        scoreLabel1.setText("Your Score: " + 0);
+        gameOver.setVisible(true);
+        btnEscape1.setOnAction(e -> {
+           openHome();
+        });
+
+        btnRestart1.setOnAction(e ->{ restartGame();gameOver.setVisible(false);});
+    }
+
+    @FXML
+    private void openHome() {
+        try {
+            // Load màn hình MenuRotate
+            Parent menuRoot = FXMLLoader.load(getClass().getResource("/unknown/oopptt/MenuRotate.fxml"));
+
+            // Nếu đang nằm trong một Scene: chỉ cần thay root để "xóa" màn hiện tại
+            if (stack_root != null && stack_root.getScene() != null) {
+                stack_root.getScene().setRoot(menuRoot);
+            } else {
+                // Dự phòng: chưa có Scene -> mở Stage mới
+                Stage stage = new Stage();
+                stage.setScene(new Scene(menuRoot));
+                stage.setTitle("Menu");
+                stage.show();
+
+                // Đóng cửa sổ hiện tại nếu đang chạy độc lập
+                closeWindowIfStandalone();
+            }
+        } catch (IOException e) {
+            e.printStackTrace(); // hoặc log ra logger của bạn
+        }
+    }
+    private void closeWindowIfStandalone() {
+        if (stack_root != null && stack_root.getScene() != null) {
+            Window w = stack_root.getScene().getWindow();
+            if (w != null) {
+                w.hide();
+            }
+        }
+    }
+
+    private void showEndGameScreen() {
+        layout_game.getChildren().remove(paddleLogic.getImageView());
+        for(Ball ball : gameBall){
+            layout_game.getChildren().remove(ball.getImageView());
+        }
+        gameBall.clear();
+        for(Powerup Pu : gamePowerup){
+            layout_game.getChildren().remove(Pu.getImageView());
+        }
+        gamePowerup.clear();
+
+        scoreLabel.setText("Your Score: " + 0);
+        endGameOverlay.setVisible(true);
+        btnEscape.setOnAction(e -> System.exit(0));
+        btnRestart.setOnAction(e ->{ restartLevel();endGameOverlay.setVisible(false);});
+        btnNext.setOnAction(e -> {loadNextLevel();endGameOverlay.setVisible(false);});
+    }
+    public void restartGame(){
+        level.start();
+        gameOver.setVisible(false);
+        setBackground(level.getBackground(), level.getMap());
+    }
+    public void loadNextLevel() {
+        endGameOverlay.setVisible(false);
+        level.nextLevel();
+        setBackground(level.getBackground(), level.getMap());
+
+    }
+    public void restartLevel() {
+        endGameOverlay.setVisible(false);
+        setBackground(level.getBackground(),level.getMap());
+    }
 
 
     // ================= gamel==================
@@ -287,6 +376,12 @@ public class Game_Screen_Controller {
                 }
                 if (shooter.getEnabled()) {
                     shooter.tryFire();
+                }
+                if (gameBricks.isEmpty()){
+                    showEndGameScreen();
+                }
+                if( player.getAlive(data.getNamePlayer()) == 0){
+                    showEndGame();
                 }
             }
         };
