@@ -66,6 +66,7 @@ public class Game_Screen_Controller {
     private ImageView gameBackground;
     @FXML
     Label scoreLabel;
+    @FXML Label diem;
     @FXML
     Label scoreLabel1;
     @FXML
@@ -585,6 +586,7 @@ public class Game_Screen_Controller {
 
     private void gameBall(double dt) {
 
+        diem.setText("Score:"+player.getPoints(data.getNamePlayer()));
         if (gameBall.isEmpty()) {
             if (player.getAlive(data.getNamePlayer()) > 0) {
                 Ball newBall = new Ball(paddleLogic.getPos_x(),
