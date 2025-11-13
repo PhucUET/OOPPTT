@@ -9,15 +9,19 @@
 
 <StackPane fx:id="stack_root" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="unknown.oopptt.controller.Game_Screen_Controller">
     <children>
-        <StackPane alignment="TOP_LEFT" prefHeight="150.0" prefWidth="200.0">
-            <children>
-                <Label fx:id="diem" prefWidth="122.0" text="Score:00000" textFill="#07a120">
+      <Pane prefHeight="200.0" prefWidth="200.0">
+         <children>
+                <Label fx:id="diem" prefWidth="122.0" text="Score:00000" textFill="#056914">
                     <font>
                         <Font name="System Bold Italic" size="24.0" />
                     </font>
                 </Label>
-            </children>
-        </StackPane>
+            <Label fx:id="live" layoutY="30.0" text="Live:" textFill="#05511e">
+               <font>
+                  <Font name="System Bold Italic" size="20.0" />
+               </font></Label>
+         </children>
+      </Pane>
         <Pane fx:id="layout_game" maxHeight="640.0" maxWidth="500.0" minHeight="640.0" minWidth="500.0" prefHeight="640.0" prefWidth="500.0" StackPane.alignment="CENTER">
             <children>
                 <Group fx:id="gameGroup">
