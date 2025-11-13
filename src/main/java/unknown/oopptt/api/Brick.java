@@ -26,6 +26,16 @@ public class Brick extends GameEntity {
     private double timeDrop = 0.3;
     private boolean wait = false;
     private int Point = 100;
+    private int typePU;
+
+    public int getTypePU() {
+        return typePU;
+    }
+
+    public void setTypePU(int typePU) {
+        this.typePU = typePU;
+    }
+
     private static String Get_type(int t) {
         String type = "";
         switch (t) {
@@ -74,6 +84,13 @@ public class Brick extends GameEntity {
         super(x + widthBrick/2, y + heightBrick/2, widthBrick, heightBrick, Get_type(t));
         hitPoints = t;
         typeBrick = t;
+    }
+
+    public Brick(double x, double y, int t, int typePU) {
+        super(x + widthBrick/2, y + heightBrick/2, widthBrick, heightBrick, Get_type(t));
+        hitPoints = t;
+        typeBrick = t;
+        this.typePU = typePU;
     }
 
     public Brick(double x, double y, double width, double height , int t) {

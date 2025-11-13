@@ -5,6 +5,7 @@ import javafx.application.Platform;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.Pane;
+import unknown.oopptt.controller.BattleScreenController;
 import unknown.oopptt.controller.Game_Screen_Controller;
 
 import java.io.File;
@@ -28,9 +29,10 @@ public class Powerup  {
     private double width = 40;
     private double height = 20;
     private Game_Screen_Controller controller;
+    private BattleScreenController BTcontroller;
 
     public enum PowerupType {
-        UPBALL(10), UPPADDLE(8), MOREBALL(-1), SLOW(10),
+        MOREBALL(-1),UPBALL(10), UPPADDLE(8), SLOW(10),
         CATCHBALL(10), GUN(8), REDIR(10), ADDHP(-1), SHIELD(-1);
         private final int duration;
         PowerupType(int duration) {
@@ -48,6 +50,10 @@ public class Powerup  {
         PowerupType[] vals = PowerupType.values();
         int i = ThreadLocalRandom.current().nextInt(vals.length);
         return vals[i];
+    }
+    static PowerupType randomUniform(int x) {
+        PowerupType[] vals = PowerupType.values();
+        return vals[x];
     }
 
     public Powerup(double pos_x, double pos_y ) {
@@ -86,6 +92,106 @@ public class Powerup  {
         imageView.setFitHeight(height);
         imageView.setTranslateX(pos_x -  imageView.getFitWidth() / 2);
         imageView.setTranslateY(pos_y -  imageView.getFitHeight() / 2);
+    }
+
+    public Powerup(double pos_x, double pos_y,int typePu) {
+        this.type = randomUniform(typePu);
+        this.pos_x = pos_x;
+        this.pos_y = pos_y;
+        switch (type) {
+            case PowerupType.ADDHP:
+                imageView = new ImageView(new Image(addHp));
+            case PowerupType.UPBALL:
+                imageView = new ImageView(new Image(upballview));
+                break;
+            case PowerupType.UPPADDLE:
+                imageView = new ImageView(new Image(upballview));
+                break;
+            case  PowerupType.MOREBALL:
+                imageView = new ImageView(new Image(upballview));
+                break;
+            case PowerupType.SLOW:
+                imageView = new ImageView(new Image(upballview));
+                break;
+            case PowerupType.CATCHBALL:
+                imageView = new ImageView(new Image(catchBall));
+                break;
+            case PowerupType.GUN:
+                imageView = new ImageView(new Image(upballview));
+                break;
+            case PowerupType.REDIR:
+                imageView = new ImageView(new Image(upballview));
+                break;
+            case PowerupType.SHIELD:
+                imageView = new ImageView(new Image(shield));
+                break;
+        }
+        imageView.setFitWidth(width);
+        imageView.setFitHeight(height);
+        imageView.setTranslateX(pos_x -  imageView.getFitWidth() / 2);
+        imageView.setTranslateY(pos_y -  imageView.getFitHeight() / 2);
+    }
+
+    public void WhenCollison(BattleScreenController controller,boolean player) {
+        this.BTcontroller = controller;
+        if(player) {
+            switch (type) {
+                case PowerupType.UPBALL:
+                    runTimeEffect(type.getDuration(), BTcontroller::upBall1, BTcontroller::resetBall1);
+                    break;
+                case PowerupType.UPPADDLE:
+                    runTimeEffect(type.getDuration(), BTcontroller::upPaddle1, BTcontroller::offUpPaddle1);
+                    break;
+                case PowerupType.MOREBALL:
+                    controller.moreBall1();
+                    break;
+                case PowerupType.SLOW:
+                    runTimeEffect(type.getDuration(), BTcontroller::slowBall1, BTcontroller::resetSlowBall1);
+                    break;
+                case PowerupType.CATCHBALL:
+                    runTimeEffect(type.getDuration(), BTcontroller::catchBall1, BTcontroller::catchBall1);
+                    break;
+                case PowerupType.GUN:
+                    runTimeEffect(type.getDuration(), BTcontroller::enableGun1, BTcontroller::unEnableGun1);
+                    break;
+                case PowerupType.REDIR:
+                    runTimeEffect(type.getDuration(), BTcontroller::setRedirPaddle1, BTcontroller::offRedirPaddle1);
+                    break;
+                case PowerupType.SHIELD:
+                    BTcontroller.setShieldOn1();
+                    break;
+
+            }
+        }
+        else{
+            switch (type) {
+                case PowerupType.UPBALL:
+                    runTimeEffect(type.getDuration(), BTcontroller::upBall2, BTcontroller::resetBall2);
+                    break;
+                case PowerupType.UPPADDLE:
+                    runTimeEffect(type.getDuration(), BTcontroller::upPaddle2, BTcontroller::offUpPaddle2);
+                    break;
+                case PowerupType.MOREBALL:
+                    BTcontroller.moreBall1();
+                    break;
+                case PowerupType.SLOW:
+                    runTimeEffect(type.getDuration(), BTcontroller::slowBall2, BTcontroller::resetSlowBall2);
+                    break;
+                case PowerupType.CATCHBALL:
+                    runTimeEffect(type.getDuration(), BTcontroller::catchBall2, BTcontroller::catchBall2);
+                    break;
+                case PowerupType.GUN:
+                    runTimeEffect(type.getDuration(), BTcontroller::enableGun2, BTcontroller::unEnableGun2);
+                    break;
+                case PowerupType.REDIR:
+                    runTimeEffect(type.getDuration(), BTcontroller::setRedirPaddle2, BTcontroller::offRedirPaddle2);
+                    break;
+                case PowerupType.SHIELD:
+                    BTcontroller.setShieldOn2();
+                    break;
+            }
+        }
+
     }
 
     public Powerup(double pos_x, double pos_y, PowerupType type) {

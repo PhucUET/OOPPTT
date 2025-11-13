@@ -5,6 +5,7 @@ import javafx.scene.image.ImageView;
 import unknown.oopptt.api.ball.Ball;
 import unknown.oopptt.api.enemy.Enemy;
 import unknown.oopptt.api.enemy.TransitEnemy;
+import unknown.oopptt.controller.BattleScreenController;
 import unknown.oopptt.controller.Game_Screen_Controller;
 
 import java.util.List;
@@ -12,13 +13,19 @@ import java.util.concurrent.ThreadLocalRandom;
 
 public class BaseGame {
 
-    private final Game_Screen_Controller controller;
-    private final Data data;
-    private final NowPlay player;
+    private Game_Screen_Controller controller;
+    private BattleScreenController BTcontroller;
+    private  Data data;
+    private NowPlay player;
 
 
     public BaseGame(Game_Screen_Controller controller) {
         this.controller = controller;
+        this.data = controller.getData();
+        this.player = controller.getPlayer();
+    }
+    public BaseGame(BattleScreenController controller) {
+        this.BTcontroller = controller;
         this.data = controller.getData();
         this.player = controller.getPlayer();
     }
@@ -185,6 +192,20 @@ public class BaseGame {
         }
         return false;
     }
+    public boolean paddlePUCollision(Powerup p, Paddle paddlelogic,String keydefine) {
+        if (p.getImageView().getBoundsInParent().intersects(paddlelogic.getImageView().getBoundsInParent())) {
+            if(keydefine.equals("BTS1")) {
+                p.WhenCollison(BTcontroller,true);
+            }
+            if(keydefine.equals("BTS2")) {
+                p.WhenCollison(BTcontroller,false);
+            }
+            return true;
+        }
+        return false;
+
+    }
+
 
     public static int rand1to20() {
         return ThreadLocalRandom.current().nextInt(-20, 21); // [1, 21)
