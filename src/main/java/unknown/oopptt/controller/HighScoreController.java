@@ -7,6 +7,7 @@ import javafx.scene.Scene;
 import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
 import javafx.stage.Window;
+import unknown.oopptt.api.SoundManager;
 
 import java.io.IOException;
 
@@ -15,6 +16,7 @@ public class HighScoreController {
 
     @FXML
     public void handleOut() {
+        SoundManager.playSoundEffect("click.mp3");
         try {
             // Load màn hình MenuRotate
             Parent menuRoot = FXMLLoader.load(

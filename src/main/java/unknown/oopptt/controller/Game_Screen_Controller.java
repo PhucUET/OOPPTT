@@ -328,6 +328,7 @@ public class Game_Screen_Controller {
 
     @FXML
     private void openHome() {
+        SoundManager.playSoundEffect("click.mp3");
         try {
             // Load màn hình MenuRotate
             Parent menuRoot = FXMLLoader.load(getClass().getResource("/unknown/oopptt/MenuRotate.fxml"));
@@ -423,6 +424,7 @@ public class Game_Screen_Controller {
     }
 
     public void loadNextLevel() {
+        SoundManager.playSoundEffect("click.mp3");
         endGameOverlay.setVisible(false);
         level.nextLevel();
         setBackground(level.getBackground(), level.getMap());
@@ -431,6 +433,7 @@ public class Game_Screen_Controller {
     }
 
     public void restartLevel() {
+        SoundManager.playSoundEffect("click.mp3");
         endGameOverlay.setVisible(false);
         setBackground(level.getBackground(), level.getMap());
     }
@@ -494,6 +497,7 @@ public class Game_Screen_Controller {
     }
 
     public void pauseGame() {
+        SoundManager.playSoundEffect("click.mp3");
         if (paused) return;
         paused = true;
 
@@ -520,6 +524,7 @@ public class Game_Screen_Controller {
     }
 
     public void resumeGame() {
+        SoundManager.playSoundEffect("click.mp3");
         paused = false;
         if (gameLoop != null) gameLoop.start();
         // lấy lại focus để nhận phím

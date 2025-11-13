@@ -168,7 +168,7 @@ public class MenuRotateController {
 
     @FXML
     public void onSelectCenter(ActionEvent e) {
-        handleSelect(e);             // gọi khi click nút (có event)
+        handleSelect(e);           // gọi khi click nút (có event)
     }
     public void onSelectCenter() {    // gọi khi nhấn Enter/Space (không event)
         handleSelect(null);

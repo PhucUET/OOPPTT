@@ -11,6 +11,7 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 import unknown.oopptt.api.Data;
+import unknown.oopptt.api.SoundManager;
 
 import java.io.IOException;
 
@@ -31,6 +32,7 @@ public class PauseScreenController {
 
     @FXML
     private void handleContinue() {
+        SoundManager.playSoundEffect("click.mp3");
         if (root == null || root.getScene() == null) { closeWindowIfStandalone(); return; }
         Scene scene = root.getScene();
         Object prev = scene.getProperties().get("previousRoot");
@@ -49,6 +51,7 @@ public class PauseScreenController {
 
     @FXML
     private void openHome() {
+        SoundManager.playSoundEffect("click.mp3");
         try {
             // Load màn hình MenuRotate
             Parent menuRoot = FXMLLoader.load(
@@ -75,6 +78,7 @@ public class PauseScreenController {
 
     @FXML
     private void openNewGame() {
+        SoundManager.playSoundEffect("click.mp3");
         try {
             // Load màn hình game mới
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/unknown/oopptt/GameScreen.fxml"));
