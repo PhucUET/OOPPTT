@@ -33,7 +33,7 @@ public class PauseScreenController {
             previousRoot.requestFocus();
             Object gc = scene.getProperties().get("gameController");
             if (gc instanceof unknown.oopptt.controller.Game_Screen_Controller gsc) {
-               // gsc.resumeGame();
+                gsc.resumeGame();
             }
             return;
         }

@@ -184,13 +184,13 @@ public class MenuRotateController {
 
     private void startAdventure(ActionEvent e) {
         SoundManager.playSoundEffect("click.mp3");
-        switchTo("/unknown/oopptt/GameScreen.fxml", e);
+        switchTo("/unknown/oopptt/GameScreen.fxml", e,true);
         // TODO: load AdventureScreen.fxml và setRoot
     }
 
     private void goBattle(ActionEvent e) {
         SoundManager.playSoundEffect("click.mp3");
-        switchTo("/unknown/oopptt/BattleScreen.fxml", e);
+        switchTo("/unknown/oopptt/BattleScreen.fxml", e,false);
         // TODO: load BattleScreen.fxml và setRoot
     }
 
@@ -230,14 +230,19 @@ public class MenuRotateController {
         Image a = load(primary);
         return a != null ? a : load(fallback);
     }
-    private void switchTo(String fxml, ActionEvent e) {
+    private void switchTo(String fxml, ActionEvent e,boolean first) {
         try {
             FXMLLoader nextFx = new FXMLLoader(getClass().getResource(fxml));
             Parent root = nextFx.load();
             Stage stage = (Stage) ((Node) e.getSource()).getScene().getWindow();
-            Game_Screen_Controller controller = nextFx.getController();
-             stage.getScene().setRoot(root);
-            controller.setData(data);
+            if (first) {
+                Game_Screen_Controller controller = nextFx.getController();
+                stage.getScene().setRoot(root);
+                controller.setData(data);
+            }
+            else{
+                stage.getScene().setRoot(root);
+            }
         } catch (Exception ex) {
             ex.printStackTrace();
         }
