@@ -338,6 +338,7 @@ public class Game_Screen_Controller {
         endGameOverlay.setVisible(false);
         level.nextLevel();
         setBackground(level.getBackground(), level.getMap());
+        bg.reset(level.getBackground());
 
     }
     public void restartLevel() {
@@ -405,8 +406,11 @@ public class Game_Screen_Controller {
                 scene.getProperties().put("previousRoot", scene.getRoot());
                 scene.getProperties().put("gameController", this);
 
-                Parent pauseRoot = FXMLLoader.load(
-                        getClass().getResource("/unknown/oopptt/PauseScreen.fxml"));
+                FXMLLoader fx = new FXMLLoader(getClass().getResource("/unknown/oopptt/PauseScreen.fxml"));
+
+                Parent pauseRoot = fx.load();
+                PauseScreenController controller = fx.getController();
+                controller.setData(data);
                 scene.setRoot(pauseRoot);
             } catch (IOException ex) {
                 ex.printStackTrace();
@@ -435,7 +439,7 @@ public class Game_Screen_Controller {
                     gameBricks.remove(i);
                     if (shouldDrop(0.7)) {
                         Powerup p = new Powerup(
-                                brick.getImageView().getBoundsInParent().getCenterX(), brick.getImageView().getBoundsInParent().getCenterY(), Powerup.PowerupType.GUN);
+                                brick.getImageView().getBoundsInParent().getCenterX(), brick.getImageView().getBoundsInParent().getCenterY());
                         layout_game.getChildren().add(p.getImageView());
                         gamePowerup.add(p);
                     }

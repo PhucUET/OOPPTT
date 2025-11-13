@@ -42,6 +42,35 @@ public class ParallaxBackground extends Pane {
         return (Math.random() * (max - min)) + min;
     }
 
+    public void reset(String folderPath) {
+
+        frames.clear();
+        loadFrames(folderPath);
+        for (Image image : frames) {
+            ImageView imageView = new ImageView(image);
+            ImageView imageView2 = new ImageView(image);
+
+            imageView.setPreserveRatio(false);
+            imageView2.setPreserveRatio(false);
+
+            imageView.setFitWidth(root.getPrefWidth());
+            imageView2.setFitWidth(root.getPrefWidth());
+
+            imageView2.setFitHeight(root.getPrefHeight());
+            imageView.setFitHeight(root.getPrefHeight());
+
+            imageView.setTranslateY(0);
+            imageView2.setTranslateY(-root.getPrefHeight());
+            root.getChildren().add(imageView);
+            root.getChildren().add(imageView2);
+            double speed = random(-20, 20);
+            speeds.add(speed);
+            speeds.add(speed);
+            layers.add(imageView);
+            layers.add(imageView2);
+        }
+    }
+
     public ParallaxBackground(double width, double height, String path) {
         root = new Pane();
         root.setPrefSize(width, height);
