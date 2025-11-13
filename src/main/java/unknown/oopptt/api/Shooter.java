@@ -55,11 +55,11 @@ public class Shooter {
         this.bulletImg = new Image(path);
 
         for (int i = 0 ; i < prewarmPoolSize ; i++){
-            Bullet bullet = new Bullet(new ImageView(bulletImg));
+            Bullet bullet = new Bullet();
             bulletPool.push(bullet);
             bullet.imageView.setVisible(false);
-            bullet.imageView.setFitWidth(BULLET_W * 5);
-            bullet.imageView.setFitHeight(BULLET_H * 5);
+            bullet.imageView.setFitWidth(BULLET_W );
+            bullet.imageView.setFitHeight(BULLET_H);
             bullet.imageView.setPreserveRatio(false);
             game_Layout.getChildren().add(bullet.imageView);
         }
@@ -104,22 +104,28 @@ public class Shooter {
                     it.remove();
                     continue;
                 }
-                bullet.y +=  dtsecond * BULLET_SPEED ;
+                bullet.y +=  dtsecond * bullet.vy ;
 
                 bullet.animation.update(dtsecond);
-                bullet.imageView.setTranslateY(bullet.y - BULLET_H * 5 /2);
+                bullet.imageView.setTranslateY(bullet.y - BULLET_H /2);
 
-
-                System.out.println(bullet.imageView.getTranslateX() + " " + bullet.imageView.getTranslateY());
-
-                if (bullet.y == 0) {
+                if (bullet.y <= -BULLET_H) {
                     recycle(it, bullet);
                     continue;
                 }
 
                 for (int i = bricks.size() - 1; i >= 0; i--){
                     Brick brick = bricks.get(i);
-                    if (brick.getImageView().getBoundsInParent().intersects(bullet.imageView.getBoundsInParent())){
+                    Bounds en = bullet.imageView.getBoundsInParent();
+                    Bounds bReduced = new javafx.geometry.BoundingBox(
+                            en.getMinX() + 20, en.getMinY() + 20,
+                            en.getWidth() - 40, en.getHeight() - 40);
+
+                    Bounds eu = brick.getImageView().getBoundsInParent();
+                    Bounds eReduced = new javafx.geometry.BoundingBox(
+                            eu.getMinX() + 20, eu.getMinY() + 20,
+                            eu.getWidth() - 40, eu.getHeight() - 40);
+                    if (eReduced.intersects(bReduced)){
                         if (!brick.hit()) {
                             game_Layout.getChildren().remove(brick.imageView);
                             bricks.remove(brick);
@@ -232,8 +238,8 @@ public class Shooter {
         double py =  paddleView.getBoundsInParent().getMinY();
         System.out.println(leftX + " " + rightX);
         Bullet  lBullet = getBullet();
-        lBullet.x = leftX - BULLET_W * 5/2.0;
-        lBullet.y = py - BULLET_H * 5/2.0;
+        lBullet.x = leftX - BULLET_W /2.0;
+        lBullet.y = py - BULLET_H /2.0;
         lBullet.vy = -BULLET_SPEED;
         lBullet.imageView.setTranslateX(lBullet.x);
         lBullet.imageView.setTranslateY(lBullet.y);
@@ -242,8 +248,8 @@ public class Shooter {
         active.add(lBullet);
 
         Bullet rBullet = getBullet();
-        rBullet.x = rightX - BULLET_W * 5/2.0;
-        rBullet.y = py - BULLET_H * 5/2.0;
+        rBullet.x = rightX - BULLET_W /2.0;
+        rBullet.y = py - BULLET_H /2.0;
         rBullet.vy = -BULLET_SPEED;
         rBullet.imageView.setTranslateX(rBullet.x);
         rBullet.imageView.setTranslateY(rBullet.y);
