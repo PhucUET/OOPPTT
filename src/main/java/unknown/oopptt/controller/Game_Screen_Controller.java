@@ -54,34 +54,45 @@ public class Game_Screen_Controller {
 
     private final List<Brick> gameBricks = new LinkedList<>();
     private Shooter shooter;
-//    private Level level = Level.getInstance();
-    private  BaseGame baseGame;
+    //    private Level level = Level.getInstance();
+    private BaseGame baseGame;
 
 
-    @FXML private StackPane stack_root;
-    @FXML private MediaView mediaView;
-    @FXML private ImageView gameBackground;
-    @FXML Label scoreLabel;
-    @FXML Label scoreLabel1;
-    @FXML Button btnRestart,btnNext,btnEscape;
-    @FXML Button btnRestart1,btnEscape1;
-    @FXML private StackPane endGameOverlay;
-    @FXML StackPane gameOver;
+    @FXML
+    private StackPane stack_root;
+    @FXML
+    private MediaView mediaView;
+    @FXML
+    private ImageView gameBackground;
+    @FXML
+    Label scoreLabel;
+    @FXML
+    Label scoreLabel1;
+    @FXML
+    Button btnRestart, btnNext, btnEscape;
+    @FXML
+    Button btnRestart1, btnEscape1;
+    @FXML
+    private StackPane endGameOverlay;
+    @FXML
+    StackPane gameOver;
     private Paddle paddleLogic;
-    @FXML private Group bgr;
+    @FXML
+    private Group bgr;
     private String ngusi = new File("src/main/resources/graphic/B3-Pale").toString();
     private final List<Ball> gameBall = new ArrayList<>();
-    private final List<Enemy> gameEnemies =  new ArrayList<>();
+    private final List<Enemy> gameEnemies = new ArrayList<>();
     private final List<Powerup> gamePowerup = new ArrayList<>();
     private PowerBall powerBall;
     private SpecialPaddle specialPaddle;
-    private ParallaxBackground bg = new ParallaxBackground(500,640, ngusi) ;
+    private ParallaxBackground bg = new ParallaxBackground(500, 640, ngusi);
     private Sheild shield;
     private NowPlay player = new NowPlay();
     private Data data = new Data();
     private Level level = Level.getInstance();
 
-    @FXML Pane layout_game;
+    @FXML
+    Pane layout_game;
 
     private boolean isCatch = false;
 
@@ -95,7 +106,7 @@ public class Game_Screen_Controller {
         preloadAssets();
         stack_root.getChildren().add(0, bg.getRoot());
         stack_root.setAlignment(Pos.CENTER);
-        setBackground(BG_IMAGE_PATH,MAP_FILE);
+        setBackground(BG_IMAGE_PATH, MAP_FILE);
         ListenEventHandle();
         startGameloop();
     }
@@ -134,24 +145,24 @@ public class Game_Screen_Controller {
         //gameBackground.setImage(new Image(backgroundPath));
 
 //        if(endGameOverlay.isVisible() == false) {
-            paddleLogic = new Paddle(gameBackground.getBoundsInParent().getCenterX(),
-                    gameBackground.getBoundsInParent().getMaxY() - 40, gameBackground);
+        paddleLogic = new Paddle(gameBackground.getBoundsInParent().getCenterX(),
+                gameBackground.getBoundsInParent().getMaxY() - 40, gameBackground);
 
-            layout_game.getChildren().add(paddleLogic.getImageView());
-            specialPaddle = new SpecialPaddle(paddleLogic);
+        layout_game.getChildren().add(paddleLogic.getImageView());
+        specialPaddle = new SpecialPaddle(paddleLogic);
 
-            Ball first_ball = new Ball(paddleLogic.getPos_x(),
-                    paddleLogic.getPos_y() - 5, 0.3, 0, layout_game);
+        Ball first_ball = new Ball(paddleLogic.getPos_x(),
+                paddleLogic.getPos_y() - 5, 0.3, 0, layout_game);
 
-            gameBall.add(first_ball);
+        gameBall.add(first_ball);
 
-            layout_game.getChildren().add(first_ball.getImageView());
-            powerBall = new PowerBall(gameBall);
+        layout_game.getChildren().add(first_ball.getImageView());
+        powerBall = new PowerBall(gameBall);
 
-            shooter = new Shooter(200, 3, 60, 60, layout_game, paddleLogic.getImageView(), 20);
+        shooter = new Shooter(200, 3, 60, 60, layout_game, paddleLogic.getImageView(), 20);
 
-            shield = new Sheild(layout_game);
-            upMap(MAP_FILE);
+        shield = new Sheild(layout_game);
+        upMap(MAP_FILE);
 
 
 //            Platform.runLater(() -> {
@@ -160,7 +171,7 @@ public class Game_Screen_Controller {
 //                layout_game.getChildren().add(bossEnemy.getImageView());
 //            });
 
-      //  }
+        //  }
     }
 
     private void upMap(File MAP_FILE) {
@@ -190,9 +201,13 @@ public class Game_Screen_Controller {
                         int newY = startY + row[0] * BRICK_CELL_H;
                         Enemy new_Enemy = null;
                         switch (type) {
-                            case 1: break;
-                            case 2: break;
-                            case 0: new_Enemy = new ShooterEnemy(newX, newY, 30, 30, layout_game, paddleLogic.getImageView(), paddleLogic); break;
+                            case 0:
+                                new_Enemy = new BasicEnemy(newX, newY, 30, 30);
+                            case 2:
+                                new_Enemy = new BossEnemy(newX, newY, 40, 40, 60, paddleLogic, this, layout_game);
+                            case 1:
+                                new_Enemy = new ShooterEnemy(newX, newY, 30, 30, layout_game, paddleLogic.getImageView(), paddleLogic);
+                                break;
                             default:
                                 throw new IllegalStateException("Unexpected value: " + type);
                         }
@@ -227,18 +242,19 @@ public class Game_Screen_Controller {
 
     private void onKeyPressed(KeyEvent e) {
         switch (e.getCode()) {
-            case A, LEFT  -> paddleLogic.setLeftHeld(true);
+            case A, LEFT -> paddleLogic.setLeftHeld(true);
             case D, RIGHT -> paddleLogic.setRightHeld(true);
-            case SHIFT    -> paddleLogic.setMoveSpeed(600);
-            case SPACE    -> setBallmove();
-            case P        -> pauseGame();
+            case SHIFT -> paddleLogic.setMoveSpeed(600);
+            case SPACE -> setBallmove();
+            case P -> pauseGame();
         }
     }
+
     private void onKeyReleased(KeyEvent e) {
         switch (e.getCode()) {
-            case A, LEFT  -> paddleLogic.setLeftHeld(false);
+            case A, LEFT -> paddleLogic.setLeftHeld(false);
             case D, RIGHT -> paddleLogic.setRightHeld(false);
-            case SHIFT    -> paddleLogic.setMoveSpeed(500);
+            case SHIFT -> paddleLogic.setMoveSpeed(500);
         }
     }
 
@@ -255,14 +271,14 @@ public class Game_Screen_Controller {
 
     private void showEndGame() {
         layout_game.getChildren().remove(paddleLogic.getImageView());
-        for(Ball ball : gameBall){
+        for (Ball ball : gameBall) {
             layout_game.getChildren().remove(ball.getImageView());
         }
         gameBall.clear();
-        for(Powerup Pu : gamePowerup){
+        for (Powerup Pu : gamePowerup) {
             layout_game.getChildren().remove(Pu.getImageView());
         }
-        for(Brick brick : gameBricks){
+        for (Brick brick : gameBricks) {
             layout_game.getChildren().remove(brick.getImageView());
         }
         gameBricks.clear();
@@ -273,7 +289,10 @@ public class Game_Screen_Controller {
             openHome();
         });
 
-        btnRestart1.setOnAction(e ->{ restartGame();gameOver.setVisible(false);});
+        btnRestart1.setOnAction(e -> {
+            restartGame();
+            gameOver.setVisible(false);
+        });
     }
 
     @FXML
@@ -299,6 +318,7 @@ public class Game_Screen_Controller {
             e.printStackTrace(); // hoặc log ra logger của bạn
         }
     }
+
     private void closeWindowIfStandalone() {
         if (stack_root != null && stack_root.getScene() != null) {
             Window w = stack_root.getScene().getWindow();
@@ -310,15 +330,15 @@ public class Game_Screen_Controller {
 
     private void showEndGameScreen() {
         layout_game.getChildren().remove(paddleLogic.getImageView());
-        for(Ball ball : gameBall){
+        for (Ball ball : gameBall) {
             layout_game.getChildren().remove(ball.getImageView());
         }
         gameBall.clear();
-        for(Brick brick : gameBricks){
+        for (Brick brick : gameBricks) {
             layout_game.getChildren().remove(brick.getImageView());
         }
         gameBricks.clear();
-        for(Powerup Pu : gamePowerup){
+        for (Powerup Pu : gamePowerup) {
             layout_game.getChildren().remove(Pu.getImageView());
         }
         gamePowerup.clear();
@@ -326,14 +346,22 @@ public class Game_Screen_Controller {
         scoreLabel.setText("Your Score: " + 0);
         endGameOverlay.setVisible(true);
         btnEscape.setOnAction(e -> System.exit(0));
-        btnRestart.setOnAction(e ->{ restartLevel();endGameOverlay.setVisible(false);});
-        btnNext.setOnAction(e -> {loadNextLevel();endGameOverlay.setVisible(false);});
+        btnRestart.setOnAction(e -> {
+            restartLevel();
+            endGameOverlay.setVisible(false);
+        });
+        btnNext.setOnAction(e -> {
+            loadNextLevel();
+            endGameOverlay.setVisible(false);
+        });
     }
-    public void restartGame(){
+
+    public void restartGame() {
         gameOver.setVisible(false);
         level.start();
         setBackground(level.getBackground(), level.getMap());
     }
+
     public void loadNextLevel() {
         endGameOverlay.setVisible(false);
         level.nextLevel();
@@ -341,16 +369,16 @@ public class Game_Screen_Controller {
         bg.reset(level.getBackground());
 
     }
+
     public void restartLevel() {
         endGameOverlay.setVisible(false);
-        setBackground(level.getBackground(),level.getMap());
+        setBackground(level.getBackground(), level.getMap());
     }
-
 
 
     // ================= gamel==================
     private static final double TARGET_FPS = 60;
-    private static final  double STEP = 1.0/TARGET_FPS;
+    private static final double STEP = 1.0 / TARGET_FPS;
 
     private AnimationTimer gameLoop;
     private boolean paused = false;
@@ -364,7 +392,10 @@ public class Game_Screen_Controller {
             public void handle(long now) {
                 if (paused) return; // nếu đang pause thì bỏ qua cập nhật
 
-                if (lastTime == 0L) { lastTime = now; return; }
+                if (lastTime == 0L) {
+                    lastTime = now;
+                    return;
+                }
                 double dt = (now - lastTime) / 1e9;
                 if (dt > 0.25) dt = 0.25;
                 lastTime = now;
@@ -383,10 +414,10 @@ public class Game_Screen_Controller {
                 }
                 if (shooter.getEnabled()) shooter.tryFire();
                 if (gameBricks.isEmpty()) showEndGameScreen();
-                if (gameBricks.isEmpty() &&  player.getAlive(data.getNamePlayer()) > 0){
+                if (gameBricks.isEmpty() && player.getAlive(data.getNamePlayer()) > 0) {
                     showEndGameScreen();
                 }
-                if( player.getAlive(data.getNamePlayer()) == 0){
+                if (player.getAlive(data.getNamePlayer()) == 0) {
                     showEndGame();
                 }
             }
@@ -430,6 +461,7 @@ public class Game_Screen_Controller {
     private static double clamp(double v, double lo, double hi) {
         return (v < lo) ? lo : (v > hi) ? hi : v;
     }
+
     private void gameBricksUp(double dt) {
         for (int i = gameBricks.size() - 1; i >= 0; i--) {
             Brick brick = gameBricks.get(i);
@@ -468,7 +500,7 @@ public class Game_Screen_Controller {
                     layout_game.getChildren().remove(enemy.getImageView());
                     gameEnemies.remove(i);
                 }
-                BasicEnemy  basicEnemy = (BasicEnemy) enemy;
+                BasicEnemy basicEnemy = (BasicEnemy) enemy;
                 basicEnemy.update(dt);
             }
 
@@ -520,7 +552,7 @@ public class Game_Screen_Controller {
 
             baseGame.brickCollision(ballLogic, gameBricks);
             baseGame.paddleballCollision(ballLogic, paddleLogic, isCatch);
-            baseGame.enemyCollision(ballLogic,gameEnemies);
+            baseGame.enemyCollision(ballLogic, gameEnemies);
             baseGame.wallCollision(ballLogic, gameBackground);
 
             ballLogic.update(dt);
@@ -544,6 +576,7 @@ public class Game_Screen_Controller {
             pu.movedown(dt);
         }
     }
+
     private boolean shouldDrop(double probability) {
         return ThreadLocalRandom.current().nextDouble() < probability;
     }
@@ -560,63 +593,99 @@ public class Game_Screen_Controller {
         return data;
     }
 
-    public void upBall()             { powerBall.upBall(); }
-    public void resetBall()          { powerBall.downBall(); }
-    public void slowBall()           { powerBall.slowBall(); }
-    public void resetSlowBall()      { powerBall.normalBall(); }
-    public void moreBall()           { powerBall.moreBall(layout_game); }
+    public void upBall() {
+        powerBall.upBall();
+    }
+
+    public void resetBall() {
+        powerBall.downBall();
+    }
+
+    public void slowBall() {
+        powerBall.slowBall();
+    }
+
+    public void resetSlowBall() {
+        powerBall.normalBall();
+    }
+
+    public void moreBall() {
+        powerBall.moreBall(layout_game);
+    }
 
     public void upPaddle() {
-        if (paddleLogic.getWidth() * 2 <= gameBackground.getBoundsInParent().getWidth() / 2.0)  {
+        if (paddleLogic.getWidth() * 2 <= gameBackground.getBoundsInParent().getWidth() / 2.0) {
             specialPaddle.setBig();
         }
     }
 
-    public void offUpPaddle()        {
+    public void offUpPaddle() {
         specialPaddle.setNormalSize();
         for (Ball balLogic : gameBall) {
-            balLogic.setOffsetOnPaddle(balLogic.getOffsetOnPaddle()/2);
+            balLogic.setOffsetOnPaddle(balLogic.getOffsetOnPaddle() / 2);
         }
     }
-    public void slowPaddle()        {
+
+    public void slowPaddle() {
         specialPaddle.setSlow();
     }
-    public void offslowPaddle()        {
+
+    public void offslowPaddle() {
         specialPaddle.setNormalSpeed();
     }
+
     public void downPaddle() {
         specialPaddle.setSmall();
     }
-    public void offdownPaddle()    {
+
+    public void offdownPaddle() {
         specialPaddle.setNormalSize();
     }
-    public void fastPaddle()        {
+
+    public void fastPaddle() {
         specialPaddle.setFast();
     }
+
     public void createMinions() {
 
     }
+
     public void setCreateMinions() {
         isSpam = true;
     }
-    public  void setOffCreateMinions() {
+
+    public void setOffCreateMinions() {
         isSpam = false;
     }
+
     public void setRedirPaddle() {
         specialPaddle.setRedir(true);
     }
+
     public void offRedirPaddle() {
         specialPaddle.setRedir(false);
     }
+
     public void createFakePU() {
-        Powerup newPU = new Powerup(gameBackground.getBoundsInParent().getCenterX()/2,0, Powerup.PowerupType.REDIR);
+        Powerup newPU = new Powerup(gameBackground.getBoundsInParent().getCenterX() / 2, 0, Powerup.PowerupType.REDIR);
     }
-    public void catchBall()          { isCatch = !isCatch; }
-    public void enableGun()          { shooter.setEnabled(true); }
-    public void unEnableGun()        { shooter.setEnabled(false); }
-    public void setShieldOn()        {
+
+    public void catchBall() {
+        isCatch = !isCatch;
+    }
+
+    public void enableGun() {
+        shooter.setEnabled(true);
+    }
+
+    public void unEnableGun() {
+        shooter.setEnabled(false);
+    }
+
+    public void setShieldOn() {
         shield.setOpenShield(true);
     }
+
     public void upHp() {
         player.addLive(data.getNamePlayer());
     }

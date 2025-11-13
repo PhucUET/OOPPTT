@@ -4,7 +4,7 @@ import javafx.scene.image.ImageView;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 
-public  class FireSpark {
+public class FireSpark {
     final Circle node;
     double vx, vy, life = 1.0;
 

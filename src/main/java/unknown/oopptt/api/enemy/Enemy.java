@@ -30,18 +30,45 @@ public abstract class Enemy extends GameEntity {
         return isDead() ? point : 0;
     }
 
-    public boolean isDead() { return hp <= 0; }
-    public void healFull() { hp = maxHp; }
+    public boolean isDead() {
+        return hp <= 0;
+    }
 
-    public double getSpeedX() { return speedX; }
-    public void setSpeedX(double speedX) { this.speedX = speedX; }
-    public double getSpeedY() { return speedY; }
-    public void setSpeedY(double speedY) { this.speedY = speedY; }
+    public void healFull() {
+        hp = maxHp;
+    }
 
-    public int getPoint() { return point; }
-    public void setPoint(int point) { this.point = Math.max(0, point); }
-    public int getHp() { return hp; }
-    public int getMaxHp() { return maxHp; }
+    public double getSpeedX() {
+        return speedX;
+    }
+
+    public void setSpeedX(double speedX) {
+        this.speedX = speedX;
+    }
+
+    public double getSpeedY() {
+        return speedY;
+    }
+
+    public void setSpeedY(double speedY) {
+        this.speedY = speedY;
+    }
+
+    public int getPoint() {
+        return point;
+    }
+
+    public void setPoint(int point) {
+        this.point = Math.max(0, point);
+    }
+
+    public int getHp() {
+        return hp;
+    }
+
+    public int getMaxHp() {
+        return maxHp;
+    }
 
     @Override
     public abstract void update(double dt);

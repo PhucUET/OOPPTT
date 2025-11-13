@@ -16,7 +16,7 @@ public class Paddle extends GameEntity {
     private ImageView backgroundGame;
     // Kích thước mặc định
     private static final int DEFAULT_WIDTH = 120;
-    private static final int DEFAULT_HEIGHT = 50 ;
+    private static final int DEFAULT_HEIGHT = 50;
 
     private Boolean leftHeld = false;
     private Boolean rightHeld = false;
@@ -40,6 +40,7 @@ public class Paddle extends GameEntity {
     private static double clamp(double v, double lo, double hi) {
         return (v < lo) ? lo : (v > hi) ? hi : v;
     }
+
     @Override
     public void update(double dt) {
         double transit = 0;
@@ -49,14 +50,14 @@ public class Paddle extends GameEntity {
         if (rightHeld) {
             transit = 1;
         }
-        this.pos_x = this.pos_x + dt *  moveSpeed * transit * redir;
-        if (this.pos_x <= backgroundGame.getBoundsInParent().getMinX() +  this.width/2
-                || this.pos_x >=  backgroundGame.getBoundsInParent().getMaxX()  - this.width/2) {
-            this.pos_x = clamp(this.pos_x, backgroundGame.getBoundsInParent().getMinX() + this.width/2,
-                    backgroundGame.getBoundsInParent().getMaxX() - this.width/2);
+        this.pos_x = this.pos_x + dt * moveSpeed * transit * redir;
+        if (this.pos_x <= backgroundGame.getBoundsInParent().getMinX() + this.width / 2
+                || this.pos_x >= backgroundGame.getBoundsInParent().getMaxX() - this.width / 2) {
+            this.pos_x = clamp(this.pos_x, backgroundGame.getBoundsInParent().getMinX() + this.width / 2,
+                    backgroundGame.getBoundsInParent().getMaxX() - this.width / 2);
         }
-        imageView.setTranslateX(this.pos_x - this.width/2);
-        imageView.setTranslateY(this.pos_y - this.height/2);
+        imageView.setTranslateX(this.pos_x - this.width / 2);
+        imageView.setTranslateY(this.pos_y - this.height / 2);
 
         this.updateAnimation(dt);
     }
@@ -65,7 +66,7 @@ public class Paddle extends GameEntity {
     public void changeSize(double newSize) {
         this.width = newSize;
         imageView.setFitWidth(width);
-        imageView.setTranslateX(pos_x - width/2);
+        imageView.setTranslateX(pos_x - width / 2);
 
     }
 
@@ -77,13 +78,13 @@ public class Paddle extends GameEntity {
     @Override
     public void setLocation(double v, double dt) {
         this.pos_x = v;
-        this.imageView.setTranslateX(this.pos_x - this.width/2);
+        this.imageView.setTranslateX(this.pos_x - this.width / 2);
         updateAnimation(dt);
     }
 
 
     public Pair<Double, Double> getPosition() {
-        return new Pair<>(this.pos_x - this.width/2, this.pos_y - this.height/2);
+        return new Pair<>(this.pos_x - this.width / 2, this.pos_y - this.height / 2);
     }
 
     public Boolean getRightHeld() {

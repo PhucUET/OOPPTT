@@ -87,6 +87,7 @@ public class Data extends Manage {
             return "ERROR";
         }
     }
+
     private String namePlayer = null;
 
     //dang nhap
@@ -104,7 +105,7 @@ public class Data extends Manage {
             String response = reader.readLine();
             reader.close();
 
-            if (response.contains("LOGIN_OK"))  {
+            if (response.contains("LOGIN_OK")) {
                 namePlayer = username;
                 return "LOGIN_OK";
             }
@@ -207,8 +208,13 @@ public class Data extends Manage {
             this.highscore = highscore;
         }
 
-        public String getName() { return name; }
-        public int getHighscore() { return highscore; }
+        public String getName() {
+            return name;
+        }
+
+        public int getHighscore() {
+            return highscore;
+        }
     }
 
     /**

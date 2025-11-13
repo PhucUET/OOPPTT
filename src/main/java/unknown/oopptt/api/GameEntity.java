@@ -23,20 +23,22 @@ public abstract class GameEntity {
     protected double width;
     protected double height;
     private static String superBall = new File("src/main/resources/graphic/Slime2_Attack_with_shadow.png").toURI().toString();
-    private  SpriteAnimation animation;
+    private SpriteAnimation animation;
+
     /**
      * Constructor của GameEntity.
-     * @param x Tọa độ X ban đầu.
-     * @param y Tọa độ Y ban đầu.
-     * @param width Chiều rộng của đối tượng.
+     *
+     * @param x      Tọa độ X ban đầu.
+     * @param y      Tọa độ Y ban đầu.
+     * @param width  Chiều rộng của đối tượng.
      * @param height Chiều cao của đối tượng.
      */
     public GameEntity(double x, double y, double width, double height, String path) {
-        animation = new SpriteAnimation(path, 10 );
+        animation = new SpriteAnimation(path, 10);
         animation.setDisplaySize(width, height);
         this.imageView = animation.getView();
-        this.imageView.setTranslateX(x - width/2);
-        this.imageView.setTranslateY(y -  height/2);
+        this.imageView.setTranslateX(x - width / 2);
+        this.imageView.setTranslateY(y - height / 2);
         this.imageView.setFitWidth(width);
         this.imageView.setFitHeight(height);
 
@@ -47,7 +49,7 @@ public abstract class GameEntity {
     }
 
     public void setAnimation(String newpath) {
-       animation.changeFrames(newpath);
+        animation.changeFrames(newpath);
     }
 
     public ImageView getImageView() {
@@ -63,13 +65,21 @@ public abstract class GameEntity {
 
     public abstract void setLocation(double v, double dt);
 
-    public double getPos_x() {return pos_x;}
+    public double getPos_x() {
+        return pos_x;
+    }
 
-    public double getPos_y() {return pos_y;}
+    public double getPos_y() {
+        return pos_y;
+    }
 
-    public double getWidth() {return width;}
+    public double getWidth() {
+        return width;
+    }
 
-    public double getHeight() {return height;}
+    public double getHeight() {
+        return height;
+    }
 }
 
 

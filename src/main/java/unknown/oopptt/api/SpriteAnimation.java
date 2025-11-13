@@ -68,6 +68,7 @@ public class SpriteAnimation {
             view.setImage(frames.get(currentFrame));
         }
     }
+
     public void updateWhenHit() {
         if (frames.isEmpty()) return;
         currentFrame = (currentFrame + 1) % frames.size();

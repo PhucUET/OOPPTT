@@ -13,18 +13,19 @@ public class Sheild {
     private Pane layout_game;
     private ImageView imageView;
     private double durantion = 10.0;
+
     public Sheild(Pane layout_game) {
         this.layout_game = layout_game;
         imageView = new ImageView(new Image(path));
         imageView.setFitHeight(5);
         imageView.setFitWidth(layout_game.getWidth());
         imageView.setTranslateX(0);
-        imageView.setTranslateY(layout_game.getHeight());
+        imageView.setTranslateY(layout_game.getHeight() - 10);
         imageView.setVisible(false);
         layout_game.getChildren().add(imageView);
     }
 
-     public void setOpenShield(boolean isOpen) {
+    public void setOpenShield(boolean isOpen) {
         if (isOpen) {
             return;
         }
@@ -32,6 +33,7 @@ public class Sheild {
         this.isActive = isOpen;
         durantion = 10;
     }
+
     public void update(double dt) {
         if (durantion <= 0) {
             this.isActive = false;

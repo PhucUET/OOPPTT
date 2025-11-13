@@ -20,7 +20,7 @@ public class Brick extends GameEntity {
     private int hitPoints = 1;
     protected String powerupType; // Loại PowerUp (ví dụ: "EXPAND", "MULTI_BALL"), null nếu không có
     private final static int widthBrick = 50;
-    private final static int heightBrick = 23 ;
+    private final static int heightBrick = 23;
     private int typeBrick = 0;
     private final ArrayList<Integer> pointList = new ArrayList<Integer>(Arrays.asList(50, 100, 150, 200));
     private double timeDrop = 0.3;
@@ -81,20 +81,20 @@ public class Brick extends GameEntity {
     }
 
     public Brick(double x, double y, int t) {
-        super(x + widthBrick/2, y + heightBrick/2, widthBrick, heightBrick, Get_type(t));
+        super(x + widthBrick / 2, y + heightBrick / 2, widthBrick, heightBrick, Get_type(t));
         hitPoints = t;
         typeBrick = t;
     }
 
     public Brick(double x, double y, int t, int typePU) {
-        super(x + widthBrick/2, y + heightBrick/2, widthBrick, heightBrick, Get_type(t));
+        super(x + widthBrick / 2, y + heightBrick / 2, widthBrick, heightBrick, Get_type(t));
         hitPoints = t;
         typeBrick = t;
         this.typePU = typePU;
     }
 
-    public Brick(double x, double y, double width, double height , int t) {
-        super(x + width/2, y + height/2 , width, height, Get_type(t));
+    public Brick(double x, double y, double width, double height, int t) {
+        super(x + width / 2, y + height / 2, width, height, Get_type(t));
         hitPoints = t;
         typeBrick = t;
     }
@@ -115,12 +115,13 @@ public class Brick extends GameEntity {
         }
         return true;
     }
+
     /**
      * Xử lý khi gạch bị bóng chạm.
+     *
      * @return Loại PowerUp nếu gạch bị phá, ngược lại trả về null.
      */
     //public abstract boolean hit();
-
     @Override
     public void update(double dt) {
 

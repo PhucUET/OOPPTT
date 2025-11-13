@@ -24,7 +24,7 @@ public class BossEnemy extends Enemy {
     private double targetX;
     private double targetY;
 
-    private  Paddle paddleLogic;
+    private Paddle paddleLogic;
     private final Game_Screen_Controller controller;
     private Pane layout_game;
     private Shooter shooter;
@@ -36,7 +36,7 @@ public class BossEnemy extends Enemy {
 
     public BossEnemy(double x, double y, double height, double width, int health,
                      Paddle paddleLogic, Game_Screen_Controller controller, Pane layout_game) {
-        super(x,y,height,width,path,30,30,health, Point);
+        super(x, y, height, width, path, 30, 30, health, Point);
         this.paddleLogic = java.util.Objects.requireNonNull(paddleLogic, "paddleLogic is null");
         this.controller = controller;
         this.layout_game = layout_game;
@@ -52,6 +52,7 @@ public class BossEnemy extends Enemy {
     public enum BOSSEFECT {
         SLOWPADDLE(3), THINPADDLE(4), FAKEPU(-1), MINIONS(3);
         private final int duration;
+
         BOSSEFECT(int duration) {
             this.duration = duration;
         }
@@ -59,15 +60,17 @@ public class BossEnemy extends Enemy {
         public int getDuration() {
             return duration;
         }
+
         public boolean haveDuration() {
             return duration > 0;
-    }
+        }
 
     }
 
     public static int random1to2() {
         return ThreadLocalRandom.current().nextInt(1, 2); // 1.0 <= x < 2.0
     }
+
     public static double random1to3() {
         return ThreadLocalRandom.current().nextDouble(1, 2); // 1.0 <= x < 2.0
     }
@@ -75,6 +78,7 @@ public class BossEnemy extends Enemy {
     private boolean shouldDrop(double probability) {
         return ThreadLocalRandom.current().nextDouble() < probability;
     }
+
     @Override
     public void update(double dt) {
         double dx = targetX - this.pos_x;
@@ -126,7 +130,8 @@ public class BossEnemy extends Enemy {
             Platform.runLater((startEffect));
             try {
                 Thread.sleep(duration * 1000L);
-            } catch (InterruptedException e) {}
+            } catch (InterruptedException e) {
+            }
             Platform.runLater(endEffect);
         }).start();
     }
@@ -139,10 +144,18 @@ public class BossEnemy extends Enemy {
 
     private void setEffect(BOSSEFECT id) {
         switch (id) {
-            case BOSSEFECT.FAKEPU: controller.createFakePU();break;
-            case BOSSEFECT.SLOWPADDLE:runTimeEffect(id.duration,controller::slowPaddle,controller::offslowPaddle);break;
-            case BOSSEFECT.THINPADDLE:runTimeEffect(id.duration,controller::downPaddle,controller::offdownPaddle);break;
-            case BOSSEFECT.MINIONS:runTimeEffect(id.duration,controller::setCreateMinions, controller::setOffCreateMinions);break;
+            case BOSSEFECT.FAKEPU:
+                controller.createFakePU();
+                break;
+            case BOSSEFECT.SLOWPADDLE:
+                runTimeEffect(id.duration, controller::slowPaddle, controller::offslowPaddle);
+                break;
+            case BOSSEFECT.THINPADDLE:
+                runTimeEffect(id.duration, controller::downPaddle, controller::offdownPaddle);
+                break;
+            case BOSSEFECT.MINIONS:
+                runTimeEffect(id.duration, controller::setCreateMinions, controller::setOffCreateMinions);
+                break;
         }
     }
 

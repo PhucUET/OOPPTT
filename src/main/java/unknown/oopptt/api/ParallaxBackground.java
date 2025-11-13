@@ -18,7 +18,7 @@ public class ParallaxBackground extends Pane {
 
     //private String path = new File("src/main/resources/graphic/B1-Pale").toString();
 
-    private Pane  root;
+    private Pane root;
 
     private void loadFrames(String folderPath) {
         File folder = new File(folderPath);
@@ -38,6 +38,7 @@ public class ParallaxBackground extends Pane {
 
         System.out.println("✅ Loaded " + frames.size() + " frames from " + folderPath);
     }
+
     private double random(double min, double max) {
         return (Math.random() * (max - min)) + min;
     }
@@ -74,8 +75,8 @@ public class ParallaxBackground extends Pane {
     public ParallaxBackground(double width, double height, String path) {
         root = new Pane();
         root.setPrefSize(width, height);
-        root.setMaxSize(width,height);
-        root.setMinSize(width,height);
+        root.setMaxSize(width, height);
+        root.setMinSize(width, height);
         root.setPickOnBounds(true);
         Rectangle rect = new Rectangle(width, height);
         root.setClip(rect);
@@ -106,8 +107,6 @@ public class ParallaxBackground extends Pane {
     }
 
 
-
-
     public Pane getRoot() {
         return root;
     }
@@ -115,9 +114,9 @@ public class ParallaxBackground extends Pane {
     public void update(double deltaTime) {
         double baseSpeed = 60.0;
         ImageView base = layers.get(0);
-        for (int i = 2 ; i < layers.size() ; i += 2) {
+        for (int i = 2; i < layers.size(); i += 2) {
             ImageView imageView = layers.get(i);
-            ImageView imageView2 = layers.get(i+1);
+            ImageView imageView2 = layers.get(i + 1);
             double speed = speeds.get(i);
             imageView.setTranslateY(imageView.getTranslateY() + deltaTime * (baseSpeed + speed));
             imageView2.setTranslateY(imageView2.getTranslateY() + deltaTime * (baseSpeed + speed));
