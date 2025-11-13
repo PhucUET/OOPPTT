@@ -109,7 +109,7 @@ public class Shooter {
                 bullet.animation.update(dtsecond);
                 bullet.imageView.setTranslateY(bullet.y - BULLET_H /2);
 
-                if (bullet.y <= -BULLET_H) {
+                if (bullet.y <=  0) {
                     recycle(it, bullet);
                     continue;
                 }
@@ -118,13 +118,13 @@ public class Shooter {
                     Brick brick = bricks.get(i);
                     Bounds en = bullet.imageView.getBoundsInParent();
                     Bounds bReduced = new javafx.geometry.BoundingBox(
-                            en.getMinX() + 20, en.getMinY() + 20,
-                            en.getWidth() - 40, en.getHeight() - 40);
+                            en.getMinX() + 5, en.getMinY() + 5,
+                            en.getWidth() - 10, en.getHeight() - 10);
 
                     Bounds eu = brick.getImageView().getBoundsInParent();
                     Bounds eReduced = new javafx.geometry.BoundingBox(
-                            eu.getMinX() + 20, eu.getMinY() + 20,
-                            eu.getWidth() - 40, eu.getHeight() - 40);
+                            eu.getMinX() + 10, eu.getMinY() + 10,
+                            eu.getWidth() - 20, eu.getHeight() - 20);
                     if (eReduced.intersects(bReduced)){
                         if (!brick.hit()) {
                             game_Layout.getChildren().remove(brick.imageView);
