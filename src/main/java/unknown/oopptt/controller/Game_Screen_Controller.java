@@ -9,7 +9,6 @@ import javafx.scene.Cursor;
 import javafx.scene.Group;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
-import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.Pane;
@@ -323,7 +322,7 @@ public class Game_Screen_Controller {
                     gameBricks.remove(i);
                     if (shouldDrop(0.7)) {
                         Powerup p = new Powerup(
-                                brick.getImageView().getBoundsInParent().getCenterX(), brick.getImageView().getBoundsInParent().getCenterY());
+                                brick.getImageView().getBoundsInParent().getCenterX(), brick.getImageView().getBoundsInParent().getCenterY(), brick.getTypePU());
                         layout_game.getChildren().add(p.getImageView());
                         gamePowerup.add(p);
                     }

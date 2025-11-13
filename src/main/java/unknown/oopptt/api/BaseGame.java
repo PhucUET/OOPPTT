@@ -187,6 +187,22 @@ public class BaseGame {
         }
         return false;
     }
+    public boolean paddlePUCollision(Powerup p, Paddle paddlelogic,String keydefine) {
+        if (p.getImageView().getBoundsInParent().intersects(paddlelogic.getImageView().getBoundsInParent())) {
+            if(keydefine.equals("GS")) {
+                p.WhenCollison(controller);
+            }
+            if(keydefine.equals("BTS1")) {
+                p.WhenCollison(BTcontroller,true);
+            }
+            if(keydefine.equals("BTS2")) {
+                p.WhenCollison(BTcontroller,false);
+            }
+            return true;
+        }
+        return false;
+
+    }
 
     public static int rand1to20() {
         return ThreadLocalRandom.current().nextInt(-20, 21); // [1, 21)

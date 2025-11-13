@@ -22,6 +22,16 @@ public class Brick extends GameEntity {
     private final static int widthBrick = 50;
     private final static int heightBrick = 23 ;
     private int typeBrick = 0;
+
+    public int getTypePU() {
+        return typePU;
+    }
+
+    public void setTypePU(int typePU) {
+        this.typePU = typePU;
+    }
+
+    private int typePU;
     private final ArrayList<Integer> pointList = new ArrayList<Integer>(Arrays.asList(50, 100, 150, 200));
     private double timeDrop = 0.3;
     private boolean wait = false;
@@ -70,6 +80,12 @@ public class Brick extends GameEntity {
         super(x + widthBrick/2, y + heightBrick/2, widthBrick, heightBrick, Get_type(t));
         hitPoints = t;
         typeBrick = t;
+    }
+    public Brick(double x, double y, int t, int typePU) {
+        super(x + widthBrick/2, y + heightBrick/2, widthBrick, heightBrick, Get_type(t));
+        hitPoints = t;
+        typeBrick = t;
+        this.typePU = typePU;
     }
 
     public Brick(double x, double y, double width, double height , int t) {

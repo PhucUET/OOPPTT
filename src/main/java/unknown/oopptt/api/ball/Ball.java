@@ -21,7 +21,7 @@ public class Ball extends GameEntity {
 
     // ====== CONSTANTS ======
     private static final String BALL_FOLDER = "src/main/resources/graphic/Ball";
-    private static final double BASE_SPEED = 360.0;
+    private static final double BASE_SPEED = 300.0;
     private static final int BALL_SIZE = 12;
 
     // ====== MOVEMENT ======
@@ -181,8 +181,13 @@ public class Ball extends GameEntity {
         imageView.setTranslateX(newX - BALL_SIZE / 2.0);
         updateAnimation(dt);
     }
-
-
+    public void setLocation(double newX,double newY, double dt) {
+        this.pos_x = newX;
+        this.pos_y = newY;
+        imageView.setTranslateX(newX - BALL_SIZE / 2.0);
+        imageView.setTranslateY(newY - BALL_SIZE / 2.0);
+        updateAnimation(dt);
+    }
     // ============================================================== //
     // Game interaction helpers
     // ============================================================== //

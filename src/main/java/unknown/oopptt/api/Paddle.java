@@ -41,6 +41,7 @@ public class Paddle extends GameEntity {
             transit = 1;
         }
         this.pos_x = this.pos_x + dt *  moveSpeed * transit * redir;
+        //System.out.println(this.pos_x+" "+dt+" "+moveSpeed+" "+redir);
         if (this.pos_x <= backgroundGame.getBoundsInParent().getMinX() +  this.width/2
                 || this.pos_x >=  backgroundGame.getBoundsInParent().getMaxX()  - this.width/2) {
             this.pos_x = clamp(this.pos_x, backgroundGame.getBoundsInParent().getMinX() + this.width/2,
@@ -69,6 +70,7 @@ public class Paddle extends GameEntity {
     public void setLocation(double v, double dt) {
         this.pos_x = v;
         this.imageView.setTranslateX(this.pos_x - this.width/2);
+        this.imageView.setTranslateY(this.pos_y - this.height/2);
         updateAnimation(dt);
     }
 
