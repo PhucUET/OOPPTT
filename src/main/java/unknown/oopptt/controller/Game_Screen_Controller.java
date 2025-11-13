@@ -39,6 +39,11 @@ import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Stream;
 
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
+import javafx.animation.AnimationTimer;
+
 
 public class Game_Screen_Controller {
     private int BRICK_CELL_W = 50;
@@ -226,6 +231,7 @@ public class Game_Screen_Controller {
             case D, RIGHT -> paddleLogic.setRightHeld(true);
             case SHIFT    -> paddleLogic.setMoveSpeed(600);
             case SPACE    -> setBallmove();
+            case P        -> pauseGame();
         }
     }
     private void onKeyReleased(KeyEvent e) {
@@ -345,37 +351,25 @@ public class Game_Screen_Controller {
     private static final double TARGET_FPS = 60;
     private static final  double STEP = 1.0/TARGET_FPS;
 
+    private AnimationTimer gameLoop;
+    private boolean paused = false;
+
     private void startGameloop() {
-        AnimationTimer timer = new AnimationTimer() {
+        gameLoop = new AnimationTimer() {
             private long lastTime = 0L;
             private double accumulator = 0.0;
 
             @Override
             public void handle(long now) {
-                if (lastTime == 0L) {
-                    lastTime = now;
-                    return;
-                }
+                if (paused) return; // nếu đang pause thì bỏ qua cập nhật
 
+                if (lastTime == 0L) { lastTime = now; return; }
                 double dt = (now - lastTime) / 1e9;
-                if (dt > 0.25) {
-                    dt = 0.25;
-                }
-
+                if (dt > 0.25) dt = 0.25;
                 lastTime = now;
                 accumulator += dt;
 
                 if (accumulator > STEP) {
-
-                    if (paddleLogic.getDead() == true) {
-                        paddleLogic.setDead(false);
-                        for (int i = gameBall.size() - 1; i >= 0; i--) {
-                            Ball ball = gameBall.get(i);
-                            layout_game.getChildren().remove(ball.getImageView());
-                            gameBall.remove(i);
-                        }
-                    }
-                    //System.out.println(player.getPoints(data.getNamePlayer()));
                     gameBall(STEP);
                     paddleLogic.update(STEP);
                     gameBricksUp(STEP);
@@ -383,13 +377,11 @@ public class Game_Screen_Controller {
                     enemyGame(STEP);
                     bg.update(STEP);
                     shield.update(STEP);
-                    shooter.update(STEP,gameBricks);
                     accumulator -= STEP;
                     specialPaddle.applyAllEffects();
                 }
-                if (shooter.getEnabled()) {
-                    shooter.tryFire();
-                }
+                if (shooter.getEnabled()) shooter.tryFire();
+                if (gameBricks.isEmpty()) showEndGameScreen();
                 if (gameBricks.isEmpty() &&  player.getAlive(data.getNamePlayer()) > 0){
                     showEndGameScreen();
                 }
@@ -398,8 +390,39 @@ public class Game_Screen_Controller {
                 }
             }
         };
-        timer.start();
+        gameLoop.start();
     }
+
+    public void pauseGame() {
+        if (paused) return;
+        paused = true;
+
+        if (layout_game != null && layout_game.getScene() != null) {
+            try {
+                Scene scene = layout_game.getScene();
+
+                // Lưu root & controller để Continue trả lại màn game và resume loop
+                scene.getProperties().put("previousRoot", scene.getRoot());
+                scene.getProperties().put("gameController", this);
+
+                Parent pauseRoot = FXMLLoader.load(
+                        getClass().getResource("/unknown/oopptt/PauseScreen.fxml"));
+                scene.setRoot(pauseRoot);
+            } catch (IOException ex) {
+                ex.printStackTrace();
+            }
+        }
+
+        if (gameLoop != null) gameLoop.stop();
+    }
+
+    public void resumeGame() {
+        paused = false;
+        if (gameLoop != null) gameLoop.start();
+        // lấy lại focus để nhận phím
+        if (layout_game != null) layout_game.requestFocus();
+    }
+
     private static double clamp(double v, double lo, double hi) {
         return (v < lo) ? lo : (v > hi) ? hi : v;
     }
