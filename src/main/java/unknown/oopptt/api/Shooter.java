@@ -58,8 +58,8 @@ public class Shooter {
             Bullet bullet = new Bullet(new ImageView(bulletImg));
             bulletPool.push(bullet);
             bullet.imageView.setVisible(false);
-            bullet.imageView.setFitWidth(BULLET_W);
-            bullet.imageView.setFitHeight(BULLET_H);
+            bullet.imageView.setFitWidth(BULLET_W * 5);
+            bullet.imageView.setFitHeight(BULLET_H * 5);
             bullet.imageView.setPreserveRatio(false);
             game_Layout.getChildren().add(bullet.imageView);
         }
@@ -104,9 +104,13 @@ public class Shooter {
                     it.remove();
                     continue;
                 }
-                bullet.y += bullet.vy * dtsecond * bullet.dy ;
-                bullet.imageView.setTranslateY(bullet.y);
-                bullet.imageView.setTranslateX(bullet.x);
+                bullet.y +=  dtsecond * BULLET_SPEED ;
+
+                bullet.animation.update(dtsecond);
+                bullet.imageView.setTranslateY(bullet.y - BULLET_H * 5 /2);
+
+
+                System.out.println(bullet.imageView.getTranslateX() + " " + bullet.imageView.getTranslateY());
 
                 if (bullet.y == 0) {
                     recycle(it, bullet);
@@ -182,6 +186,7 @@ public class Shooter {
         if (timeSinceLastShoot < COLD_DOWN) {
             return;
         }
+
         paddleFire();
         timeSinceLastShoot = 0;
     }
@@ -218,7 +223,6 @@ public class Shooter {
             return;
         }
         enemyFire();
-        timeSinceLastShoot = 0;
     }
 
 
@@ -226,10 +230,10 @@ public class Shooter {
         double leftX = paddleView.getBoundsInParent().getMinX();
         double rightX = paddleView.getBoundsInParent().getMaxX();
         double py =  paddleView.getBoundsInParent().getMinY();
-
+        System.out.println(leftX + " " + rightX);
         Bullet  lBullet = getBullet();
-        lBullet.x = leftX - BULLET_W/2.0;
-        lBullet.y = py - BULLET_H/2.0;
+        lBullet.x = leftX - BULLET_W * 5/2.0;
+        lBullet.y = py - BULLET_H * 5/2.0;
         lBullet.vy = -BULLET_SPEED;
         lBullet.imageView.setTranslateX(lBullet.x);
         lBullet.imageView.setTranslateY(lBullet.y);
@@ -238,8 +242,8 @@ public class Shooter {
         active.add(lBullet);
 
         Bullet rBullet = getBullet();
-        rBullet.x = rightX - BULLET_W/2.0;
-        rBullet.y = py - BULLET_H/2.0;
+        rBullet.x = rightX - BULLET_W * 5/2.0;
+        rBullet.y = py - BULLET_H * 5/2.0;
         rBullet.vy = -BULLET_SPEED;
         rBullet.imageView.setTranslateX(rBullet.x);
         rBullet.imageView.setTranslateY(rBullet.y);
@@ -281,7 +285,6 @@ public class Shooter {
         newBullet.imageView.setTranslateX(newBullet.x - BULLET_W * 3 / 2 );
         newBullet.imageView.setTranslateY(newBullet.y -  BULLET_H * 3 / 2 );
         active.add(newBullet);
-        System.out.println("bantinh");
         timeSinceLastShoot = 0;
 
     }

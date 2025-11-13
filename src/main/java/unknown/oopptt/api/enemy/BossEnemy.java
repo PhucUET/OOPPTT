@@ -106,6 +106,10 @@ public class BossEnemy extends Enemy {
         this.getImageView().setTranslateY(this.pos_y - this.height / 2.0);
     }
 
+    public void clearShooter() {
+        shooter.reset();
+    }
+
     private void pickNewTarget() {
         double u = ThreadLocalRandom.current().nextDouble();
         double v = ThreadLocalRandom.current().nextDouble();

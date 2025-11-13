@@ -21,15 +21,20 @@ public class Powerup  {
     private String catchBall = new  File("src/main/resources/graphic/PU/magnet").toString();
     private String shield  =  new File("src/main/resources/graphic/PU/Defence").toString();
     private String addHp = new  File("src/main/resources/graphic/PU/HPx2").toString();
+    private String moreBall = new  File("src/main/resources/graphic/PU/attackx3").toString();
+    private String slowBall = new   File("src/main/resources/graphic/PU/Anti-speed").toString();
+    private String Gun = new File("src/main/resources/graphic/PU/doppelganger").toString();
+    private String reDir = new File("src/main/resources/graphic/PU/redir").toString();
     private ImageView imageView;
     private TranslateTransition translateTransition = new TranslateTransition();
     private PowerupType type;
     private double pos_x;
     private double pos_y;
-    private double width = 40;
-    private double height = 20;
+    private double width = 60;
+    private double height = 60;
     private Game_Screen_Controller controller;
     private BattleScreenController BTcontroller;
+    private SpriteAnimation  spriteAnimation;
 
     public enum PowerupType {
         MOREBALL(-1),UPBALL(10), UPPADDLE(8), SLOW(10),
@@ -62,32 +67,33 @@ public class Powerup  {
         this.pos_y = pos_y;
         switch (type) {
             case PowerupType.ADDHP:
-                imageView = new ImageView(new Image(addHp));
+                spriteAnimation = new SpriteAnimation(addHp,30);
             case PowerupType.UPBALL:
-                imageView = new ImageView(new Image(upballview));
+                spriteAnimation = new SpriteAnimation(upballview,30);
                 break;
             case PowerupType.UPPADDLE:
-                imageView = new ImageView(new Image(upballview));
+                spriteAnimation = new SpriteAnimation(upballview,30);
                 break;
             case  PowerupType.MOREBALL:
-                imageView = new ImageView(new Image(upballview));
+                spriteAnimation = new SpriteAnimation(moreBall,30);
                 break;
             case PowerupType.SLOW:
-                imageView = new ImageView(new Image(upballview));
+                spriteAnimation = new SpriteAnimation(slowBall,30);
                 break;
             case PowerupType.CATCHBALL:
-                imageView = new ImageView(new Image(catchBall));
+                spriteAnimation = new SpriteAnimation(catchBall,30);
                 break;
             case PowerupType.GUN:
-                imageView = new ImageView(new Image(upballview));
+                spriteAnimation = new SpriteAnimation(Gun,30);
                 break;
             case PowerupType.REDIR:
-                imageView = new ImageView(new Image(upballview));
+                spriteAnimation = new SpriteAnimation(reDir,30);
                 break;
             case PowerupType.SHIELD:
-                imageView = new ImageView(new Image(shield));
+                spriteAnimation = new SpriteAnimation(shield,30);
                 break;
         }
+        imageView = spriteAnimation.getView();
         imageView.setFitWidth(width);
         imageView.setFitHeight(height);
         imageView.setTranslateX(pos_x -  imageView.getFitWidth() / 2);
@@ -100,32 +106,33 @@ public class Powerup  {
         this.pos_y = pos_y;
         switch (type) {
             case PowerupType.ADDHP:
-                imageView = new ImageView(new Image(addHp));
+                spriteAnimation = new SpriteAnimation(addHp,30);
             case PowerupType.UPBALL:
-                imageView = new ImageView(new Image(upballview));
+                spriteAnimation = new SpriteAnimation(upballview,30);
                 break;
             case PowerupType.UPPADDLE:
-                imageView = new ImageView(new Image(upballview));
+                spriteAnimation = new SpriteAnimation(upballview,30);
                 break;
             case  PowerupType.MOREBALL:
-                imageView = new ImageView(new Image(upballview));
+                spriteAnimation = new SpriteAnimation(moreBall,30);
                 break;
             case PowerupType.SLOW:
-                imageView = new ImageView(new Image(upballview));
+                spriteAnimation = new SpriteAnimation(slowBall,30);
                 break;
             case PowerupType.CATCHBALL:
-                imageView = new ImageView(new Image(catchBall));
+                spriteAnimation = new SpriteAnimation(catchBall,30);
                 break;
             case PowerupType.GUN:
-                imageView = new ImageView(new Image(upballview));
+                spriteAnimation = new SpriteAnimation(Gun,30);
                 break;
             case PowerupType.REDIR:
-                imageView = new ImageView(new Image(upballview));
+                spriteAnimation = new SpriteAnimation(reDir,30);
                 break;
             case PowerupType.SHIELD:
-                imageView = new ImageView(new Image(shield));
+                spriteAnimation = new SpriteAnimation(shield,30);
                 break;
         }
+        imageView = spriteAnimation.getView();
         imageView.setFitWidth(width);
         imageView.setFitHeight(height);
         imageView.setTranslateX(pos_x -  imageView.getFitWidth() / 2);
@@ -200,32 +207,33 @@ public class Powerup  {
         this.pos_y = pos_y;
         switch (type) {
             case PowerupType.ADDHP:
-                imageView = new ImageView(new Image(addHp));
+                spriteAnimation = new SpriteAnimation(addHp,30);
             case PowerupType.UPBALL:
-                imageView = new ImageView(new Image(upballview));
+                spriteAnimation = new SpriteAnimation(upballview,30);
                 break;
             case PowerupType.UPPADDLE:
-                imageView = new ImageView(new Image(upballview));
+                spriteAnimation = new SpriteAnimation(upballview,30);
                 break;
             case  PowerupType.MOREBALL:
-                imageView = new ImageView(new Image(upballview));
+                spriteAnimation = new SpriteAnimation(moreBall,30);
                 break;
             case PowerupType.SLOW:
-                imageView = new ImageView(new Image(upballview));
+                spriteAnimation = new SpriteAnimation(slowBall,30);
                 break;
             case PowerupType.CATCHBALL:
-                imageView = new ImageView(new Image(catchBall));
+                spriteAnimation = new SpriteAnimation(catchBall,30);
                 break;
             case PowerupType.GUN:
-                imageView = new ImageView(new Image(upballview));
+                spriteAnimation = new SpriteAnimation(Gun,30);
                 break;
             case PowerupType.REDIR:
-                imageView = new ImageView(new Image(upballview));
+                spriteAnimation = new SpriteAnimation(reDir,30);
                 break;
             case PowerupType.SHIELD:
-                imageView = new ImageView(new Image(shield));
+                spriteAnimation = new SpriteAnimation(shield,30);
                 break;
         }
+        imageView = spriteAnimation.getView();
         imageView.setFitWidth(width);
         imageView.setFitHeight(height);
         imageView.setTranslateX(pos_x -  imageView.getFitWidth() / 2);
@@ -237,8 +245,9 @@ public class Powerup  {
     }
 
     public void movedown(double dt) {
-        this.pos_y += 300 * dt;
+        this.pos_y += 400 * dt;
         imageView.setTranslateY(pos_y - imageView.getFitHeight() / 2);
+        spriteAnimation.update(dt);
     }
 
     private void runTimeEffect(int duration, Runnable startEffect, Runnable endEffect) {

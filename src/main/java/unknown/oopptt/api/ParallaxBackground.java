@@ -16,7 +16,7 @@ public class ParallaxBackground extends Pane {
     private final List<Double> speeds = new ArrayList<>();
     private List<Image> frames = new ArrayList<>();
 
-    private String path = new File("src/main/resources/graphic/B1-Pale").toString();
+    //private String path = new File("src/main/resources/graphic/B1-Pale").toString();
 
     private Pane  root;
 
@@ -42,7 +42,7 @@ public class ParallaxBackground extends Pane {
         return (Math.random() * (max - min)) + min;
     }
 
-    public ParallaxBackground(double width, double height) {
+    public ParallaxBackground(double width, double height, String path) {
         root = new Pane();
         root.setPrefSize(width, height);
         root.setMaxSize(width,height);

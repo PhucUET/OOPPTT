@@ -220,7 +220,7 @@ public class BaseGame {
 
 
             if (simpleCollision(ballLogic, bReduced)) {
-                player.updateScore(data.getNamePlayer(), enemy.takeDamage(10));
+                player.updateScore(data.getNamePlayer(), enemy.takeDamage(20));
                 if (enemy instanceof TransitEnemy) {
                     ballLogic.setLocation(ballLogic.pos_x + rand1to20() ,  ballLogic.pos_y + rand1to20());
                 }

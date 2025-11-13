@@ -16,6 +16,8 @@ import unknown.oopptt.api.Data;
 import unknown.oopptt.api.ParallaxBackground;
 import unknown.oopptt.api.SoundManager;
 
+import java.io.File;
+
 public class LoginScreenController {
     @FXML private TextField txtUsername;
     @FXML private PasswordField txtPassword;
@@ -23,8 +25,9 @@ public class LoginScreenController {
     @FXML private ImageView background;
     @FXML private AnchorPane root;
     @FXML private StackPane layout;
+    private String path = new File("src/main/resources/graphic/B1-Pale").toString();
 
-    private ParallaxBackground bg = new ParallaxBackground(1440, 780);
+    private ParallaxBackground bg = new ParallaxBackground(1440, 780, path);
 
     private  Data data = new Data();
 
@@ -160,7 +163,7 @@ public class LoginScreenController {
     public void initialize() {
 
         Platform.runLater(() -> {
-            bg = new ParallaxBackground(root.getWidth(), root.getHeight());
+            bg = new ParallaxBackground(root.getWidth(), root.getHeight(), path);
             root.getChildren().add(0, bg.getRoot());
             startGameloop();
         });

@@ -91,7 +91,6 @@ public class NowPlay extends Manage {
     //thêm người chơi mới nếu chưa tồn tại
     public void addPlayer(String name) {
         players.putIfAbsent(name, new Player(name));
-        System.out.println("Added player " + name);
     }
 
     //cập nhật điểm số

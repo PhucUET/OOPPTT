@@ -56,13 +56,13 @@ public class Game_Screen_Controller {
 //    @FXML StackPane endGameOverlay;
     private Paddle paddleLogic;
     @FXML private Group bgr;
-
+    private String ngusi = new File("src/main/resources/graphic/B3-Pale").toString();
     private final List<Ball> gameBall = new ArrayList<>();
     private final List<Enemy> gameEnemies =  new ArrayList<>();
     private final List<Powerup> gamePowerup = new ArrayList<>();
     private PowerBall powerBall;
     private SpecialPaddle specialPaddle;
-    private ParallaxBackground bg = new ParallaxBackground(500,640) ;
+    private ParallaxBackground bg = new ParallaxBackground(500,640, ngusi) ;
     private Sheild shield;
     private NowPlay player = new NowPlay();
     private Data data = new Data();
@@ -134,17 +134,17 @@ public class Game_Screen_Controller {
             layout_game.getChildren().add(first_ball.getImageView());
             powerBall = new PowerBall(gameBall);
 
-            shooter = new Shooter(200, 2, 5, 10, layout_game, paddleLogic.getImageView(), 20);
+            shooter = new Shooter(200, 3, 60, 60, layout_game, paddleLogic.getImageView(), 20);
 
             shield = new Sheild(layout_game);
             upMap(MAP_FILE);
 
 
-            Platform.runLater(() -> {
-                BossEnemy bossEnemy = new BossEnemy(250, 300, 100, 100, 50, paddleLogic, this, layout_game);
-                gameEnemies.add(bossEnemy);
-                layout_game.getChildren().add(bossEnemy.getImageView());
-            });
+//            Platform.runLater(() -> {
+//                BossEnemy bossEnemy = new BossEnemy(250, 300, 100, 100, 20, paddleLogic, this, layout_game);
+//                gameEnemies.add(bossEnemy);
+//                layout_game.getChildren().add(bossEnemy.getImageView());
+//            });
 
       //  }
     }
@@ -281,6 +281,7 @@ public class Game_Screen_Controller {
                     enemyGame(STEP);
                     bg.update(STEP);
                     shield.update(STEP);
+                    shooter.update(STEP,gameBricks);
                     accumulator -= STEP;
                     specialPaddle.applyAllEffects();
                 }
@@ -303,7 +304,7 @@ public class Game_Screen_Controller {
                     gameBricks.remove(i);
                     if (shouldDrop(0.7)) {
                         Powerup p = new Powerup(
-                                brick.getImageView().getBoundsInParent().getCenterX(), brick.getImageView().getBoundsInParent().getCenterY());
+                                brick.getImageView().getBoundsInParent().getCenterX(), brick.getImageView().getBoundsInParent().getCenterY(), Powerup.PowerupType.GUN);
                         layout_game.getChildren().add(p.getImageView());
                         gamePowerup.add(p);
                     }
@@ -338,7 +339,11 @@ public class Game_Screen_Controller {
 
             if (enemy instanceof BossEnemy) {
                 BossEnemy bossEnemy = (BossEnemy) enemy;
-
+                if (enemy.getHp() == 0) {
+                    layout_game.getChildren().remove(enemy.getImageView());
+                    bossEnemy.clearShooter();
+                    gameEnemies.remove(i);
+                }
                 bossEnemy.update(dt);
             }
 

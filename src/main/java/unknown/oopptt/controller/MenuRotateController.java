@@ -16,6 +16,7 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
 
+import java.io.File;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -32,7 +33,8 @@ public class MenuRotateController {
     @FXML private Button btnLeft, btnRight, btnMute, btnEsc;
 
     @FXML private ImageView imgLeft, imgCenter, imgRight;
-    private ParallaxBackground bg = new ParallaxBackground(1500, 1000);
+    private String path = new File("src/main/resources/graphic/B1-Pale").toString();
+    private ParallaxBackground bg = new ParallaxBackground(1500, 1000, path);
 
     private enum Mode { BATTLE, ADVENTURE, HELP }
     // Thứ tự hiển thị: [LEFT, CENTER, RIGHT]

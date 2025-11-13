@@ -14,6 +14,8 @@ import unknown.oopptt.api.Data;
 import unknown.oopptt.api.ParallaxBackground;
 import unknown.oopptt.api.SoundManager;
 
+import java.io.File;
+
 public class RegisterScreenController {
 
     @FXML private TextField txtUsername;
@@ -22,7 +24,8 @@ public class RegisterScreenController {
     @FXML private Label lblMessage;
     @FXML private ImageView background;
     @FXML private AnchorPane root;
-    private ParallaxBackground bg = new ParallaxBackground(1440, 780);
+    private String path = new File("src/main/resources/graphic/B1-Pale").toString();
+    private ParallaxBackground bg = new ParallaxBackground(1440, 780, path);
 
     private final Data data = new Data();
 
@@ -30,7 +33,7 @@ public class RegisterScreenController {
     public void initialize() {
 
         Platform.runLater(() -> {
-            bg = new ParallaxBackground(root.getWidth(), root.getHeight());
+            bg = new ParallaxBackground(root.getWidth(), root.getHeight(), path);
             root.getChildren().add(0, bg.getRoot());
             startGameloop();
         });

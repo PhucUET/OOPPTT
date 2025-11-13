@@ -52,46 +52,44 @@ public final class Level {
     // --- private helpers ---
     private void loadLevel(int index) {
         this.map = getLevelMap(index);
-        // reset/khởi tạo những thứ khác của màn nếu cần
     }
 
     private File getLevelMap(int levelIndex) {
         switch (levelIndex) {
             case 1:
                 this.map = new File("src/main/resources/map/map1.txt");
-                this.background = new File("src/main/resources/graphic/background10.jpg")
-                        .toURI().toString();
+                this.background = new File("src/main/resources/graphic/B2-Pale")
+                        .toString();
                 break;
             case 2:
                 this.map = new File("src/main/resources/map/map2.txt");
-                this.background = new File("src/main/resources/graphic/Space3.png")
-                        .toURI().toString();
+                this.background = new File("src/main/resources/graphic/B3-Pale")
+                        .toString();
                 break;
             case 3:
                 this.map = new File("src/main/resources/map/map3.txt");
-                this.background = new File("src/main/resources/graphic/background10.jpg")
-                        .toURI().toString();
+                this.background = new File("src/main/resources/graphic/B4-Pale")
+                        .toString();
                 break;
             case 4:
                 this.map = new File("src/main/resources/map/map4.txt");
-                this.background = new File("src/main/resources/graphic/background10.jpg")
-                        .toURI().toString();
+                this.background = new File("src/main/resources/graphic/B5-Pale")
+                        .toString();
                 break;
             case 5:
                 this.map = new File("src/main/resources/map/map5.txt");
-                this.background = new File("src/main/resources/graphic/background10.jpg")
-                        .toURI().toString();
+                this.background = new File("src/main/resources/graphic/B6-Pale")
+                        .toString();
                 break;
             case 6:
                 this.map = new File("src/main/resources/map/map6.txt");
-                this.background = new File("src/main/resources/graphic/background10.jpg")
+                this.background = new File("src/main/resources/graphic/B7-Pale")
                         .toURI().toString();
                 break;
             default:
-                // hết màn: có thể loop về 1, hoặc giữ nguyên, hoặc ném exception
                 this.map = new File("src/main/resources/map/map6.txt");
-                this.background = new File("src/main/resources/graphic/background10.jpg")
-                        .toURI().toString();
+                this.background = new File("src/main/resources/graphic/B7-Pale")
+                        .toString();
         }
         return this.map;
     }
