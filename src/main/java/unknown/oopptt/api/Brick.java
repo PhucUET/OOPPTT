@@ -84,17 +84,20 @@ public class Brick extends GameEntity {
         super(x + widthBrick / 2, y + heightBrick / 2, widthBrick, heightBrick, Get_type(t));
         hitPoints = t;
         typeBrick = t;
+        this.Point = t * 30;
     }
 
     public Brick(double x, double y, int t, int typePU) {
         super(x + widthBrick / 2, y + heightBrick / 2, widthBrick, heightBrick, Get_type(t));
         hitPoints = t;
         typeBrick = t;
+        this.Point = t * 30;
         this.typePU = typePU;
     }
 
     public Brick(double x, double y, double width, double height, int t) {
         super(x + width / 2, y + height / 2, width, height, Get_type(t));
+        this.Point = t * 30;
         hitPoints = t;
         typeBrick = t;
     }
