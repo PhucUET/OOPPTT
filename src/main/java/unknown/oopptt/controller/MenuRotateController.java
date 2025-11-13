@@ -72,7 +72,7 @@ public class MenuRotateController {
         imgFallback  = load("/graphic/background10.jpg");
         imgBattle    = firstAvailable("/graphic/battle.png", "/graphic/BattleScreen.png");
         imgAdventure = firstAvailable("/graphic/adventure.png", "/graphic/adventure.jpg");
-        imgHelp      = firstAvailable("/graphic/help.png", "/graphic/ball_orange.png");
+        imgHelp      = firstAvailable("/graphic/help.png", "/graphic/infor.png");
 
         render();
 
@@ -176,7 +176,7 @@ public class MenuRotateController {
         switch (center) {
             case ADVENTURE -> startAdventure(e);
             case BATTLE    -> goBattle(e);
-            case HELP      -> openHelp();
+            case HELP      -> openHelp(e);
         }
     }
 
@@ -194,10 +194,12 @@ public class MenuRotateController {
         // TODO: load BattleScreen.fxml và setRoot
     }
 
-    private void openHelp() {
+    private void openHelp(ActionEvent e) {
         SoundManager.playSoundEffect("click.mp3");
         System.out.println("Open Help");
+        switchTo("/unknown/oopptt/Info.fxml", e,false);
         // TODO: load Help.fxml và setRoot
+
     }
 
     /* ================== Render ================== */
