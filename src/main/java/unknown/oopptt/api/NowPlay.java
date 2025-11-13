@@ -53,6 +53,7 @@ public class NowPlay extends Manage {
             this.score = 0;
             this.lives = 3;
         }
+
         public void addLive() {
             this.lives += 1;
         }
@@ -60,6 +61,7 @@ public class NowPlay extends Manage {
         public void subLive() {
             this.lives -= 1;
         }
+
         public int getScore() {
             return this.score;
         }
@@ -74,11 +76,11 @@ public class NowPlay extends Manage {
     private Mode mode = Mode.SOLO; //gán mode chơi mặc định ban đầu là solo
 
 
-
     //đặt lại mode chơi
     public void setMode(Mode mode) {
         this.mode = mode;
     }
+
     public Mode getMode() {
         return mode;
     }
@@ -112,6 +114,7 @@ public class NowPlay extends Manage {
         Player p = players.get(name);
         p.addLive();
     }
+
     public void subLive(String name) {
         Player p = players.get(name);
         p.subLive();

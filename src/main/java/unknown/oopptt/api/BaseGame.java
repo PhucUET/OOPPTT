@@ -15,7 +15,7 @@ public class BaseGame {
 
     private Game_Screen_Controller controller;
     private BattleScreenController BTcontroller;
-    private  Data data;
+    private Data data;
     private NowPlay player;
 
 
@@ -24,6 +24,7 @@ public class BaseGame {
         this.data = controller.getData();
         this.player = controller.getPlayer();
     }
+
     public BaseGame(BattleScreenController controller) {
         this.BTcontroller = controller;
         this.data = controller.getData();
@@ -39,15 +40,15 @@ public class BaseGame {
 
         double padding = 5;
 
-        double leftWall  = wallBounds.getMinX() + padding;
+        double leftWall = wallBounds.getMinX() + padding;
         double rightWall = wallBounds.getMaxX() - padding;
-        double topWall   = wallBounds.getMinY() + padding;
-        double bottomWall= wallBounds.getMaxY() - padding;
+        double topWall = wallBounds.getMinY() + padding;
+        double bottomWall = wallBounds.getMaxY() - padding;
 
-        double bxLeft  = ballBounds.getMinX();
+        double bxLeft = ballBounds.getMinX();
         double bxRight = ballBounds.getMaxX();
-        double byTop   = ballBounds.getMinY();
-        double byBottom= ballBounds.getMaxY();
+        double byTop = ballBounds.getMinY();
+        double byBottom = ballBounds.getMaxY();
 
         double vx = ball.getSpeedX();
         double vy = ball.getSpeedY();
@@ -166,7 +167,7 @@ public class BaseGame {
             if (simpleCollision(ball, r)) {
                 // Cập nhật trạng thái gạch
                 if (!brick.hit()) {
-                    player.updateScore(data.getNamePlayer(),brick.getPoint() );
+                    player.updateScore(data.getNamePlayer(), brick.getPoint());
                     brick.setWait(true);
                     break;
                 }
@@ -192,13 +193,14 @@ public class BaseGame {
         }
         return false;
     }
-    public boolean paddlePUCollision(Powerup p, Paddle paddlelogic,String keydefine) {
+
+    public boolean paddlePUCollision(Powerup p, Paddle paddlelogic, String keydefine) {
         if (p.getImageView().getBoundsInParent().intersects(paddlelogic.getImageView().getBoundsInParent())) {
-            if(keydefine.equals("BTS1")) {
-                p.WhenCollison(BTcontroller,true);
+            if (keydefine.equals("BTS1")) {
+                p.WhenCollison(BTcontroller, true);
             }
-            if(keydefine.equals("BTS2")) {
-                p.WhenCollison(BTcontroller,false);
+            if (keydefine.equals("BTS2")) {
+                p.WhenCollison(BTcontroller, false);
             }
             return true;
         }
@@ -212,7 +214,7 @@ public class BaseGame {
     }
 
     public void enemyCollision(Ball ballLogic, List<Enemy> enemys) {
-        for (Enemy enemy :  enemys) {
+        for (Enemy enemy : enemys) {
             Bounds en = enemy.getImageView().getBoundsInParent();
             Bounds bReduced = new javafx.geometry.BoundingBox(
                     en.getMinX() + 20, en.getMinY() + 20,
@@ -222,7 +224,7 @@ public class BaseGame {
             if (simpleCollision(ballLogic, bReduced)) {
                 player.updateScore(data.getNamePlayer(), enemy.takeDamage(20));
                 if (enemy instanceof TransitEnemy) {
-                    ballLogic.setLocation(ballLogic.pos_x + rand1to20() ,  ballLogic.pos_y + rand1to20());
+                    ballLogic.setLocation(ballLogic.pos_x + rand1to20(), ballLogic.pos_y + rand1to20());
                 }
             }
         }

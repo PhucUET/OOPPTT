@@ -10,7 +10,10 @@ public final class Level {
 
     // --- Singleton (eager) ---
     private static final Level INSTANCE = new Level();
-    private Level() {}
+
+    private Level() {
+    }
+
     public static Level getInstance() {           // đổi tên cho đúng convention
         return INSTANCE;                           // KHÔNG làm gì khác ở đây
     }
@@ -37,6 +40,7 @@ public final class Level {
     public synchronized void resetNewGame() {
         start();
     }
+
     public synchronized void reset() {
         this.score = 0;
         loadLevel(this.levelIndex);
@@ -44,10 +48,21 @@ public final class Level {
 
 
     // --- getters ---
-    public synchronized int getLevelIndex() { return levelIndex; }
-    public synchronized int getScore() { return score; }
-    public synchronized File getMap() { return map; }
-    public synchronized String getBackground() { return background; }
+    public synchronized int getLevelIndex() {
+        return levelIndex;
+    }
+
+    public synchronized int getScore() {
+        return score;
+    }
+
+    public synchronized File getMap() {
+        return map;
+    }
+
+    public synchronized String getBackground() {
+        return background;
+    }
 
     // --- private helpers ---
     private void loadLevel(int index) {
