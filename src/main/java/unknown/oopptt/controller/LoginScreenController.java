@@ -22,12 +22,10 @@ public class LoginScreenController {
     @FXML private TextField txtUsername;
     @FXML private PasswordField txtPassword;
     @FXML private Label lblMessage;
-    @FXML private ImageView background;
-    @FXML private AnchorPane root;
-    @FXML private StackPane layout;
+    @FXML private StackPane root;
     private String path = new File("src/main/resources/graphic/B1-Pale").toString();
 
-    private ParallaxBackground bg = new ParallaxBackground(1440, 780, path);
+    private ParallaxBackground bg = new ParallaxBackground(1900, 1200, path);
 
     private  Data data = new Data();
 
@@ -161,13 +159,10 @@ public class LoginScreenController {
 
     @FXML
     public void initialize() {
-
-        Platform.runLater(() -> {
-            bg = new ParallaxBackground(root.getWidth(), root.getHeight(), path);
-            root.getChildren().add(0, bg.getRoot());
-            startGameloop();
-        });
-
+        root.getChildren().add(0, bg.getRoot());
+        bg.getRoot().prefWidthProperty().bind(root.widthProperty());
+        bg.getRoot().prefHeightProperty().bind(root.heightProperty());
+        startGameloop();
     }
 
     private static final double TARGET_FPS = 60;
