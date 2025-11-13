@@ -5,6 +5,7 @@ import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Bounds;
+import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Cursor;
 import javafx.scene.Group;
@@ -109,6 +110,7 @@ public class Game_Screen_Controller {
         setBackground(BG_IMAGE_PATH, MAP_FILE);
         ListenEventHandle();
         startGameloop();
+        addHighScoreButtonOverlay();
     }
 
     public void setData(Data data) {
@@ -693,6 +695,47 @@ public class Game_Screen_Controller {
         player.addLive(data.getNamePlayer());
     }
 
+    // Mở HighScore.fxml và thay thế màn hiện tại
+    private void openHighScore() {
+        try {
+            Parent highScoreRoot = FXMLLoader.load(
+                    getClass().getResource("/unknown/oopptt/HighScore.fxml"));
+
+            if (stack_root != null && stack_root.getScene() != null) {
+                stack_root.getScene().setRoot(highScoreRoot);
+                highScoreRoot.requestFocus();
+            } else {
+                Stage stage = new Stage();
+                stage.setTitle("High Score");
+                stage.setScene(new Scene(highScoreRoot, 960, 540));
+                stage.show();
+                closeWindowIfStandalone();
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    // imports cần: import javafx.geometry.Insets; import javafx.geometry.Pos;
+
+    private void addHighScoreButtonOverlay() {
+        Button hsBtn = new Button("HIGH SCORE");
+        hsBtn.setFocusTraversable(false);
+        hsBtn.setOnAction(e -> openHighScore());
+        hsBtn.setStyle("""
+        -fx-background-color: rgba(0,0,0,0.55);
+        -fx-text-fill: white;
+        -fx-font-size: 14px;
+        -fx-background-radius: 10;
+        -fx-padding: 6 12 6 12;
+    """);
+
+        // Đặt ở góc TRÁI TRÊN
+        StackPane.setAlignment(hsBtn, Pos.TOP_LEFT);
+        StackPane.setMargin(hsBtn, new Insets(12, 0, 0, 12)); // top=12, left=12
+
+        stack_root.getChildren().add(hsBtn);
+    }
 }
 
 
