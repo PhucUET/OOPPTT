@@ -42,6 +42,7 @@ public class RenderFX {
         private Fonts() {
 
         }
+
         public static Font loadFromResource(String resourcePath, double size) {
             try (InputStream is = RenderFX.class.getResourceAsStream(resourcePath)) {
                 if (is == null) return null;
@@ -50,14 +51,15 @@ public class RenderFX {
                 return null;
             }
         }
+
         public static Font loadFromFile(Path path, double size) {
             try (InputStream is = Files.newInputStream(path)) {
                 return Font.loadFont(is, size);
-            }
-            catch (IOException e) {
+            } catch (IOException e) {
                 return null;
             }
         }
+
         public static java.util.List<String> families() {
             return Font.getFamilies();
         }

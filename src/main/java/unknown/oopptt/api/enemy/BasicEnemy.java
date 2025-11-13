@@ -10,7 +10,7 @@ public class BasicEnemy extends Enemy {
     private static int point = 150;
 
     public BasicEnemy(double x, double y, double width, double height) {
-        super(x,y,width, height, path, speedX, speedY, hp, point);
+        super(x, y, width, height, path, speedX, speedY, hp, point);
     }
 
     public void update(double dt) {

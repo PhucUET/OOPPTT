@@ -7,8 +7,8 @@ import java.io.File;
 import java.util.*;
 
 public class ImageCache {
-    private static final Map<String, List<Image>> folderCache  = new HashMap<>();
-    private static final Map<String, Image> cache  = new HashMap<>();
+    private static final Map<String, List<Image>> folderCache = new HashMap<>();
+    private static final Map<String, Image> cache = new HashMap<>();
 
     public static Image load(String path) {
         return cache.computeIfAbsent(path, p -> {
@@ -20,6 +20,7 @@ public class ImageCache {
             }
         });
     }
+
     public static List<Image> loadFolder(String folderPath) {
         return folderCache.computeIfAbsent(folderPath, path -> {
             File folder = new File(path);

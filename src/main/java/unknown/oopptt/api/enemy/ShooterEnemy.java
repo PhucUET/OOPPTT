@@ -14,19 +14,21 @@ public class ShooterEnemy extends Enemy {
     private Shooter shooter;
     private final Pane gameLayout;
     private final ImageView imageCanon;
+
     public ShooterEnemy(double x, double y, double height, double width, Pane gameLayout, ImageView paddleView, Paddle paddle) {
-        super(x,y,height,width,path,0,0,50,200);
+        super(x, y, height, width, path, 0, 0, 50, 200);
         this.gameLayout = gameLayout;
         this.imageCanon = new ImageView(new Image(pathCanon));
         imageCanon.setFitHeight(height);
         imageCanon.setFitWidth(width);
-        imageCanon.setTranslateX(x - width/2);
-        imageCanon.setTranslateY(y + height/2);
+        imageCanon.setTranslateX(x - width / 2);
+        imageCanon.setTranslateY(y + height / 2);
         imageCanon.setRotate(180);
         gameLayout.getChildren().add(imageCanon);
-        shooter = new Shooter(200, 2, 20,10, gameLayout, paddleView, 30, imageCanon, paddle);
+        shooter = new Shooter(200, 2, 20, 10, gameLayout, paddleView, 30, imageCanon, paddle);
         shooter.setEnabled(true);
     }
+
     @Override
     public void update(double dt) {
         shooter.enemyTryFire(dt);
