@@ -405,8 +405,11 @@ public class Game_Screen_Controller {
                 scene.getProperties().put("previousRoot", scene.getRoot());
                 scene.getProperties().put("gameController", this);
 
-                Parent pauseRoot = FXMLLoader.load(
-                        getClass().getResource("/unknown/oopptt/PauseScreen.fxml"));
+                FXMLLoader fx = new FXMLLoader(getClass().getResource("/unknown/oopptt/PauseScreen.fxml"));
+
+                Parent pauseRoot = fx.load();
+                PauseScreenController controller = fx.getController();
+                controller.setData(data);
                 scene.setRoot(pauseRoot);
             } catch (IOException ex) {
                 ex.printStackTrace();

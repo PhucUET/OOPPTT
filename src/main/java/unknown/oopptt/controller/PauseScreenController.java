@@ -10,6 +10,8 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
+import unknown.oopptt.api.Data;
+
 import java.io.IOException;
 
 public class PauseScreenController {
@@ -22,6 +24,10 @@ public class PauseScreenController {
 //        background.fitWidthProperty().bind(root.widthProperty());
 //        background.fitHeightProperty().bind(root.heightProperty());
 //    }
+    private Data data;
+    public void setData(Data data) {
+        this.data = data;
+    }
 
     @FXML
     private void handleContinue() {
@@ -73,10 +79,11 @@ public class PauseScreenController {
             // Load màn hình game mới
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/unknown/oopptt/GameScreen.fxml"));
             Parent gameRoot = loader.load();
-
+            Game_Screen_Controller controller = loader.getController();
             // Nếu Pause đang nằm trong một Scene: thay root để "xóa" màn hiện tại
             if (root != null && root.getScene() != null) {
                 root.getScene().setRoot(gameRoot);
+                controller.setData(data);
                 gameRoot.requestFocus(); // đảm bảo nhận input ngay
             } else {
                 // Dự phòng: chưa có Scene -> mở Stage mới
