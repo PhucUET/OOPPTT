@@ -256,6 +256,10 @@ public class Game_Screen_Controller {
         for(Powerup Pu : gamePowerup){
             layout_game.getChildren().remove(Pu.getImageView());
         }
+        for(Brick brick : gameBricks){
+            layout_game.getChildren().remove(brick.getImageView());
+        }
+        gameBricks.clear();
         gamePowerup.clear();
         scoreLabel1.setText("Your Score: " + 0);
         gameOver.setVisible(true);
@@ -304,6 +308,10 @@ public class Game_Screen_Controller {
             layout_game.getChildren().remove(ball.getImageView());
         }
         gameBall.clear();
+        for(Brick brick : gameBricks){
+            layout_game.getChildren().remove(brick.getImageView());
+        }
+        gameBricks.clear();
         for(Powerup Pu : gamePowerup){
             layout_game.getChildren().remove(Pu.getImageView());
         }
@@ -316,8 +324,8 @@ public class Game_Screen_Controller {
         btnNext.setOnAction(e -> {loadNextLevel();endGameOverlay.setVisible(false);});
     }
     public void restartGame(){
-        level.start();
         gameOver.setVisible(false);
+        level.start();
         setBackground(level.getBackground(), level.getMap());
     }
     public void loadNextLevel() {
@@ -382,7 +390,7 @@ public class Game_Screen_Controller {
                 if (shooter.getEnabled()) {
                     shooter.tryFire();
                 }
-                if (gameBricks.isEmpty()){
+                if (gameBricks.isEmpty() &&  player.getAlive(data.getNamePlayer()) > 0){
                     showEndGameScreen();
                 }
                 if( player.getAlive(data.getNamePlayer()) == 0){
