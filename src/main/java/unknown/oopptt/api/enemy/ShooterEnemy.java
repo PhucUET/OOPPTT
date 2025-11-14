@@ -10,7 +10,7 @@ import java.io.File;
 
 public class ShooterEnemy extends Enemy {
     private static String path = new File("src/main/resources/graphic/Enemyshooter").toString();
-    private static String pathCanon = new File("src/main/resources/graphic/EnemyShoot/Plazma_cannon _head1.png").toURI().toString();
+    private static String pathCanon = new File("src/main/resources/graphic/EnemyShoot/Plazma_cannon_head1.png").toURI().toString();
     private Shooter shooter;
     private final Pane gameLayout;
     private final ImageView imageCanon;

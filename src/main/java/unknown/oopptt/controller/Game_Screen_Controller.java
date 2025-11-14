@@ -98,14 +98,19 @@ public class Game_Screen_Controller {
 
 
     private boolean isSpam = false;
+    private String newS = new File("src/main/resources/graphic/bgr_ex").toString();
+    private  ParallaxBackground  fullScrene = new ParallaxBackground(1900,1200, newS) ;
 
     @FXML
     public void initialize() {
         stack_root.setAlignment(Pos.CENTER);
         level.start();
         preloadAssets();
-        stack_root.getChildren().add(0, bg.getRoot());
+        layout_game.getChildren().add(0, bg.getRoot());
+        stack_root.getChildren().add(0,fullScrene.getRoot());
         stack_root.setAlignment(Pos.CENTER);
+        fullScrene.getRoot().prefWidthProperty().bind(stack_root.widthProperty());
+        fullScrene.getRoot().prefHeightProperty().bind(stack_root.heightProperty());
         setBackground(BG_IMAGE_PATH, MAP_FILE);
         ListenEventHandle();
         startGameloop();
@@ -470,6 +475,7 @@ public class Game_Screen_Controller {
                     enemyGame(STEP);
                     bg.update(STEP);
                     shield.update(STEP);
+                    fullScrene.update(STEP);
                     accumulator -= STEP;
                     specialPaddle.applyAllEffects();
                 }
