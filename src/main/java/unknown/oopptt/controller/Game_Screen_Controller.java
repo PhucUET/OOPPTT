@@ -211,9 +211,9 @@ public class Game_Screen_Controller {
                         Enemy new_Enemy = null;
                         switch (type) {
                             case 0:
-                                new_Enemy = new BasicEnemy(newX, newY, 30, 30);
+                                new_Enemy = new BasicEnemy(newX, newY, 30, 30);break;
                             case 2:
-                                new_Enemy = new BossEnemy(newX, newY, 40, 40, 60, paddleLogic, this, layout_game);
+                                new_Enemy = new BossEnemy(newX, newY, 50, 50, 60, paddleLogic, this, layout_game);break;
                             case 1:
                                 new_Enemy = new ShooterEnemy(newX, newY, 30, 30, layout_game, paddleLogic.getImageView(), paddleLogic);
                                 break;
@@ -279,7 +279,6 @@ public class Game_Screen_Controller {
     }
 
     private void showEndGame() {
-        data.saveScore(data.getNamePlayer(), player.getPoints(data.getNamePlayer()), player.getPoints(data.getNamePlayer()), "solo");
         layout_game.getChildren().remove(paddleLogic.getImageView());
         for (Ball ball : gameBall) {
             layout_game.getChildren().remove(ball.getImageView());
@@ -326,6 +325,8 @@ public class Game_Screen_Controller {
         gameOver.setVisible(true);
         btnEscape1.setOnAction(e -> {
             openHome();
+            data.saveScore(data.getNamePlayer(), player.getPoints(data.getNamePlayer()), player.getPoints(data.getNamePlayer()), "solo");
+
         });
     }
 
@@ -358,13 +359,14 @@ public class Game_Screen_Controller {
         if (stack_root != null && stack_root.getScene() != null) {
             Window w = stack_root.getScene().getWindow();
             if (w != null) {
+                data.saveScore(data.getNamePlayer(), player.getPoints(data.getNamePlayer()), player.getPoints(data.getNamePlayer()), "solo");
+
                 w.hide();
             }
         }
     }
 
     private void showEndGameScreen() {
-        data.saveScore(data.getNamePlayer(), player.getPoints(data.getNamePlayer()), player.getPoints(data.getNamePlayer()), "SOLO");
         layout_game.getChildren().remove(paddleLogic.getImageView());
         for (Ball ball : gameBall) {
             layout_game.getChildren().remove(ball.getImageView());
@@ -412,10 +414,14 @@ public class Game_Screen_Controller {
         btnEscape.setOnAction(e -> System.exit(0));
         btnRestart.setOnAction(e -> {
             restartLevel();
+            data.saveScore(data.getNamePlayer(), player.getPoints(data.getNamePlayer()), player.getPoints(data.getNamePlayer()), "solo");
+
             endGameOverlay.setVisible(false);
         });
         btnNext.setOnAction(e -> {
             loadNextLevel();
+            data.saveScore(data.getNamePlayer(), player.getPoints(data.getNamePlayer()), player.getPoints(data.getNamePlayer()), "solo");
+
             endGameOverlay.setVisible(false);
         });
     }
