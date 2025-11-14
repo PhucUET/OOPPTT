@@ -25,7 +25,7 @@ public class ShooterEnemy extends Enemy {
         imageCanon.setTranslateY(y + height / 2);
         imageCanon.setRotate(180);
         gameLayout.getChildren().add(imageCanon);
-        shooter = new Shooter(200, 2, 20, 10, gameLayout, paddleView, 30, imageCanon, paddle);
+        shooter = new Shooter(200, 2, 40, 40, gameLayout, paddleView, 30, imageCanon, paddle);
         shooter.setEnabled(true);
     }
 

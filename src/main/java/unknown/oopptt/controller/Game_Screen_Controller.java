@@ -329,6 +329,7 @@ public class Game_Screen_Controller {
     }
 
     private void showEndGameScreen() {
+        data.saveScore(data.getNamePlayer(), player.getPoints(data.getNamePlayer()), player.getPoints(data.getNamePlayer()), "SOLO");
         layout_game.getChildren().remove(paddleLogic.getImageView());
         for (Ball ball : gameBall) {
             layout_game.getChildren().remove(ball.getImageView());
@@ -343,7 +344,7 @@ public class Game_Screen_Controller {
         }
         gamePowerup.clear();
 
-        scoreLabel.setText("Your Score: " + 0);
+        scoreLabel.setText("Your Score: " + player.getPoints(data.getNamePlayer()));
         endGameOverlay.setVisible(true);
         btnEscape.setOnAction(e -> System.exit(0));
         btnRestart.setOnAction(e -> {
@@ -402,6 +403,14 @@ public class Game_Screen_Controller {
                 accumulator += dt;
 
                 if (accumulator > STEP) {
+                    if (paddleLogic.getDead()) {
+                        paddleLogic.setDead(false);
+                        for (int i = gameBall.size() - 1; i >= 0; i--) {
+                            Ball ball = gameBall.get(i);
+                            layout_game.getChildren().remove(ball.getImageView());
+                            gameBall.remove(i);
+                        }
+                    }
                     gameBall(STEP);
                     paddleLogic.update(STEP);
                     gameBricksUp(STEP);
@@ -413,7 +422,6 @@ public class Game_Screen_Controller {
                     specialPaddle.applyAllEffects();
                 }
                 if (shooter.getEnabled()) shooter.tryFire();
-                if (gameBricks.isEmpty()) showEndGameScreen();
                 if (gameBricks.isEmpty() && player.getAlive(data.getNamePlayer()) > 0) {
                     showEndGameScreen();
                 }
@@ -469,7 +477,7 @@ public class Game_Screen_Controller {
                 if (brick.dropBrick(dt)) {
                     layout_game.getChildren().remove(brick.getImageView());
                     gameBricks.remove(i);
-                    if (shouldDrop(0.7)) {
+                    if (shouldDrop(0.3)) {
                         Powerup p = new Powerup(
                                 brick.getImageView().getBoundsInParent().getCenterX(), brick.getImageView().getBoundsInParent().getCenterY());
                         layout_game.getChildren().add(p.getImageView());
