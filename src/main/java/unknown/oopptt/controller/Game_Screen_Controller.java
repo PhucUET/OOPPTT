@@ -281,6 +281,35 @@ public class Game_Screen_Controller {
         for (Brick brick : gameBricks) {
             layout_game.getChildren().remove(brick.getImageView());
         }
+
+        for (int i = gameEnemies.size() - 1; i >= 0; i--) {
+            Enemy enemy = gameEnemies.get(i);
+
+            if (enemy instanceof ShooterEnemy) {
+                ShooterEnemy shooterEnemy = (ShooterEnemy) enemy;
+
+                if (shooterEnemy.getHp() == 0) {
+                    layout_game.getChildren().remove(shooterEnemy.getImageView());
+                    shooterEnemy.clearShooter();
+                    gameEnemies.remove(i);
+                }
+
+            }
+            if (enemy instanceof BasicEnemy) {
+                    layout_game.getChildren().remove(enemy.getImageView());
+                    gameEnemies.remove(i);
+            }
+
+            if (enemy instanceof BossEnemy) {
+                BossEnemy bossEnemy = (BossEnemy) enemy;
+                    layout_game.getChildren().remove(enemy.getImageView());
+                    bossEnemy.clearShooter();
+                    gameEnemies.remove(i);
+
+            }
+
+        }
+
         gameBricks.clear();
         gamePowerup.clear();
         scoreLabel1.setText("Your Score: " + 0);
@@ -341,6 +370,34 @@ public class Game_Screen_Controller {
         gameBricks.clear();
         for (Powerup Pu : gamePowerup) {
             layout_game.getChildren().remove(Pu.getImageView());
+        }
+
+        for (int i = gameEnemies.size() - 1; i >= 0; i--) {
+            Enemy enemy = gameEnemies.get(i);
+
+            if (enemy instanceof ShooterEnemy) {
+                ShooterEnemy shooterEnemy = (ShooterEnemy) enemy;
+
+                if (shooterEnemy.getHp() == 0) {
+                    layout_game.getChildren().remove(shooterEnemy.getImageView());
+                    shooterEnemy.clearShooter();
+                    gameEnemies.remove(i);
+                }
+
+            }
+            if (enemy instanceof BasicEnemy) {
+                layout_game.getChildren().remove(enemy.getImageView());
+                gameEnemies.remove(i);
+            }
+
+            if (enemy instanceof BossEnemy) {
+                BossEnemy bossEnemy = (BossEnemy) enemy;
+                layout_game.getChildren().remove(enemy.getImageView());
+                bossEnemy.clearShooter();
+                gameEnemies.remove(i);
+
+            }
+
         }
         gamePowerup.clear();
 
