@@ -71,7 +71,7 @@ public class Game_Screen_Controller {
     @FXML
     Button btnRestart, btnNext, btnEscape;
     @FXML
-    Button btnRestart1, btnEscape1;
+    Button btnEscape1;
     @FXML
     private StackPane endGameOverlay;
     @FXML
@@ -312,15 +312,10 @@ public class Game_Screen_Controller {
 
         gameBricks.clear();
         gamePowerup.clear();
-        scoreLabel1.setText("Your Score: " + 0);
+        scoreLabel1.setText("Your Score: " + player.getPoints(data.getNamePlayer()));
         gameOver.setVisible(true);
         btnEscape1.setOnAction(e -> {
             openHome();
-        });
-
-        btnRestart1.setOnAction(e -> {
-            restartGame();
-            gameOver.setVisible(false);
         });
     }
 
