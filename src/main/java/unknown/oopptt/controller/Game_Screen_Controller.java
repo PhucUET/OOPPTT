@@ -73,6 +73,7 @@ public class Game_Screen_Controller {
     Button btnRestart, btnNext, btnEscape;
     @FXML
     Button btnEscape1;
+    @FXML Label live;
     @FXML
     private StackPane endGameOverlay;
     @FXML
@@ -586,6 +587,7 @@ public class Game_Screen_Controller {
 
     private void gameBall(double dt) {
 
+        live.setText("Live: "+player.getAlive(data.getNamePlayer()));
         diem.setText("Score:"+player.getPoints(data.getNamePlayer()));
         if (gameBall.isEmpty()) {
             if (player.getAlive(data.getNamePlayer()) > 0) {
