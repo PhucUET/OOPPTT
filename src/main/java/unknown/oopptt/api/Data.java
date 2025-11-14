@@ -186,7 +186,7 @@ public class Data extends Manage {
             // Lấy top 10 người
             int rank = 1;
             for (PlayerRecord p : records.subList(0, Math.min(12, records.size()))) {
-                topList.add(rank++ + ". " + p.getName() + " - " + p.getHighscore() + " điểm");
+                topList.add(p.getName() + "\n" + p.getHighscore() + " point");
             }
 
         } catch (Exception e) {

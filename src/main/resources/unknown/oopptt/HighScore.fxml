@@ -17,12 +17,12 @@
         </ImageView>
         <Pane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="540.0" prefWidth="960.0" StackPane.alignment="CENTER">
             <children>
-                <Canvas height="72.0" layoutX="337.0" layoutY="225.0" width="127.0" />
-                <Canvas height="66.0" layoutX="561.0" layoutY="375.0" width="127.0" />
-                <Canvas height="66.0" layoutX="565.0" layoutY="305.0" width="127.0" />
-                <Canvas height="66.0" layoutX="565.0" layoutY="228.0" width="127.0" />
-                <Canvas height="72.0" layoutX="337.0" layoutY="369.0" width="127.0" />
-                <Canvas height="72.0" layoutX="337.0" layoutY="297.0" width="127.0" />
+                <Canvas fx:id="p1" height="72.0" layoutX="337.0" layoutY="225.0" width="127.0" />
+                <Canvas fx:id="p2" height="66.0" layoutX="561.0" layoutY="375.0" width="127.0" />
+                <Canvas fx:id="p3" height="66.0" layoutX="565.0" layoutY="305.0" width="127.0" />
+                <Canvas fx:id="p4" height="66.0" layoutX="565.0" layoutY="228.0" width="127.0" />
+                <Canvas fx:id="p5" height="72.0" layoutX="337.0" layoutY="369.0" width="127.0" />
+                <Canvas fx:id="p6" height="72.0" layoutX="337.0" layoutY="297.0" width="127.0" />
                 <Button fx:id="btnOut" alignment="CENTER" layoutX="665.0" layoutY="169.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" onAction="#handleOut" style="-fx-background-color: transparent;">
                     <graphic>
                         <ImageView fitHeight="59.0" fitWidth="68.0" pickOnBounds="true" preserveRatio="true">

@@ -125,8 +125,9 @@ public class MenuRotateController {
     /* ================== Actions ================== */
 
     @FXML
-    public void HighScore(ActionEvent event) {
-
+    public void HighScore(ActionEvent e) {
+       // FXMLLoader fx = new FXMLLoader(getClass().getResource(""));
+        switchTo("/unknown/oopptt/HighScore.fxml",e,3);
     }
     @FXML
     public void onRotateLeft() {
@@ -187,20 +188,20 @@ public class MenuRotateController {
 
     private void startAdventure(ActionEvent e) {
         SoundManager.playSoundEffect("click.mp3");
-        switchTo("/unknown/oopptt/GameScreen.fxml", e,true);
+        switchTo("/unknown/oopptt/GameScreen.fxml", e,1);
         // TODO: load AdventureScreen.fxml và setRoot
     }
 
     private void goBattle(ActionEvent e) {
         SoundManager.playSoundEffect("click.mp3");
-        switchTo("/unknown/oopptt/BattleScreen.fxml", e,false);
+        switchTo("/unknown/oopptt/BattleScreen.fxml", e,2);
         // TODO: load BattleScreen.fxml và setRoot
     }
 
     private void openHelp(ActionEvent e) {
         SoundManager.playSoundEffect("click.mp3");
         System.out.println("Open Help");
-        switchTo("/unknown/oopptt/Info.fxml", e,false);
+        switchTo("/unknown/oopptt/Info.fxml", e,2);
         // TODO: load Help.fxml và setRoot
 
     }
@@ -235,18 +236,23 @@ public class MenuRotateController {
         Image a = load(primary);
         return a != null ? a : load(fallback);
     }
-    private void switchTo(String fxml, ActionEvent e,boolean first) {
+    private void switchTo(String fxml, ActionEvent e,int first) {
         try {
             FXMLLoader nextFx = new FXMLLoader(getClass().getResource(fxml));
             Parent root = nextFx.load();
             Stage stage = (Stage) ((Node) e.getSource()).getScene().getWindow();
-            if (first) {
+            if (first == 1 ) {
                 Game_Screen_Controller controller = nextFx.getController();
                 stage.getScene().setRoot(root);
                 controller.setData(data);
             }
-            else{
+            if(first == 2) {
                 stage.getScene().setRoot(root);
+            }
+            if(first == 3) {
+                HighScoreController controller = nextFx.getController();
+                stage.getScene().setRoot(root);
+                controller.setData(data);
             }
         } catch (Exception ex) {
             ex.printStackTrace();
