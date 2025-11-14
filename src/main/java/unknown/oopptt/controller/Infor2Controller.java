@@ -7,6 +7,7 @@ import javafx.scene.Scene;
 import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
 import javafx.stage.Window;
+import unknown.oopptt.api.SoundManager;
 
 import java.io.IOException;
 
@@ -16,6 +17,7 @@ public class Infor2Controller {
 
     @FXML
     public void handleOut() {
+        SoundManager.playSoundEffect("click.mp3");
         try {
             // Load màn hình MenuRotate
             Parent menuRoot = FXMLLoader.load(
@@ -51,6 +53,7 @@ public class Infor2Controller {
 
     @FXML
     public void handleBack() {
+        SoundManager.playSoundEffect("click.mp3");
         try {
             Parent info2Root = FXMLLoader.load(
                     getClass().getResource("/unknown/oopptt/Info.fxml"));
@@ -76,6 +79,7 @@ public class Infor2Controller {
 
     @FXML
     public void handleNext() {
+        SoundManager.playSoundEffect("click.mp3");
         try {
             Parent info2Root = FXMLLoader.load(
                     getClass().getResource("/unknown/oopptt/Info3.fxml"));
