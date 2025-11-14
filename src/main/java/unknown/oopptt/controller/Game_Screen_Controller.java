@@ -66,14 +66,16 @@ public class Game_Screen_Controller {
     private ImageView gameBackground;
     @FXML
     Label scoreLabel;
-    @FXML Label diem;
+    @FXML
+    Label diem;
     @FXML
     Label scoreLabel1;
     @FXML
     Button btnRestart, btnNext, btnEscape;
     @FXML
     Button btnEscape1;
-    @FXML Label live;
+    @FXML
+    Label live;
     @FXML
     private StackPane endGameOverlay;
     @FXML
@@ -101,7 +103,7 @@ public class Game_Screen_Controller {
 
     private boolean isSpam = false;
     private String newS = new File("src/main/resources/graphic/bgr_ex").toString();
-    private  ParallaxBackground  fullScrene = new ParallaxBackground(1900,1200, newS) ;
+    private ParallaxBackground fullScrene = new ParallaxBackground(1900, 1200, newS);
 
     @FXML
     public void initialize() {
@@ -109,7 +111,7 @@ public class Game_Screen_Controller {
         level.start();
         preloadAssets();
         layout_game.getChildren().add(0, bg.getRoot());
-        stack_root.getChildren().add(0,fullScrene.getRoot());
+        stack_root.getChildren().add(0, fullScrene.getRoot());
         stack_root.setAlignment(Pos.CENTER);
         fullScrene.getRoot().prefWidthProperty().bind(stack_root.widthProperty());
         fullScrene.getRoot().prefHeightProperty().bind(stack_root.heightProperty());
@@ -277,6 +279,7 @@ public class Game_Screen_Controller {
     }
 
     private void showEndGame() {
+        data.saveScore(data.getNamePlayer(), player.getPoints(data.getNamePlayer()), player.getPoints(data.getNamePlayer()), "solo");
         layout_game.getChildren().remove(paddleLogic.getImageView());
         for (Ball ball : gameBall) {
             layout_game.getChildren().remove(ball.getImageView());
@@ -303,15 +306,15 @@ public class Game_Screen_Controller {
 
             }
             if (enemy instanceof BasicEnemy) {
-                    layout_game.getChildren().remove(enemy.getImageView());
-                    gameEnemies.remove(i);
+                layout_game.getChildren().remove(enemy.getImageView());
+                gameEnemies.remove(i);
             }
 
             if (enemy instanceof BossEnemy) {
                 BossEnemy bossEnemy = (BossEnemy) enemy;
-                    layout_game.getChildren().remove(enemy.getImageView());
-                    bossEnemy.clearShooter();
-                    gameEnemies.remove(i);
+                layout_game.getChildren().remove(enemy.getImageView());
+                bossEnemy.clearShooter();
+                gameEnemies.remove(i);
 
             }
 
@@ -592,8 +595,8 @@ public class Game_Screen_Controller {
 
     private void gameBall(double dt) {
 
-        live.setText("Live: "+player.getAlive(data.getNamePlayer()));
-        diem.setText("Score:"+player.getPoints(data.getNamePlayer()));
+        live.setText("Live: " + player.getAlive(data.getNamePlayer()));
+        diem.setText("Score:" + player.getPoints(data.getNamePlayer()));
         if (gameBall.isEmpty()) {
             if (player.getAlive(data.getNamePlayer()) > 0) {
                 Ball newBall = new Ball(paddleLogic.getPos_x(),
