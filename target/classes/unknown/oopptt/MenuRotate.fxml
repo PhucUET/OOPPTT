@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.image.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+
+<StackPane fx:id="root" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="unknown.oopptt.controller.MenuRotateController">
+
+    <children>
+        <!-- Nền (tuỳ chọn) -->
+<!--        <ImageView fx:id="background" fitHeight="400.0" fitWidth="600.0" pickOnBounds="true" preserveRatio="false">-->
+<!--             <image>-->
+<!--                <Image url="@../../graphic/Space3.png" />-->
+<!--             </image>-->
+<!--        </ImageView>-->
+
+        <BorderPane>
+            <!-- TOP: Logo + Tiêu đề + ESC/Mute -->
+            <top>
+                <StackPane prefHeight="200" BorderPane.alignment="CENTER">
+                    <children>
+                        <!-- Logo (tuỳ chọn) -->
+                        <ImageView fitHeight="200" fitWidth="500" preserveRatio="true">
+                            <image>
+                                <Image url="@../../graphic/BG.png" />
+                            </image>
+                        </ImageView>
+
+                        <!-- ESC + Mute -->
+                        <HBox alignment="TOP_RIGHT" spacing="8" StackPane.alignment="TOP_RIGHT">
+                            <children>
+                        <Button fx:id="btnHS" blendMode="COLOR_DODGE" mnemonicParsing="false" onAction="#HighScore" prefHeight="39.0" prefWidth="125.0" text="HighScore">
+                           <font>
+                              <Font size="18.0" />
+                           </font>
+                        </Button>
+                                <Button fx:id="btnMute" blendMode="COLOR_DODGE" onAction="#onToggleMute" prefHeight="39.0" prefWidth="45.0" text="🔊">
+                           <font>
+                              <Font size="18.0" />
+                           </font></Button>
+                                <Button fx:id="btnEsc" blendMode="COLOR_DODGE" onAction="#onEscape" prefHeight="40.0" prefWidth="48.0" text="𝐄𝐒𝐂" />
+                            </children>
+                        </HBox>
+                    </children>
+                </StackPane>
+            </top>
+
+            <!-- CENTER: 5 cột: [Left] [<] [Center] [>] [Right] -->
+            <center>
+                <GridPane hgap="50" vgap="0" BorderPane.alignment="CENTER">
+                    <columnConstraints>
+                        <ColumnConstraints prefWidth="500" />
+                        <ColumnConstraints prefWidth="40" />
+                        <ColumnConstraints prefWidth="500" />
+                        <ColumnConstraints prefWidth="40" />
+                        <ColumnConstraints prefWidth="500" />
+                    </columnConstraints>
+                    <rowConstraints>
+                        <RowConstraints prefHeight="600" />
+                    </rowConstraints>
+
+
+                    <!-- Ô trung tâm -->
+                    <StackPane fx:id="paneCenter" GridPane.columnIndex="2">
+                        <children>
+                            <ImageView fx:id="imgCenter" blendMode="EXCLUSION" fitHeight="500" fitWidth="450" preserveRatio="true" />
+                        </children>
+                    </StackPane>
+
+                    <!-- Arrow trái -->
+                    <StackPane alignment="CENTER_RIGHT" GridPane.columnIndex="1">
+                        <children>
+                            <Button fx:id="btnLeft" blendMode="SOFT_LIGHT" onAction="#onRotateRight" prefHeight="100.0" prefWidth="36" text="◀" />
+                        </children>
+                    </StackPane>
+
+                    <!-- Arrow phải -->
+                    <StackPane alignment="CENTER_LEFT" GridPane.columnIndex="3">
+                        <children>
+                            <Button fx:id="btnRight" blendMode="SOFT_LIGHT" onAction="#onRotateLeft" prefHeight="100.0" prefWidth="36" text="▶" />
+                        </children>
+                    </StackPane>
+
+                    <!-- Ô trái (thumbnail) -->
+                    <VBox fx:id="paneLeft" alignment="CENTER_RIGHT">
+                        <children>
+                            <ImageView fx:id="imgLeft" blendMode="EXCLUSION" fitHeight="180" fitWidth="100" preserveRatio="true" />
+                        </children>
+                    </VBox>
+
+                    <!-- Ô phải (thumbnail) -->
+                    <VBox fx:id="paneRight" alignment="CENTER_LEFT" GridPane.columnIndex="4">
+                        <children>
+                            <ImageView fx:id="imgRight" blendMode="EXCLUSION" fitHeight="180" fitWidth="100" preserveRatio="true" />
+                        </children>
+                    </VBox>
+
+                </GridPane>
+            </center>
+         <bottom>
+            <StackPane alignment="TOP_CENTER" prefHeight="100.0" prefWidth="200.0" BorderPane.alignment="TOP_CENTER">
+               <children>
+                  <Button fx:id="btnSelect" blendMode="COLOR_DODGE" mnemonicParsing="false" onAction="#onSelectCenter" prefHeight="41.0" prefWidth="200.0" text="(◞‸◟)☞ 𝐏𝐋𝐀𝐘">
+                     <font>
+                        <Font size="20.0" />
+                     </font></Button>
+               </children>
+            </StackPane>
+         </bottom>
+        </BorderPane>
+    </children>
+</StackPane>

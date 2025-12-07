@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.Pane?>
+<?import javafx.scene.layout.StackPane?>
+
+<StackPane fx:id="root" prefHeight="150.0" prefWidth="200.0" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="unknown.oopptt.controller.PauseScreenController">
+    <children>
+        <Pane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="540.0" prefWidth="960.0" StackPane.alignment="CENTER">
+            <children>
+                <ImageView fitHeight="411.0" fitWidth="555.0" layoutX="203.0" layoutY="120.0" pickOnBounds="true" preserveRatio="true">
+                    <image>
+                        <Image url="@../../graphic/pause_0003_window2.png" />
+                    </image>
+                </ImageView>
+                <ImageView fitHeight="150.0" fitWidth="200.0" layoutX="380.0" layoutY="171.0" pickOnBounds="true" preserveRatio="true">
+                    <image>
+                        <Image url="@../../graphic/text_0069_title.png" />
+                    </image>
+                </ImageView>
+                <StackPane layoutX="432.0" layoutY="301.0" prefHeight="60.0" prefWidth="97.0">
+                    <children>
+                        <Button fx:id="btnContinue" mnemonicParsing="false" onAction="#handleContinue" style="-fx-background-color: transparent;">
+                            <graphic>
+                                <ImageView fitHeight="79.0" fitWidth="83.0" pickOnBounds="true" preserveRatio="true">
+                                    <image>
+                                        <Image url="@../../graphic/element_0047_play_button.png" />
+                                    </image>
+                                </ImageView>
+                            </graphic>
+                        </Button>
+                    </children>
+                </StackPane>
+                <StackPane layoutX="631.0" layoutY="398.0" prefHeight="60.0" prefWidth="88.0">
+                    <children>
+                        <Button fx:id="btnHome" mnemonicParsing="false" onAction="#openHome" style="-fx-background-color: transparent;">
+                            <graphic>
+                                <ImageView fitHeight="50.0" fitWidth="46.0" pickOnBounds="true" preserveRatio="true">
+                                    <image>
+                                        <Image url="@../../graphic/element_0084_home.png" />
+                                    </image>
+                                </ImageView>
+                            </graphic>
+                        </Button>
+                    </children>
+                </StackPane>
+                <StackPane layoutX="406.0" layoutY="438.0" prefHeight="0.0" prefWidth="133.0">
+                    <children>
+                        <Button fx:id="btnNewGame" mnemonicParsing="false" onAction="#openNewGame" prefHeight="42.0" prefWidth="191.0" style="-fx-background-color: transparent;">
+                            <graphic>
+                                <ImageView fitHeight="32.0" fitWidth="185.0" pickOnBounds="true" preserveRatio="true">
+                                    <image>
+                                        <Image url="@../../graphic/text_0068_NewGame.png" />
+                                    </image>
+                                </ImageView>
+                            </graphic>
+                        </Button>
+                    </children>
+                </StackPane>
+            </children>
+        </Pane>
+    </children>
+</StackPane>
